@@ -3,15 +3,21 @@ package com.example.gtam.ui.theme
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -27,8 +33,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -46,17 +56,36 @@ class Components {
                 context.startActivity(intent)
             },
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.hsl(120.0F, 1.0F, 0.37F),
-                contentColor = Color.White,
+                containerColor = Color.LightGray,
+                contentColor = Color.Black,
                 disabledContainerColor = Color.Transparent,
                 disabledContentColor = Color.Transparent
             ),
+            shape = RoundedCornerShape(0.dp),
             modifier = Modifier.fillMaxWidth()
                 .height(100.dp)
-                .padding(horizontal = 0.dp, vertical = 10.dp)
+                .padding(10.dp, 0.dp, 10.dp, 20.dp)
 
         ) {
             Text(text, fontSize = 30.sp)
+        }
+    }
+
+    @Composable
+    fun ButtonGeneric(onClick: () -> Unit, placeholder: String) {
+        Button(onClick = { onClick },
+            modifier = Modifier.padding(10.dp)
+                .fillMaxWidth()
+                .height(70.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.LightGray,
+                contentColor = Color.Black,
+                disabledContentColor = Color.Transparent,
+                disabledContainerColor = Color.Transparent
+            ),
+            shape = RoundedCornerShape(0.dp)
+        ) {
+                Text(placeholder, fontSize = 24.sp)
         }
     }
 
@@ -81,7 +110,8 @@ class Components {
         TextField(
             value = text,
             onValueChange = { text = it },
-            placeholder = { Text(placeholder, fontSize = 30.sp) },
+            placeholder = { Text(placeholder, fontSize = 26.sp) },
+            textStyle = TextStyle(fontSize = 26.sp),
             modifier = Modifier.padding(10.dp)
                 .fillMaxWidth()
                 .height(70.dp)
@@ -96,9 +126,28 @@ class Components {
             value = text,
             onValueChange = { text = it },
             placeholder = { Text(placeholder, fontSize = 24.sp) },
+            textStyle = TextStyle(fontSize = 24.sp),
             modifier = Modifier.padding(10.dp)
                 .fillMaxWidth()
                 .height(120.dp)
+        )
+    }
+
+    @Composable
+    fun InputFieldNumber(placeholder: String) {
+        var text by remember { mutableStateOf("") }
+
+        TextField(
+            value = text,
+            onValueChange = { newText -> if (newText.all { it.isDigit() }) {
+                text = newText
+            } },
+            placeholder = { Text(placeholder, fontSize = 26.sp) },
+            textStyle = TextStyle(fontSize = 26.sp),
+            modifier = Modifier.padding(10.dp)
+                .fillMaxWidth()
+                .height(70.dp),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
     }
 
@@ -147,6 +196,28 @@ class Components {
                     )
                 }
             }
+        }
+    }
+
+    @Composable
+    fun LittleText(text: String, modifier: Modifier) {
+        Row(modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center) {
+            Text(text, fontSize = 22.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.wrapContentWidth()
+                    .padding(0.dp, 10.dp, 0.dp, 0.dp)
+            )
+        }
+    }
+
+    @Composable
+    fun LittleTextWIButton(text: String, component: Components, message: String) {
+        Row(modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center) {
+            LittleText(text, Modifier.weight(1F))
+            component.InfoButton(message)
         }
     }
 
