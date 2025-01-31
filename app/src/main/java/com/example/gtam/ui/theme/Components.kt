@@ -73,7 +73,7 @@ class Components {
 
     @Composable
     fun ButtonGeneric(onClick: () -> Unit, placeholder: String) {
-        Button(onClick = { onClick },
+        Button(onClick = { onClick() },
             modifier = Modifier.padding(10.dp)
                 .fillMaxWidth()
                 .height(70.dp),
@@ -104,12 +104,11 @@ class Components {
     }
 
     @Composable
-    fun InputField(placeholder: String) {
-        var text by remember { mutableStateOf("") }
+    fun InputField(text: String, onValueChange: (String) -> Unit, placeholder: String) {
 
         TextField(
             value = text,
-            onValueChange = { text = it },
+            onValueChange = onValueChange,
             placeholder = { Text(placeholder, fontSize = 26.sp) },
             textStyle = TextStyle(fontSize = 26.sp),
             modifier = Modifier.padding(10.dp)
@@ -119,12 +118,11 @@ class Components {
     }
 
     @Composable
-    fun InputFieldLarge(placeholder: String) {
-        var text by remember { mutableStateOf("") }
+    fun InputFieldLarge(text: String, onValueChange: (String) -> Unit, placeholder: String) {
 
         TextField(
             value = text,
-            onValueChange = { text = it },
+            onValueChange = onValueChange,
             placeholder = { Text(placeholder, fontSize = 24.sp) },
             textStyle = TextStyle(fontSize = 24.sp),
             modifier = Modifier.padding(10.dp)
@@ -134,13 +132,12 @@ class Components {
     }
 
     @Composable
-    fun InputFieldNumber(placeholder: String) {
-        var text by remember { mutableStateOf("") }
+    fun InputFieldNumber(text: String, onValueChange: (String) -> Unit, placeholder: String) {
 
         TextField(
             value = text,
             onValueChange = { newText -> if (newText.all { it.isDigit() }) {
-                text = newText
+                onValueChange(newText)
             } },
             placeholder = { Text(placeholder, fontSize = 26.sp) },
             textStyle = TextStyle(fontSize = 26.sp),
@@ -212,12 +209,16 @@ class Components {
     }
 
     @Composable
-    fun LittleTextWIButton(text: String, component: Components, message: String) {
+    fun LittleTextWIButton(text: String, message: String) {
         Row(modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center) {
-            LittleText(text, Modifier.weight(1F))
-            component.InfoButton(message)
+            Text(text, fontSize = 22.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.wrapContentWidth()
+                    .padding(0.dp, 10.dp, 0.dp, 0.dp)
+            )
+            InfoButton(message)
         }
     }
 

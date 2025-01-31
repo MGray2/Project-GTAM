@@ -6,6 +6,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Column
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.example.gtam.ui.theme.Components
 import com.example.gtam.ui.theme.GTAMTheme
 import androidx.compose.ui.Modifier
@@ -25,19 +29,24 @@ class Activity1 : ComponentActivity()
         setContent {
             GTAMTheme {
                 Column(modifier = Modifier) {
+                    var botEmail by remember { mutableStateOf("") }
+                    var botPhoneNumber by remember { mutableStateOf("") }
+                    var messageHeader by remember { mutableStateOf("") }
+                    var messageFooter by remember { mutableStateOf("") }
+
                     component.CustomHeader("Bot Account Setup")
                     // Bot Email
-                    component.LittleTextWIButton("Bot Email", component, message1)
-                    component.InputField("Your Email Here")
+                    component.LittleTextWIButton("Bot Email", message1)
+                    component.InputField(botEmail, { botEmail = it },"Your Email Here")
                     // Bot Phone Number
-                    component.LittleTextWIButton("Bot Phone Number", component, message2)
-                    component.InputFieldNumber("Your Phone Number Here")
+                    component.LittleTextWIButton("Bot Phone Number", message2)
+                    component.InputFieldNumber(botPhoneNumber, { botPhoneNumber = it },"Your Phone Number Here")
                     // Message Header
-                    component.LittleTextWIButton("Message Header", component, message3)
-                    component.InputFieldLarge("Message")
+                    component.LittleTextWIButton("Message Header", message3)
+                    component.InputFieldLarge(messageHeader, { messageHeader = it },"Message")
                     // Message Footer
-                    component.LittleTextWIButton("Message Footer", component, message4)
-                    component.InputFieldLarge("Message")
+                    component.LittleTextWIButton("Message Footer", message4)
+                    component.InputFieldLarge(messageFooter, { messageFooter = it },"Message")
                 }
 
             }

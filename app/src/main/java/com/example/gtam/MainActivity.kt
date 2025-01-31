@@ -51,6 +51,7 @@ fun MainMenu() {
         component.LittleText("Setup", modifier = Modifier)
         component.MainMenuButton(context, Activity1::class.java, "Bot Account Setup")
         component.MainMenuButton(context, Activity2::class.java, "Manage Client Info")
+        component.MainMenuButton(context, Activity3::class.java, "Manage Services")
     }
 
 }

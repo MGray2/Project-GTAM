@@ -1,6 +1,7 @@
 package com.example.gtam
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -8,6 +9,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.example.gtam.ui.theme.GTAMTheme
@@ -21,12 +26,15 @@ class Activity2 : ComponentActivity() {
         setContent {
             GTAMTheme {
                 Column (modifier = Modifier) {
+                    var clientEmail by remember { mutableStateOf("") }
+                    var clientPhoneNumber by remember { mutableStateOf("") }
+
                     component.CustomHeader("Manage Clients")
                     component.LittleText("Client's Email", modifier = Modifier)
-                    component.InputField("Email")
+                    component.InputField(clientEmail,{ clientEmail = it },"Email")
                     component.LittleText("Client's Phone Number", modifier = Modifier)
-                    component.InputFieldNumber("Phone Number")
-                    component.ButtonGeneric({ doNothing() }, "Save")
+                    component.InputFieldNumber(clientPhoneNumber,{ clientPhoneNumber = it },"Phone Number")
+                    component.ButtonGeneric({ dataTest(clientPhoneNumber) }, "Save")
                 }
 
             }
@@ -34,6 +42,10 @@ class Activity2 : ComponentActivity() {
     }
 }
 
-fun doNothing() {
+private fun doNothing() {
     return
+}
+
+fun dataTest(input: String) {
+    Log.d("DataTest", "From input: $input")
 }
