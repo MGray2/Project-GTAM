@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,6 +47,7 @@ fun MainMenu() {
             painter = painterResource(id = R.drawable.gtam_screen),
             contentDescription = "GTAM Screen",
             modifier = Modifier.padding(0.dp, 30.dp, 0.dp, 10.dp))
+        component.MainMenuButton(context, Activity4::class.java, "Compose Message")
         component.LittleText("Setup", modifier = Modifier)
         component.MainMenuButton(context, Activity1::class.java, "Bot Account Setup")
         component.MainMenuButton(context, Activity2::class.java, "Manage Client Info")

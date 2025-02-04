@@ -15,6 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
 import com.example.gtam.ui.theme.GTAMTheme
 import com.example.gtam.ui.theme.Components
 
@@ -33,7 +34,7 @@ class Activity2 : ComponentActivity() {
                     component.LittleText("Client's Email", modifier = Modifier)
                     component.InputField(clientEmail,{ clientEmail = it },"Email")
                     component.LittleText("Client's Phone Number", modifier = Modifier)
-                    component.InputFieldNumber(clientPhoneNumber,{ clientPhoneNumber = it },"Phone Number")
+                    component.InputFieldNumber(clientPhoneNumber,{ clientPhoneNumber = it },"Phone Number", KeyboardType.Number)
                     component.ButtonGeneric({ dataTest(clientPhoneNumber) }, "Save")
                 }
 

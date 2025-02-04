@@ -38,3 +38,12 @@ interface UserBotServiceCrossRefDao {
     @Query("SELECT * FROM user_bot_services")
     fun getAllUserBotServices(): Flow<List<UserBotServiceCrossRef>>
 }
+
+@Dao
+interface ClientDao {
+    @Insert
+    suspend fun insertClient(client: Client)
+
+    @Query("SELECT * FROM clients")
+    fun getAllClients(): Flow<List<Client>>
+}

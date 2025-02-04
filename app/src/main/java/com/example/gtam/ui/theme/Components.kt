@@ -3,14 +3,12 @@ package com.example.gtam.ui.theme
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -18,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -33,10 +32,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -44,6 +41,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.gtam.R
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.OutlinedTextField
 
 
 class Components {
@@ -111,7 +113,7 @@ class Components {
             onValueChange = onValueChange,
             placeholder = { Text(placeholder, fontSize = 26.sp) },
             textStyle = TextStyle(fontSize = 26.sp),
-            modifier = Modifier.padding(10.dp)
+            modifier = Modifier.padding(9.dp)
                 .fillMaxWidth()
                 .height(70.dp)
         )
@@ -125,14 +127,14 @@ class Components {
             onValueChange = onValueChange,
             placeholder = { Text(placeholder, fontSize = 24.sp) },
             textStyle = TextStyle(fontSize = 24.sp),
-            modifier = Modifier.padding(10.dp)
+            modifier = Modifier.padding(9.dp)
                 .fillMaxWidth()
                 .height(120.dp)
         )
     }
 
     @Composable
-    fun InputFieldNumber(text: String, onValueChange: (String) -> Unit, placeholder: String) {
+    fun InputFieldNumber(text: String, onValueChange: (String) -> Unit, placeholder: String, keyboardType: KeyboardType) {
 
         TextField(
             value = text,
@@ -141,10 +143,10 @@ class Components {
             } },
             placeholder = { Text(placeholder, fontSize = 26.sp) },
             textStyle = TextStyle(fontSize = 26.sp),
-            modifier = Modifier.padding(10.dp)
+            modifier = Modifier.padding(9.dp)
                 .fillMaxWidth()
                 .height(70.dp),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            keyboardOptions = KeyboardOptions(keyboardType = keyboardType)
         )
     }
 
@@ -219,6 +221,44 @@ class Components {
                     .padding(0.dp, 10.dp, 0.dp, 0.dp)
             )
             InfoButton(message)
+        }
+    }
+
+    @Composable
+    fun InputDropDown() {
+        var expanded by remember { mutableStateOf(false) }
+        var selectedOption by remember { mutableStateOf("Select an option") }
+        val options = listOf("Option 1", "Option 2", "Option 3")
+
+        Box(modifier = Modifier.fillMaxWidth()) {
+            OutlinedTextField(
+                value = selectedOption,
+                onValueChange = {},
+                readOnly = true,
+                modifier = Modifier.fillMaxWidth()
+                    .clickable { expanded = true },
+                trailingIcon = {
+                    Icon(
+                        imageVector = if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                        contentDescription = "Dropdown Icon"
+                    )
+                }
+            )
+
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                options.forEach { option ->
+                    DropdownMenuItem(
+                        text = { Text(option) },
+                        onClick = {
+                            selectedOption = option
+                            expanded = false
+                        }
+                    )
+                }
+            }
         }
     }
 

@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -13,6 +14,8 @@ import androidx.compose.runtime.setValue
 import com.example.gtam.ui.theme.Components
 import com.example.gtam.ui.theme.GTAMTheme
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
 
 
 class Activity1 : ComponentActivity()
@@ -29,7 +32,8 @@ class Activity1 : ComponentActivity()
         setContent {
             GTAMTheme {
                 Column(modifier = Modifier) {
-                    var botEmail by remember { mutableStateOf("") }
+                    var botGmail by remember { mutableStateOf("") }
+                    var botOutlook by remember { mutableStateOf("") }
                     var botPhoneNumber by remember { mutableStateOf("") }
                     var messageHeader by remember { mutableStateOf("") }
                     var messageFooter by remember { mutableStateOf("") }
@@ -37,16 +41,18 @@ class Activity1 : ComponentActivity()
                     component.CustomHeader("Bot Account Setup")
                     // Bot Email
                     component.LittleTextWIButton("Bot Email", message1)
-                    component.InputField(botEmail, { botEmail = it },"Your Email Here")
+                    component.InputField(botGmail, { botGmail = it },"Gmail")
+                    component.InputField(botOutlook, { botOutlook = it }, placeholder = "Outlook")
                     // Bot Phone Number
                     component.LittleTextWIButton("Bot Phone Number", message2)
-                    component.InputFieldNumber(botPhoneNumber, { botPhoneNumber = it },"Your Phone Number Here")
+                    component.InputFieldNumber(botPhoneNumber, { botPhoneNumber = it },"Phone Number", KeyboardType.Number)
                     // Message Header
                     component.LittleTextWIButton("Message Header", message3)
                     component.InputFieldLarge(messageHeader, { messageHeader = it },"Message")
                     // Message Footer
                     component.LittleTextWIButton("Message Footer", message4)
                     component.InputFieldLarge(messageFooter, { messageFooter = it },"Message")
+                    component.ButtonGeneric({ doNothing() }, "Save")
                 }
 
             }
@@ -54,6 +60,8 @@ class Activity1 : ComponentActivity()
     }
 }
 
-
+private fun doNothing() {
+    return
+}
 
 

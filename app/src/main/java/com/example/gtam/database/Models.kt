@@ -7,9 +7,9 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "user_bots")
 data class UserBot(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val gmail: String,
-    val outlook: String,
-    val phoneNumber: String,
+    val gmail: String?,
+    val outlook: String?,
+    val phoneNumber: String?,
     val messageHeader: String,
     val messageFooter: String
 )
@@ -18,7 +18,7 @@ data class UserBot(
 data class Service(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val serviceName: String,
-    val servicePrice: Long
+    val servicePrice: Double
 )
 
 @Entity(
@@ -38,6 +38,6 @@ data class UserBotServiceCrossRef(
 data class Client(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val clientName: String,
-    val clientEmail: String,
-    val clientPhoneNumber: String
+    val clientEmail: String?,
+    val clientPhoneNumber: String?
 )
