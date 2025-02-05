@@ -43,9 +43,11 @@ import androidx.compose.ui.window.Dialog
 import com.example.gtam.R
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.ui.graphics.vector.ImageVector
 
 
 class Components {
@@ -88,6 +90,25 @@ class Components {
             shape = RoundedCornerShape(0.dp)
         ) {
                 Text(placeholder, fontSize = 24.sp)
+        }
+    }
+
+    @Composable
+    fun DeleteButton(onClick: () -> Unit) {
+        Button(
+            onClick = onClick,
+            contentPadding = PaddingValues(0.dp),
+            modifier = Modifier.size(24.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Transparent,
+                contentColor = Color.DarkGray
+            )
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Delete,
+                contentDescription = "Delete",
+                modifier = Modifier.size(24.dp)
+            )
         }
     }
 

@@ -47,6 +47,6 @@ private fun doNothing() {
     return
 }
 
-fun dataTest(input: String) {
+private fun dataTest(input: String) {
     Log.d("DataTest", "From input: $input")
 }

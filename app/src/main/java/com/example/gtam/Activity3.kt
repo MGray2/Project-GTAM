@@ -5,20 +5,27 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
@@ -26,9 +33,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.gtam.database.Service
 import com.example.gtam.ui.theme.Components
 import com.example.gtam.ui.theme.GTAMTheme
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 // Manage Services
@@ -65,18 +69,16 @@ class Activity3 : ComponentActivity() {
                         modifier = Modifier.verticalScroll(rememberScrollState())
                             .fillMaxWidth().padding(10.dp)
                     ) {
+                        var itemCount = 0
                         serviceList.forEach { service ->
-                            Text(text = "${service.serviceName} - $${service.servicePrice}") // Example display
+                            ServiceWindow(itemCount, service, dbServices, component)
+                            itemCount++
                         }
                     }
                 }
             }
         }
     }
-}
-
-private fun doNothing() {
-    return
 }
 
 class ActivityViewModel : ViewModel() {
@@ -90,5 +92,39 @@ class ActivityViewModel : ViewModel() {
         serviceDAO.insertService(newService)
         }
 
+    }
+
+    fun deleteService(serviceID: Long) {
+        viewModelScope.launch {
+            serviceDAO.getServiceById(serviceID).collect { targetService ->
+                if (targetService != null) {
+                    serviceDAO.deleteService(targetService)
+                }
+            }
+        }
+    }
+}
+
+// List of Services are styled here
+@Composable
+private fun ServiceWindow(counter: Int, iterable: Service, database: ActivityViewModel, component: Components) {
+    if (counter % 2 != 0) {
+        ServiceRow(modifier = Modifier.background(Color.LightGray), iterable, database, component)
+    } else {
+        ServiceRow(modifier = Modifier, iterable, database, component)
+    }
+}
+
+@Composable
+private fun ServiceRow(modifier: Modifier, iterable: Service, database: ActivityViewModel, component: Components) {
+    Row(modifier = modifier
+        .fillMaxWidth()
+        .wrapContentHeight()
+        .padding(10.dp),
+        verticalAlignment = Alignment.CenterVertically) {
+        Text(text = "${iterable.serviceName} - $${iterable.servicePrice}",
+            modifier = Modifier.weight(1F),
+            fontSize = 20.sp)
+        component.DeleteButton { database.deleteService(iterable.id) }
     }
 }
