@@ -3,6 +3,7 @@ package com.example.gtam.ui.theme
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -281,6 +282,10 @@ class Components {
                 }
             }
         }
+    }
+
+    fun ShowToast(message: String, context: Context) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
 
 }

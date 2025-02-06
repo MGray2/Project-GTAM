@@ -49,4 +49,10 @@ interface ClientDao {
 
     @Query("SELECT * FROM clients")
     fun getAllClients(): Flow<List<Client>>
+
+    @Delete
+    suspend fun deleteClient(client: Client)
+
+    @Query("SELECT * FROM clients WHERE id = :target")
+    fun getClientById(target: Long): Flow<Client?>
 }

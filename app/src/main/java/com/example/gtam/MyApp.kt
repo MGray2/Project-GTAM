@@ -3,6 +3,8 @@ package com.example.gtam
 import android.app.Application
 import androidx.room.Room
 import com.example.gtam.database.AppDatabase
+import com.example.gtam.database.Migrations
+
 
 class MyApp : Application() {
     companion object {
@@ -15,6 +17,6 @@ class MyApp : Application() {
             applicationContext,
             AppDatabase::class.java,
             "app_database"
-        ).build()
+        ).addMigrations(Migrations.MIGRATION_1_2).build()
     }
 }
