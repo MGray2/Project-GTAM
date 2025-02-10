@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -45,9 +46,11 @@ import com.example.gtam.R
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.graphics.vector.ImageVector
 
 
@@ -61,7 +64,7 @@ class Components {
                 context.startActivity(intent)
             },
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.LightGray,
+                containerColor = Green194,
                 contentColor = Color.Black,
                 disabledContainerColor = Color.Transparent,
                 disabledContentColor = Color.Transparent
@@ -135,7 +138,7 @@ class Components {
             onValueChange = onValueChange,
             placeholder = { Text(placeholder, fontSize = 26.sp) },
             textStyle = TextStyle(fontSize = 26.sp),
-            modifier = Modifier.padding(9.dp)
+            modifier = Modifier.padding(9.dp, 0.dp)
                 .fillMaxWidth()
                 .height(70.dp)
         )
@@ -149,7 +152,7 @@ class Components {
             onValueChange = onValueChange,
             placeholder = { Text(placeholder, fontSize = 24.sp) },
             textStyle = TextStyle(fontSize = 24.sp),
-            modifier = Modifier.padding(9.dp)
+            modifier = Modifier.padding(9.dp, 0.dp)
                 .fillMaxWidth()
                 .height(120.dp)
         )
@@ -165,7 +168,7 @@ class Components {
             } },
             placeholder = { Text(placeholder, fontSize = 26.sp) },
             textStyle = TextStyle(fontSize = 26.sp),
-            modifier = Modifier.padding(9.dp)
+            modifier = Modifier.padding(9.dp, 0.dp)
                 .fillMaxWidth()
                 .height(70.dp),
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType)
@@ -184,7 +187,7 @@ class Components {
                 contentColor = Color.DarkGray
             )
         ) {
-            Icon(painter = painterResource(id = R.drawable.info),
+            Icon(imageVector = Icons.Filled.Info,
                 contentDescription = "Info",
                 modifier = Modifier.size(20.dp))
         }
@@ -223,11 +226,12 @@ class Components {
     @Composable
     fun LittleText(text: String, modifier: Modifier) {
         Row(modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center) {
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically) {
             Text(text, fontSize = 22.sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.wrapContentWidth()
-                    .padding(0.dp, 10.dp, 0.dp, 0.dp)
+                    .padding(0.dp, 15.dp, 0.dp, 0.dp)
             )
         }
     }
@@ -240,42 +244,54 @@ class Components {
             Text(text, fontSize = 22.sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.wrapContentWidth()
-                    .padding(0.dp, 10.dp, 0.dp, 0.dp)
+                    .padding(0.dp, 15.dp, 0.dp, 0.dp)
             )
             InfoButton(message)
         }
     }
 
+    // Composable dropdown function
     @Composable
-    fun InputDropDown() {
+    fun InputDropDown(
+        options: List<Pair<Long, String>>,
+        selectedId: MutableState<Long?>,
+        placeholder: String
+    ) {
         var expanded by remember { mutableStateOf(false) }
-        var selectedOption by remember { mutableStateOf("Select an option") }
-        val options = listOf("Option 1", "Option 2", "Option 3")
+        var selectedName by remember { mutableStateOf(placeholder) }
 
-        Box(modifier = Modifier.fillMaxWidth()) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentSize(Alignment.TopStart)
+        ) {
             OutlinedTextField(
-                value = selectedOption,
+                value = selectedName,
                 onValueChange = {},
                 readOnly = true,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .clickable { expanded = true },
                 trailingIcon = {
                     Icon(
                         imageVector = if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
-                        contentDescription = "Dropdown Icon"
+                        contentDescription = "Dropdown Icon",
+                        modifier = Modifier.clickable { expanded = !expanded }
                     )
                 }
             )
 
             DropdownMenu(
                 expanded = expanded,
-                onDismissRequest = { expanded = false }
+                onDismissRequest = { expanded = false },
+                modifier = Modifier.fillMaxWidth() // Ensures menu width matches text field
             ) {
-                options.forEach { option ->
+                options.forEach { (id, name) ->
                     DropdownMenuItem(
-                        text = { Text(option) },
+                        text = { Text(name) },
                         onClick = {
-                            selectedOption = option
+                            selectedId.value = id  // Store the selected ID
+                            selectedName = name    // Display the selected name
                             expanded = false
                         }
                     )

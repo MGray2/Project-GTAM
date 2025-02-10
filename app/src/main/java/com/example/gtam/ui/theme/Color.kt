@@ -1,6 +1,7 @@
 package com.example.gtam.ui.theme
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.colorspace.ColorSpaces
 
 val Purple80 = Color(0xFFD0BCFF)
 val PurpleGrey80 = Color(0xFFCCC2DC)
@@ -12,3 +13,4 @@ val Pink40 = Color(0xFF7D5260)
 
 val Green240 = Color(0, 240, 0)
 val Green255 = Color(149, 255, 0)
+val Green194 = Color.hsl(121F, 0.9F, 0.4F, 1F, colorSpace = ColorSpaces.Srgb)
