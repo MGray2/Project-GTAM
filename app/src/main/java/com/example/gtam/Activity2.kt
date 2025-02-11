@@ -2,13 +2,11 @@ package com.example.gtam
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -35,11 +33,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.gtam.database.Client
-import com.example.gtam.database.Service
 import com.example.gtam.ui.theme.GTAMTheme
 import com.example.gtam.ui.theme.Components
 import kotlinx.coroutines.launch
-import java.util.Locale
 
 // Manage Clients
 class Activity2 : ComponentActivity() {

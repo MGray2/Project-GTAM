@@ -4,9 +4,9 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "user_bots")
+@Entity(tableName = "user_bot")
 data class UserBot(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    @PrimaryKey val id: Long = 1,
     val gmail: String?,
     val outlook: String?,
     val phoneNumber: String?,

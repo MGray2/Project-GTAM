@@ -3,16 +3,20 @@ package com.example.gtam.database
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface UserBotDao {
-    @Insert
-    suspend fun insertUserBot(userBot: UserBot)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertOrUpdate(userBot: UserBot)
 
-    @Query("SELECT * FROM user_bots")
-    fun getAllUserBots(): Flow<List<UserBot>>
+    @Query("SELECT * FROM user_bot WHERE id = 1 LIMIT 1")
+    fun getUserBot(): Flow<UserBot?>
+
+    @Query("UPDATE user_bot SET gmail = :gmail, outlook = :outlook, phoneNumber = :phoneNumber, messageHeader = :messageHeader, messageFooter = :messageFooter WHERE id = 1")
+    suspend fun updateUserBot(gmail: String, outlook: String, phoneNumber: String, messageHeader: String, messageFooter: String)
 
     @Delete
     suspend fun deleteUserBot(userBot: UserBot)
