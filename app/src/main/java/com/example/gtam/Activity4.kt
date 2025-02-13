@@ -11,17 +11,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import com.example.gtam.database.Client
 import com.example.gtam.ui.theme.Components
 import com.example.gtam.ui.theme.GTAMTheme
+import com.example.gtam.viewmodel.AllViewModel
 
 // Compose Message
 class Activity4 : ComponentActivity() {
+    // Global
     private val component = Components()
     private val dbAll: AllViewModel by viewModels()
 
@@ -29,10 +26,14 @@ class Activity4 : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            // Database
+            val clientList by dbAll.allClients.observeAsState(initial = emptyList())
+            // Local
+            val clientOptions = clientList.map { it.id to it.clientName }
+            val clientSelected = remember { mutableStateOf<Long?>(null) }
+
+            // UI
             GTAMTheme {
-                val clientList by dbAll.allClients.observeAsState(initial = emptyList())
-                val clientOptions = clientList.map { it.id to it.clientName }
-                val clientSelected = remember { mutableStateOf<Long?>(null) }
                 Column() {
                     component.CustomHeader("Compose Message")
                     component.LittleText("Message Recipient", modifier = Modifier)
@@ -45,8 +46,3 @@ class Activity4 : ComponentActivity() {
     }
 }
 
-class AllViewModel : ViewModel() {
-    private val clientDAO = MyApp.database.clientDao()
-
-    val allClients: LiveData<List<Client>> = clientDAO.getAllClients().asLiveData()
-}

@@ -16,17 +16,12 @@ import com.example.gtam.ui.theme.Components
 import com.example.gtam.ui.theme.GTAMTheme
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.example.gtam.database.UserBot
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.launch
+import com.example.gtam.viewmodel.BotViewModel
 
 // Bot Account Setup
-class Activity1 : ComponentActivity()
-{
+class Activity1 : ComponentActivity() {
+    // Global
     private val component = Components()
     private val dbBot: BotViewModel by viewModels()
     private val message1 = "This will be the email that the system uses for messaging."
@@ -38,27 +33,29 @@ class Activity1 : ComponentActivity()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            // Local
+            var botGmail by remember { mutableStateOf("") }
+            var botOutlook by remember { mutableStateOf("") }
+            var botPhoneNumber by remember { mutableStateOf("") }
+            var messageHeader by remember { mutableStateOf("") }
+            var messageFooter by remember { mutableStateOf("") }
+            // Database
+            val bot by dbBot.userBot.observeAsState(initial = UserBot(id = 1, gmail = "", outlook = "", phoneNumber = "", messageHeader = "", messageFooter = ""))
+            if (bot.gmail != null) {
+                botGmail = bot.gmail!!
+            }
+            if (bot.outlook != null) {
+                botOutlook = bot.outlook!!
+            }
+            if (bot.phoneNumber != null) {
+                botPhoneNumber = bot.phoneNumber!!
+            }
+            messageHeader = bot.messageHeader
+            messageFooter = bot.messageFooter
+
+            // UI
             GTAMTheme {
                 Column(modifier = Modifier) {
-                    var botGmail by remember { mutableStateOf("") }
-                    var botOutlook by remember { mutableStateOf("") }
-                    var botPhoneNumber by remember { mutableStateOf("") }
-                    var messageHeader by remember { mutableStateOf("") }
-                    var messageFooter by remember { mutableStateOf("") }
-                    val bot by dbBot.userBot.observeAsState(initial = UserBot(id = 1, gmail = "", outlook = "", phoneNumber = "", messageHeader = "", messageFooter = ""))
-
-                    if (bot.gmail != null) {
-                        botGmail = bot.gmail!!
-                    }
-                    if (bot.outlook != null) {
-                        botOutlook = bot.outlook!!
-                    }
-                    if (bot.phoneNumber != null) {
-                        botPhoneNumber = bot.phoneNumber!!
-                    }
-                    messageHeader = bot.messageHeader
-                    messageFooter = bot.messageFooter
-
                     component.CustomHeader("Bot Account Setup")
                     // Bot Email
                     component.LittleTextWIButton("Bot Email", message1)
@@ -81,47 +78,6 @@ class Activity1 : ComponentActivity()
     }
 }
 
-class BotViewModel : ViewModel() {
-    private val botDAO = MyApp.database.userBotDao()
 
-    private val _userBot = MutableLiveData<UserBot>()
-    val userBot: LiveData<UserBot> get() = _userBot
-
-    init {
-        viewModelScope.launch {
-            _userBot.value = getOrCreateBot()
-        }
-    }
-
-    // Find instance of UserBot or else create one
-    private suspend fun getOrCreateBot(): UserBot {
-        val existingBot = botDAO.getUserBot().firstOrNull()
-        return if (existingBot != null) {
-            existingBot
-        } else {
-            val defaultBot = UserBot(
-                id = 1,
-                gmail = null,
-                outlook = null,
-                phoneNumber = null,
-                messageHeader = "",
-                messageFooter = ""
-            )
-            botDAO.insertOrUpdate(defaultBot)
-            defaultBot
-        }
-    }
-
-    // Update changes to UserBot
-    fun updateBot(gmail: String, outlook: String, phoneNumber: String, messageHeader: String, messageFooter: String) {
-        viewModelScope.launch {
-            botDAO.updateUserBot(gmail = gmail,
-                outlook = outlook,
-                phoneNumber = phoneNumber,
-                messageHeader = messageHeader,
-                messageFooter = messageFooter)
-        }
-    }
-}
 
 

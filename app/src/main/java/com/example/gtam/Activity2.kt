@@ -28,17 +28,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
 import com.example.gtam.database.Client
 import com.example.gtam.ui.theme.GTAMTheme
 import com.example.gtam.ui.theme.Components
-import kotlinx.coroutines.launch
+import com.example.gtam.viewmodel.ClientViewModel
 
 // Manage Clients
 class Activity2 : ComponentActivity() {
+    // Global
     private val component = Components()
     private val dbClients: ClientViewModel by viewModels()
 
@@ -46,24 +43,32 @@ class Activity2 : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            // Local
+            val context = LocalContext.current
+            var clientName by remember { mutableStateOf("") }
+            var clientEmail by remember { mutableStateOf("") }
+            var clientPhoneNumber by remember { mutableStateOf("") }
+            // Database
+            val clientList by dbClients.allClients.observeAsState(initial = emptyList())
+
+            // UI
             GTAMTheme {
                 Column (modifier = Modifier) {
-                    val context = LocalContext.current
-                    var clientName by remember { mutableStateOf("") }
-                    var clientEmail by remember { mutableStateOf("") }
-                    var clientPhoneNumber by remember { mutableStateOf("") }
-                    val clientList by dbClients.allClients.observeAsState(initial = emptyList())
-
                     component.CustomHeader("Manage Clients")
+                    // Name
                     component.LittleText("Client's Name", modifier = Modifier)
                     component.InputField(clientName, { clientName = it }, "Name")
+                    // Email
                     component.LittleText("Client's Email", modifier = Modifier)
                     component.InputField(clientEmail,{ clientEmail = it },"Email")
+                    // Phone Number
                     component.LittleText("Client's Phone Number", modifier = Modifier)
                     component.InputFieldNumber(clientPhoneNumber,{ clientPhoneNumber = it },"Phone Number", KeyboardType.Number)
+                    // Save Button
                     component.ButtonGeneric({
                         saveClient(clientName, clientEmail, clientPhoneNumber, dbClients, context, component)
                     }, "Save")
+                    // Window for viewing Clients
                     Column(
                         modifier = Modifier.verticalScroll(rememberScrollState())
                             .fillMaxWidth().padding(10.dp)
@@ -81,34 +86,7 @@ class Activity2 : ComponentActivity() {
     }
 }
 
-class ClientViewModel : ViewModel() {
-    private val clientDAO = MyApp.database.clientDao()
-
-    val allClients: LiveData<List<Client>> = clientDAO.getAllClients().asLiveData()
-
-    fun insertClient(clientName: String, email: String?, phoneNumber: String?) {
-        if (email.isNullOrBlank() && phoneNumber.isNullOrBlank()) {
-            return
-        }
-        viewModelScope.launch {
-            val newClient = Client(clientName = clientName,
-                clientEmail = email,
-                clientPhoneNumber = phoneNumber)
-            clientDAO.insertClient(newClient)
-        }
-    }
-
-    fun deleteClient(clientId: Long) {
-        viewModelScope.launch {
-            clientDAO.getClientById(clientId).collect { targetClient ->
-                if (targetClient != null) {
-                    clientDAO.deleteClient(targetClient)
-                }
-            }
-        }
-    }
-}
-
+// Outsourced functionality for save button
 private fun saveClient(clientName: String, clientEmail: String, clientPhoneNumber: String, database: ClientViewModel, context: Context, component: Components) {
     if (clientName.isNotBlank()) {
         if (clientEmail.isNotBlank() || clientPhoneNumber.isNotBlank()) {
@@ -121,6 +99,7 @@ private fun saveClient(clientName: String, clientEmail: String, clientPhoneNumbe
     }
 }
 
+// Window for displaying the list of Clients
 @Composable
 private fun ClientWindow(counter: Int, iterable: Client, database: ClientViewModel, component: Components) {
     if (counter % 2 != 0) {
@@ -130,6 +109,7 @@ private fun ClientWindow(counter: Int, iterable: Client, database: ClientViewMod
     }
 }
 
+// Additional styling for each client
 @Composable
 private fun ClientRow(modifier: Modifier, iterable: Client, database: ClientViewModel, component: Components) {
     Row(modifier = modifier
