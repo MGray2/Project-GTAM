@@ -46,6 +46,7 @@ class Activity2 : ComponentActivity() {
             // Local
             val context = LocalContext.current
             var clientName by remember { mutableStateOf("") }
+            var clientAddress by remember { mutableStateOf("") }
             var clientEmail by remember { mutableStateOf("") }
             var clientPhoneNumber by remember { mutableStateOf("") }
             // Database
@@ -55,9 +56,10 @@ class Activity2 : ComponentActivity() {
             GTAMTheme {
                 Column (modifier = Modifier) {
                     component.CustomHeader("Manage Clients")
-                    // Name
-                    component.LittleText("Client's Name", modifier = Modifier)
+                    // Identity
+                    component.LittleText("Client's Name / Address", modifier = Modifier)
                     component.InputField(clientName, { clientName = it }, "Name")
+                    component.InputField(clientAddress, { clientAddress = it }, "Address")
                     // Email
                     component.LittleText("Client's Email", modifier = Modifier)
                     component.InputField(clientEmail,{ clientEmail = it },"Email")
@@ -66,7 +68,7 @@ class Activity2 : ComponentActivity() {
                     component.InputFieldNumber(clientPhoneNumber,{ clientPhoneNumber = it },"Phone Number", KeyboardType.Number)
                     // Save Button
                     component.ButtonGeneric({
-                        saveClient(clientName, clientEmail, clientPhoneNumber, dbClients, context, component)
+                        saveClient(clientName, clientAddress, clientEmail, clientPhoneNumber, dbClients, context, component)
                     }, "Save")
                     // Window for viewing Clients
                     Column(
@@ -87,15 +89,15 @@ class Activity2 : ComponentActivity() {
 }
 
 // Outsourced functionality for save button
-private fun saveClient(clientName: String, clientEmail: String, clientPhoneNumber: String, database: ClientViewModel, context: Context, component: Components) {
-    if (clientName.isNotBlank()) {
-        if (clientEmail.isNotBlank() || clientPhoneNumber.isNotBlank()) {
-            database.insertClient(clientName, clientEmail, clientPhoneNumber)
+private fun saveClient(clientName: String?, clientAddress: String?, clientEmail: String?, clientPhoneNumber: String?, database: ClientViewModel, context: Context, component: Components) {
+    if (!clientName.isNullOrBlank() || !clientAddress.isNullOrBlank()) {
+        if (!clientEmail.isNullOrBlank() || !clientPhoneNumber.isNullOrBlank()) {
+            database.insertClient(clientName, clientAddress, clientEmail, clientPhoneNumber)
         } else {
             component.ShowToast("Missing email or phone number.", context)
         }
     } else {
-        component.ShowToast("Missing client name.", context)
+        component.ShowToast("Missing Name or Address.", context)
     }
 }
 
@@ -117,9 +119,15 @@ private fun ClientRow(modifier: Modifier, iterable: Client, database: ClientView
         .wrapContentHeight()
         .padding(10.dp),
         verticalAlignment = Alignment.CenterVertically) {
-        Text(text = iterable.clientName,
-            modifier = Modifier.weight(1F),
-            fontSize = 20.sp)
+        if (!iterable.clientName.isNullOrBlank()) {
+            Text(text = iterable.clientName,
+                modifier = Modifier.weight(1F),
+                fontSize = 20.sp)
+        } else if (!iterable.clientAddress.isNullOrBlank()){
+            Text(text = iterable.clientAddress,
+                modifier = Modifier.weight(1F),
+                fontSize = 20.sp)
+        }
         if (!iterable.clientEmail.isNullOrBlank()) {
             Text(text = iterable.clientEmail,
                 modifier = Modifier.weight(1F),

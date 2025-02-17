@@ -51,7 +51,9 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.lifecycle.LiveData
 
 
 class Components {
@@ -292,6 +294,108 @@ class Components {
                         onClick = {
                             selectedId.value = id  // Store the selected ID
                             selectedName = name    // Display the selected name
+                            expanded = false
+                        }
+                    )
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun InputDropDownLive(
+        optionsLiveData: LiveData<List<Pair<Long, String>>>, // LiveData instead of List
+        selectedId: MutableState<Long?>,
+        placeholder: String
+    ) {
+        var expanded by remember { mutableStateOf(false) }
+        var selectedName by remember { mutableStateOf(placeholder) }
+
+        // Observe LiveData to get the latest options
+        val options by optionsLiveData.observeAsState(initial = emptyList())
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentSize(Alignment.TopStart)
+        ) {
+            OutlinedTextField(
+                value = selectedName,
+                onValueChange = {},
+                readOnly = true,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { expanded = true },
+                trailingIcon = {
+                    Icon(
+                        imageVector = if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                        contentDescription = "Dropdown Icon",
+                        modifier = Modifier.clickable { expanded = !expanded }
+                    )
+                }
+            )
+
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                options.forEach { (id, name) ->
+                    DropdownMenuItem(
+                        text = { Text(name) },
+                        onClick = {
+                            selectedId.value = id  // Store the selected ID
+                            selectedName = name    // Display the selected name
+                            expanded = false
+                        }
+                    )
+                }
+            }
+        }
+    }
+
+    // Composable dropdown function
+    @Composable
+    fun InputDropDownNullable(
+        options: List<Pair<Long, String?>>,
+        selectedId: MutableState<Long?>,
+        placeholder: String
+    ) {
+        var expanded by remember { mutableStateOf(false) }
+        var selectedName by remember { mutableStateOf(placeholder) }
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentSize(Alignment.TopStart)
+        ) {
+            OutlinedTextField(
+                value = selectedName,
+                onValueChange = {},
+                readOnly = true,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { expanded = true },
+                trailingIcon = {
+                    Icon(
+                        imageVector = if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                        contentDescription = "Dropdown Icon",
+                        modifier = Modifier.clickable { expanded = !expanded }
+                    )
+                }
+            )
+
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = Modifier.fillMaxWidth() // Ensures menu width matches text field
+            ) {
+                options.forEach { (id, name) ->
+                    DropdownMenuItem(
+                        text = { Text(name!!) },
+                        onClick = {
+                            selectedId.value = id  // Store the selected ID
+                            selectedName = name!!    // Display the selected name
                             expanded = false
                         }
                     )

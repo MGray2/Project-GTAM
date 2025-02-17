@@ -13,12 +13,14 @@ class ClientViewModel : ViewModel() {
 
     val allClients: LiveData<List<Client>> = clientDAO.getAllClients().asLiveData()
 
-    fun insertClient(clientName: String, email: String?, phoneNumber: String?) {
-        if (email.isNullOrBlank() && phoneNumber.isNullOrBlank()) {
+    fun insertClient(name: String?, address: String?, email: String?, phoneNumber: String?) {
+        if (name.isNullOrBlank() && address.isNullOrBlank() && email.isNullOrBlank() && phoneNumber.isNullOrBlank()) {
             return
         }
         viewModelScope.launch {
-            val newClient = Client(clientName = clientName,
+            val newClient = Client(
+                clientName = name,
+                clientAddress = address,
                 clientEmail = email,
                 clientPhoneNumber = phoneNumber)
             clientDAO.insertClient(newClient)

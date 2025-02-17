@@ -1,5 +1,6 @@
 package com.example.gtam.viewmodel
 
+import android.annotation.SuppressLint
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,6 +10,7 @@ import com.example.gtam.database.UserBot
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
+@SuppressLint("NullSafeMutableLiveData")
 class BotViewModel : ViewModel() {
     private val botDAO = MyApp.database.userBotDao()
 
@@ -17,28 +19,24 @@ class BotViewModel : ViewModel() {
 
     init {
         viewModelScope.launch {
-            _userBot.value = getOrCreateBot()
+            val existingBot = botDAO.getUserBot().firstOrNull()
+            if (existingBot == null) {
+                val defaultBot = UserBot(
+                    id = 1,
+                    gmail = null,
+                    outlook = null,
+                    phoneNumber = null,
+                    messageHeader = "",
+                    messageFooter = ""
+                )
+                botDAO.insertOrUpdate(defaultBot)
+                _userBot.postValue(defaultBot)
+            } else {
+                _userBot.postValue(existingBot)
+            }
         }
     }
 
-    // Find instance of UserBot or else create one
-    private suspend fun getOrCreateBot(): UserBot {
-        val existingBot = botDAO.getUserBot().firstOrNull()
-        return if (existingBot != null) {
-            existingBot
-        } else {
-            val defaultBot = UserBot(
-                id = 1,
-                gmail = null,
-                outlook = null,
-                phoneNumber = null,
-                messageHeader = "",
-                messageFooter = ""
-            )
-            botDAO.insertOrUpdate(defaultBot)
-            defaultBot
-        }
-    }
 
     // Update changes to UserBot
     fun updateBot(gmail: String, outlook: String, phoneNumber: String, messageHeader: String, messageFooter: String) {

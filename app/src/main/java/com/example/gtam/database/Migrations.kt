@@ -18,4 +18,11 @@ object Migrations {
             database.execSQL("CREATE TABLE IF NOT EXISTS `user_bot` (`id` INTEGER PRIMARY KEY NOT NULL, `gmail` TEXT, `outlook` TEXT, `phoneNumber` TEXT, `messageHeader` TEXT, `messageFooter` TEXT)")
         }
     }
+
+    val MIGRATION_3_4 = object : Migration(3, 4) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("ALTER TABLE clients ADD COLUMN clientAddress TEXT")
+            database.execSQL("ALTER TABLE services ADD COLUMN serviceDate TEXT")
+        }
+    }
 }

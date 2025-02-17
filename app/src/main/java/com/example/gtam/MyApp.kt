@@ -17,6 +17,8 @@ class MyApp : Application() {
             applicationContext,
             AppDatabase::class.java,
             "app_database"
-        ).addMigrations(Migrations.MIGRATION_1_2, Migrations.MIGRATION_2_3).build()
+        ).addMigrations(Migrations.MIGRATION_1_2,
+            Migrations.MIGRATION_2_3,
+            Migrations.MIGRATION_3_4).build()
     }
 }

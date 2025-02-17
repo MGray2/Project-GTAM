@@ -15,7 +15,7 @@ class ServiceViewModel : ViewModel() {
 
     fun insertService(serviceName: String, servicePrice: Double) {
         viewModelScope.launch {
-            val newService = Service(serviceName = serviceName, servicePrice = servicePrice)
+            val newService = Service(serviceName = serviceName, servicePrice = servicePrice, serviceDate = null)
             serviceDAO.insertService(newService)
         }
 

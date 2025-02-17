@@ -11,7 +11,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.map
+import com.example.gtam.database.Client
+import com.example.gtam.database.UserBot
 import com.example.gtam.ui.theme.Components
 import com.example.gtam.ui.theme.GTAMTheme
 import com.example.gtam.viewmodel.AllViewModel
@@ -27,17 +32,32 @@ class Activity4 : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             // Database
-            val clientList by dbAll.allClients.observeAsState(initial = emptyList())
+            val allClients: LiveData<List<Client>> = dbAll.allClients
+            val serviceList by dbAll.allServices.observeAsState(initial = emptyList())
+            val bot by dbAll.userBot.observeAsState(initial = UserBot(id = 1, gmail = "", outlook = "", phoneNumber = "", messageHeader = "", messageFooter = ""))
+            val clientOptions: LiveData<List<Pair<Long, String>>> = dbAll.clientDropdownList
             // Local
-            val clientOptions = clientList.map { it.id to it.clientName }
             val clientSelected = remember { mutableStateOf<Long?>(null) }
-
+            var messageHeader by remember { mutableStateOf("") }
+            var messageFooter by remember { mutableStateOf("") }
+            messageHeader = bot.messageHeader
+            messageFooter = bot.messageFooter
             // UI
             GTAMTheme {
                 Column() {
                     component.CustomHeader("Compose Message")
+                    // Message Recipient
                     component.LittleText("Message Recipient", modifier = Modifier)
-                    component.InputDropDown(options = clientOptions, selectedId = clientSelected, "Client")
+                    component.InputDropDownLive(optionsLiveData = clientOptions, selectedId = clientSelected, "Client")
+                    // Body 1
+                    component.LittleText("Message Header", Modifier)
+                    component.InputFieldLarge(messageHeader, { messageHeader = it }, "Header")
+
+                    // Body 2
+                    component.LittleText("Message Footer", modifier = Modifier)
+                    component.InputFieldLarge(messageFooter, { messageFooter = it }, "Footer")
+
+                    // Test Button
                     component.ButtonGeneric({ Log.d("DataTest", "$clientSelected") }, "Test")
                 }
 
