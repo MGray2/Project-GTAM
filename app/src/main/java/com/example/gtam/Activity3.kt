@@ -28,7 +28,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.gtam.database.Service
-import com.example.gtam.ui.theme.Components
+import com.example.gtam.ui.theme.components.*
 import com.example.gtam.ui.theme.GTAMTheme
 import androidx.compose.ui.platform.LocalContext
 import java.util.Locale
@@ -37,7 +37,9 @@ import com.example.gtam.viewmodel.ServiceViewModel
 // Manage Services
 class Activity3 : ComponentActivity() {
     // Global
-    private val component = Components()
+    private val banner = Banners()
+    private val button = Buttons()
+    private val input = Input()
     private val message1 = "Write the name of your service to be selected at message composition."
     private val message2 = "This is the cost of your service, you can also add the same name with a different price."
     private val dbServices: ServiceViewModel by viewModels()
@@ -56,20 +58,20 @@ class Activity3 : ComponentActivity() {
             // UI
             GTAMTheme {
                 Column(modifier = Modifier) {
-                    component.CustomHeader("Manage Services")
+                    banner.CustomHeader("Manage Services")
                     // Service Name
-                    component.LittleTextWIButton("Service", message1)
-                    component.InputField(service, { service = it }, "Service")
+                    banner.LittleText("Service", modifier = Modifier, button, message1)
+                    input.InputField(service, { service = it }, "Service")
                     // Service Price
-                    component.LittleTextWIButton("Price", message2)
-                    component.InputFieldNumber(price, { price = it }, "Price", KeyboardType.Decimal)
+                    banner.LittleText("Price", modifier = Modifier, button, message2)
+                    input.InputFieldNumber(price, { price = it }, "Price", KeyboardType.Decimal)
                     // Save Button
-                    component.ButtonGeneric({
+                    button.ButtonGeneric({
                         if (service != "" && price != "") {
                             dbServices.insertService(service, price.toDouble())
                             service = ""
                             price = "" }
-                        else { component.ShowToast("All fields must be filled.", context) } }, "Add Service")
+                        else { button.showToast("All fields must be filled.", context) } }, "Add Service")
                     // Window to view services
                     Column(
                         modifier = Modifier.verticalScroll(rememberScrollState())
@@ -77,7 +79,7 @@ class Activity3 : ComponentActivity() {
                     ) {
                         var itemCount = 0
                         serviceList.forEach { service ->
-                            ServiceWindow(itemCount, service, dbServices, component)
+                            ServiceWindow(itemCount, service, dbServices, button)
                             itemCount++
                         }
                     }
@@ -89,17 +91,17 @@ class Activity3 : ComponentActivity() {
 
 // Window to view the list of Services
 @Composable
-private fun ServiceWindow(counter: Int, iterable: Service, database: ServiceViewModel, component: Components) {
+private fun ServiceWindow(counter: Int, iterable: Service, database: ServiceViewModel, button: Buttons) {
     if (counter % 2 != 0) {
-        ServiceRow(modifier = Modifier.background(Color.LightGray), iterable, database, component)
+        ServiceRow(modifier = Modifier.background(Color.LightGray), iterable, database, button)
     } else {
-        ServiceRow(modifier = Modifier, iterable, database, component)
+        ServiceRow(modifier = Modifier, iterable, database, button)
     }
 }
 
 // Additional styling for each Service
 @Composable
-private fun ServiceRow(modifier: Modifier, iterable: Service, database: ServiceViewModel, component: Components) {
+private fun ServiceRow(modifier: Modifier, iterable: Service, database: ServiceViewModel, button: Buttons) {
     val rounded = String.format(Locale.US,"%.2f", iterable.servicePrice)
     Row(modifier = modifier
         .fillMaxWidth()
@@ -112,6 +114,6 @@ private fun ServiceRow(modifier: Modifier, iterable: Service, database: ServiceV
         Text(text = "$${rounded}",
             modifier = Modifier.weight(1F),
             fontSize = 20.sp)
-        component.DeleteButton { database.deleteService(iterable.id) }
+        button.DeleteButton { database.deleteService(iterable.id) }
     }
 }

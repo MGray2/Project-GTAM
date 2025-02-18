@@ -14,17 +14,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.map
 import com.example.gtam.database.Client
 import com.example.gtam.database.UserBot
-import com.example.gtam.ui.theme.Components
+import com.example.gtam.ui.theme.components.*
 import com.example.gtam.ui.theme.GTAMTheme
 import com.example.gtam.viewmodel.AllViewModel
 
 // Compose Message
 class Activity4 : ComponentActivity() {
     // Global
-    private val component = Components()
+    private val banner = Banners()
+    private val button = Buttons()
+    private val input = Input()
     private val dbAll: AllViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,20 +46,20 @@ class Activity4 : ComponentActivity() {
             // UI
             GTAMTheme {
                 Column() {
-                    component.CustomHeader("Compose Message")
+                    banner.CustomHeader("Compose Message")
                     // Message Recipient
-                    component.LittleText("Message Recipient", modifier = Modifier)
-                    component.InputDropDownLive(optionsLiveData = clientOptions, selectedId = clientSelected, "Client")
+                    banner.LittleText("Message Recipient", modifier = Modifier)
+                    input.InputDropDown(optionsLiveData = clientOptions, selectedId = clientSelected, "Client")
                     // Body 1
-                    component.LittleText("Message Header", Modifier)
-                    component.InputFieldLarge(messageHeader, { messageHeader = it }, "Header")
+                    banner.LittleText("Message Header", Modifier)
+                    input.InputFieldLarge(messageHeader, { messageHeader = it }, "Header")
 
                     // Body 2
-                    component.LittleText("Message Footer", modifier = Modifier)
-                    component.InputFieldLarge(messageFooter, { messageFooter = it }, "Footer")
+                    banner.LittleText("Message Footer", modifier = Modifier)
+                    input.InputFieldLarge(messageFooter, { messageFooter = it }, "Footer")
 
                     // Test Button
-                    component.ButtonGeneric({ Log.d("DataTest", "$clientSelected") }, "Test")
+                    button.ButtonGeneric({ Log.d("DataTest", "$clientSelected") }, "Test")
                 }
 
             }

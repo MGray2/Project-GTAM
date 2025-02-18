@@ -30,13 +30,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.gtam.database.Client
 import com.example.gtam.ui.theme.GTAMTheme
-import com.example.gtam.ui.theme.Components
+import com.example.gtam.ui.theme.components.*
 import com.example.gtam.viewmodel.ClientViewModel
 
 // Manage Clients
 class Activity2 : ComponentActivity() {
     // Global
-    private val component = Components()
+    private val banner = Banners()
+    private val input = Input()
+    private val button = Buttons()
     private val dbClients: ClientViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,20 +57,20 @@ class Activity2 : ComponentActivity() {
             // UI
             GTAMTheme {
                 Column (modifier = Modifier) {
-                    component.CustomHeader("Manage Clients")
+                    banner.CustomHeader("Manage Clients")
                     // Identity
-                    component.LittleText("Client's Name / Address", modifier = Modifier)
-                    component.InputField(clientName, { clientName = it }, "Name")
-                    component.InputField(clientAddress, { clientAddress = it }, "Address")
+                    banner.LittleText("Client's Name / Address", modifier = Modifier)
+                    input.InputField(clientName, { clientName = it }, "Name")
+                    input.InputField(clientAddress, { clientAddress = it }, "Address")
                     // Email
-                    component.LittleText("Client's Email", modifier = Modifier)
-                    component.InputField(clientEmail,{ clientEmail = it },"Email")
+                    banner.LittleText("Client's Email", modifier = Modifier)
+                    input.InputField(clientEmail,{ clientEmail = it },"Email")
                     // Phone Number
-                    component.LittleText("Client's Phone Number", modifier = Modifier)
-                    component.InputFieldNumber(clientPhoneNumber,{ clientPhoneNumber = it },"Phone Number", KeyboardType.Number)
+                    banner.LittleText("Client's Phone Number", modifier = Modifier)
+                    input.InputFieldNumber(clientPhoneNumber,{ clientPhoneNumber = it },"Phone Number", KeyboardType.Number)
                     // Save Button
-                    component.ButtonGeneric({
-                        saveClient(clientName, clientAddress, clientEmail, clientPhoneNumber, dbClients, context, component)
+                    button.ButtonGeneric({
+                        saveClient(clientName, clientAddress, clientEmail, clientPhoneNumber, dbClients, context, button)
                     }, "Save")
                     // Window for viewing Clients
                     Column(
@@ -77,7 +79,7 @@ class Activity2 : ComponentActivity() {
                     ) {
                         var itemCount = 0
                         clientList.forEach { client ->
-                            ClientWindow(itemCount, client, dbClients, component)
+                            ClientWindow(itemCount, client, dbClients, button)
                             itemCount++
                         }
                     }
@@ -89,31 +91,31 @@ class Activity2 : ComponentActivity() {
 }
 
 // Outsourced functionality for save button
-private fun saveClient(clientName: String?, clientAddress: String?, clientEmail: String?, clientPhoneNumber: String?, database: ClientViewModel, context: Context, component: Components) {
+private fun saveClient(clientName: String?, clientAddress: String?, clientEmail: String?, clientPhoneNumber: String?, database: ClientViewModel, context: Context, button: Buttons) {
     if (!clientName.isNullOrBlank() || !clientAddress.isNullOrBlank()) {
         if (!clientEmail.isNullOrBlank() || !clientPhoneNumber.isNullOrBlank()) {
             database.insertClient(clientName, clientAddress, clientEmail, clientPhoneNumber)
         } else {
-            component.ShowToast("Missing email or phone number.", context)
+            button.showToast("Missing email or phone number.", context)
         }
     } else {
-        component.ShowToast("Missing Name or Address.", context)
+        button.showToast("Missing Name or Address.", context)
     }
 }
 
 // Window for displaying the list of Clients
 @Composable
-private fun ClientWindow(counter: Int, iterable: Client, database: ClientViewModel, component: Components) {
+private fun ClientWindow(counter: Int, iterable: Client, database: ClientViewModel, button: Buttons) {
     if (counter % 2 != 0) {
-        ClientRow(modifier = Modifier.background(Color.LightGray), iterable, database, component)
+        ClientRow(modifier = Modifier.background(Color.LightGray), iterable, database, button)
     } else {
-        ClientRow(modifier = Modifier, iterable, database, component)
+        ClientRow(modifier = Modifier, iterable, database, button)
     }
 }
 
 // Additional styling for each client
 @Composable
-private fun ClientRow(modifier: Modifier, iterable: Client, database: ClientViewModel, component: Components) {
+private fun ClientRow(modifier: Modifier, iterable: Client, database: ClientViewModel, button: Buttons) {
     Row(modifier = modifier
         .fillMaxWidth()
         .wrapContentHeight()
@@ -138,6 +140,6 @@ private fun ClientRow(modifier: Modifier, iterable: Client, database: ClientView
                 modifier = Modifier.weight(1F),
                 fontSize = 20.sp)
         }
-        component.DeleteButton { database.deleteClient(iterable.id) }
+        button.DeleteButton { database.deleteClient(iterable.id) }
     }
 }

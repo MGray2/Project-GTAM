@@ -12,7 +12,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import com.example.gtam.ui.theme.Components
+import com.example.gtam.ui.theme.components.*
 import com.example.gtam.ui.theme.GTAMTheme
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
@@ -22,7 +22,9 @@ import com.example.gtam.viewmodel.BotViewModel
 // Bot Account Setup
 class Activity1 : ComponentActivity() {
     // Global
-    private val component = Components()
+    private val input = Input()
+    private val button = Buttons()
+    private val banner = Banners()
     private val dbBot: BotViewModel by viewModels()
     private val message1 = "This will be the email that the system uses for messaging."
     private val message2 = "This will be the phone number that the system uses for texting."
@@ -56,22 +58,22 @@ class Activity1 : ComponentActivity() {
             // UI
             GTAMTheme {
                 Column(modifier = Modifier) {
-                    component.CustomHeader("Bot Account Setup")
+                    banner.CustomHeader("Bot Account Setup")
                     // Bot Email
-                    component.LittleTextWIButton("Bot Email", message1)
-                    component.InputField(botGmail, { botGmail = it },"Gmail")
-                    component.InputField(botOutlook, { botOutlook = it }, placeholder = "Outlook")
+                    banner.LittleText("Bot Email", modifier = Modifier, button, message1)
+                    input.InputField(botGmail, { botGmail = it },"Gmail")
+                    input.InputField(botOutlook, { botOutlook = it }, placeholder = "Outlook")
                     // Bot Phone Number
-                    component.LittleTextWIButton("Bot Phone Number", message2)
-                    component.InputFieldNumber(botPhoneNumber, { botPhoneNumber = it },"Phone Number", KeyboardType.Number)
+                    banner.LittleText("Bot Phone Number", modifier = Modifier, button, message2)
+                    input.InputFieldNumber(botPhoneNumber, { botPhoneNumber = it },"Phone Number", KeyboardType.Number)
                     // Message Header
-                    component.LittleTextWIButton("Message Header", message3)
-                    component.InputFieldLarge(messageHeader, { messageHeader = it },"Message")
+                    banner.LittleText("Message Header", modifier = Modifier, button, message3)
+                    input.InputFieldLarge(messageHeader, { messageHeader = it },"Message")
                     // Message Footer
-                    component.LittleTextWIButton("Message Footer", message4)
-                    component.InputFieldLarge(messageFooter, { messageFooter = it },"Message")
+                    banner.LittleText("Message Footer", modifier = Modifier, button, message4)
+                    input.InputFieldLarge(messageFooter, { messageFooter = it },"Message")
                     // Save Button
-                    component.ButtonGeneric({ dbBot.updateBot(botGmail, botOutlook, botPhoneNumber, messageHeader, messageFooter) }, "Save")
+                    button.ButtonGeneric({ dbBot.updateBot(botGmail, botOutlook, botPhoneNumber, messageHeader, messageFooter) }, "Save")
                 }
             }
         }
