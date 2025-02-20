@@ -146,6 +146,11 @@ class Input {
         // Observe LiveData to get the latest options
         val options by optionsLiveData.observeAsState(initial = emptyList())
 
+        fun resetDropdown() {
+            selectedId.value = null
+            selectedName = placeholder
+        }
+
         Box(
             modifier = Modifier
                 .fillMaxWidth()

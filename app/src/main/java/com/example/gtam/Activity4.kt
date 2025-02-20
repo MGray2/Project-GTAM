@@ -6,19 +6,34 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.LiveData
-import com.example.gtam.database.Client
+import com.example.gtam.database.Service
 import com.example.gtam.database.UserBot
 import com.example.gtam.ui.theme.components.*
 import com.example.gtam.ui.theme.GTAMTheme
 import com.example.gtam.viewmodel.AllViewModel
+import java.util.Locale
+
 
 // Compose Message
 class Activity4 : ComponentActivity() {
@@ -33,14 +48,16 @@ class Activity4 : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             // Database
-            val allClients: LiveData<List<Client>> = dbAll.allClients
-            val serviceList by dbAll.allServices.observeAsState(initial = emptyList())
             val bot by dbAll.userBot.observeAsState(initial = UserBot(id = 1, gmail = "", outlook = "", phoneNumber = "", messageHeader = "", messageFooter = ""))
             val clientOptions: LiveData<List<Pair<Long, String>>> = dbAll.clientDropdownList
+            val serviceOptions: LiveData<List<Pair<Long, String>>> = dbAll.serviceDropdownList
             // Local
             val clientSelected = remember { mutableStateOf<Long?>(null) }
+            val serviceSelected = remember { mutableStateOf<Long?>(null) }
             var messageHeader by remember { mutableStateOf("") }
             var messageFooter by remember { mutableStateOf("") }
+            val serviceList by dbAll.selectedServices.observeAsState(emptyList())
+
             messageHeader = bot.messageHeader
             messageFooter = bot.messageFooter
             // UI
@@ -54,16 +71,62 @@ class Activity4 : ComponentActivity() {
                     banner.LittleText("Message Header", Modifier)
                     input.InputFieldLarge(messageHeader, { messageHeader = it }, "Header")
 
+                    // Add Services
+                    banner.LittleText("Services", modifier = Modifier)
+                    input.InputDropDown(optionsLiveData = serviceOptions, selectedId = serviceSelected, "Add Service")
+                    button.ButtonGeneric({ dbAll.addService(serviceSelected) }, "Add Service")
+                    // Service Window
+                    Column(modifier = Modifier.verticalScroll(rememberScrollState())
+                        .fillMaxWidth().padding(10.dp)) {
+                        var itemCount = 0
+                        serviceList.forEach {
+                            service -> ServiceWindow(itemCount, service, dbAll, button)
+                            Log.d("DataTest", "$service")
+                            itemCount++
+                        }
+                    }
+
+
                     // Body 2
                     banner.LittleText("Message Footer", modifier = Modifier)
                     input.InputFieldLarge(messageFooter, { messageFooter = it }, "Footer")
 
                     // Test Button
-                    button.ButtonGeneric({ Log.d("DataTest", "$clientSelected") }, "Test")
+                    button.ButtonGeneric({ Log.d("DataTest", "$serviceSelected") }, "Test")
                 }
 
             }
         }
+    }
+}
+
+
+// Window to view the list of Services
+@Composable
+private fun ServiceWindow(counter: Int, iterable: Service, database: AllViewModel, button: Buttons) {
+    if (counter % 2 != 0) {
+        ServiceRow(modifier = Modifier.background(Color.LightGray), iterable, database, button)
+    } else {
+        ServiceRow(modifier = Modifier, iterable, database, button)
+    }
+}
+
+// Additional styling for each Service
+@Composable
+private fun ServiceRow(modifier: Modifier, iterable: Service, database: AllViewModel, button: Buttons) {
+    val rounded = String.format(Locale.US,"%.2f", iterable.servicePrice)
+    Row(modifier = modifier
+        .fillMaxWidth()
+        .wrapContentHeight()
+        .padding(10.dp),
+        verticalAlignment = Alignment.CenterVertically) {
+        Text(text = iterable.serviceName,
+            modifier = Modifier.weight(1F),
+            fontSize = 20.sp)
+        Text(text = "$${rounded}",
+            modifier = Modifier.weight(1F),
+            fontSize = 20.sp)
+        button.RemoveButton { database.removeService(iterable.id) }
     }
 }
 

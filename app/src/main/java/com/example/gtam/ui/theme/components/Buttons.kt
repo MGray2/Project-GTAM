@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
@@ -88,6 +89,25 @@ class Buttons {
         ) {
             Icon(
                 imageVector = Icons.Filled.Delete,
+                contentDescription = "Delete",
+                modifier = Modifier.size(24.dp)
+            )
+        }
+    }
+
+    @Composable
+    fun RemoveButton(onClick: () -> Unit) {
+        Button(
+            onClick = onClick,
+            contentPadding = PaddingValues(0.dp),
+            modifier = Modifier.size(24.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Transparent,
+                contentColor = Color.DarkGray
+            )
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Clear,
                 contentDescription = "Delete",
                 modifier = Modifier.size(24.dp)
             )
