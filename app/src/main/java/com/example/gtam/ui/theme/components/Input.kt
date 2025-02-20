@@ -4,9 +4,11 @@ import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -62,6 +64,24 @@ class Input {
             modifier = Modifier.padding(9.dp, 0.dp)
                 .fillMaxWidth()
                 .height(120.dp)
+        )
+    }
+
+    // Text field with reduced height and even smaller text
+    @Composable
+    fun InputFieldSmall(text: String, onValueChange: (String) -> Unit, placeholder: String) {
+
+        TextField(
+            value = text,
+            onValueChange = onValueChange,
+            placeholder = { Text(
+                placeholder, fontSize = 20.sp,
+                modifier = Modifier.fillMaxHeight()
+            ) },
+            textStyle = TextStyle(fontSize = 20.sp),
+            modifier = Modifier
+                .width(120.dp)
+                .padding(2.dp)
         )
     }
 

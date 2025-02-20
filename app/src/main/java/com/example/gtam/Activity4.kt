@@ -16,6 +16,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -80,7 +81,7 @@ class Activity4 : ComponentActivity() {
                         .fillMaxWidth().padding(10.dp)) {
                         var itemCount = 0
                         serviceList.forEach {
-                            service -> ServiceWindow(itemCount, service, dbAll, button)
+                            service -> ServiceWindow(itemCount, service, dbAll, input, button)
                             Log.d("DataTest", "$service")
                             itemCount++
                         }
@@ -92,7 +93,7 @@ class Activity4 : ComponentActivity() {
                     input.InputFieldLarge(messageFooter, { messageFooter = it }, "Footer")
 
                     // Test Button
-                    button.ButtonGeneric({ Log.d("DataTest", "$serviceSelected") }, "Test")
+                    button.ButtonGeneric({ Log.d("DataTest", "${serviceList[0].serviceDate}") }, "Test")
                 }
 
             }
@@ -103,17 +104,18 @@ class Activity4 : ComponentActivity() {
 
 // Window to view the list of Services
 @Composable
-private fun ServiceWindow(counter: Int, iterable: Service, database: AllViewModel, button: Buttons) {
+private fun ServiceWindow(counter: Int, iterable: Service, database: AllViewModel, input: Input, button: Buttons) {
+    val serviceDateState = remember { mutableStateOf(iterable.serviceDate ?: "") }
     if (counter % 2 != 0) {
-        ServiceRow(modifier = Modifier.background(Color.LightGray), iterable, database, button)
+        ServiceRow(modifier = Modifier.background(Color.LightGray), iterable, database, input, button, serviceDateState)
     } else {
-        ServiceRow(modifier = Modifier, iterable, database, button)
+        ServiceRow(modifier = Modifier, iterable, database, input, button, serviceDateState)
     }
 }
 
 // Additional styling for each Service
 @Composable
-private fun ServiceRow(modifier: Modifier, iterable: Service, database: AllViewModel, button: Buttons) {
+private fun ServiceRow(modifier: Modifier, iterable: Service, database: AllViewModel, input: Input, button: Buttons, serviceDateState: MutableState<String>) {
     val rounded = String.format(Locale.US,"%.2f", iterable.servicePrice)
     Row(modifier = modifier
         .fillMaxWidth()
@@ -126,6 +128,10 @@ private fun ServiceRow(modifier: Modifier, iterable: Service, database: AllViewM
         Text(text = "$${rounded}",
             modifier = Modifier.weight(1F),
             fontSize = 20.sp)
+        input.InputFieldSmall(
+            serviceDateState.value,
+            { serviceDateState.value = it
+            iterable.serviceDate = it }, "Date")
         button.RemoveButton { database.removeService(iterable.id) }
     }
 }

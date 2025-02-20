@@ -19,7 +19,7 @@ data class Service(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val serviceName: String,
     val servicePrice: Double,
-    val serviceDate: String?
+    var serviceDate: String?
 )
 
 @Entity(
