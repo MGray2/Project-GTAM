@@ -158,18 +158,14 @@ class Input {
     fun InputDropDown(
         optionsLiveData: LiveData<List<Pair<Long, String>>>,
         selectedId: MutableState<Long?>,
-        placeholder: String
+        placeholder: String,
+        onReset: (() -> Unit) -> Unit
     ) {
         var expanded by remember { mutableStateOf(false) }
         var selectedName by remember { mutableStateOf(placeholder) }
 
         // Observe LiveData to get the latest options
         val options by optionsLiveData.observeAsState(initial = emptyList())
-
-        fun resetDropdown() {
-            selectedId.value = null
-            selectedName = placeholder
-        }
 
         Box(
             modifier = Modifier
@@ -209,6 +205,12 @@ class Input {
                 }
             }
         }
+        fun resetDropdown() {
+            selectedId.value = null
+            selectedName = placeholder
+        }
+
+        onReset { resetDropdown() }
     }
 
     // Composable dropdown function

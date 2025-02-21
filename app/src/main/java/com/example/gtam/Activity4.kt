@@ -22,6 +22,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.readable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -52,32 +53,44 @@ class Activity4 : ComponentActivity() {
             val bot by dbAll.userBot.observeAsState(initial = UserBot(id = 1, gmail = "", outlook = "", phoneNumber = "", messageHeader = "", messageFooter = ""))
             val clientOptions: LiveData<List<Pair<Long, String>>> = dbAll.clientDropdownList
             val serviceOptions: LiveData<List<Pair<Long, String>>> = dbAll.serviceDropdownList
+            val serviceList by dbAll.selectedServices.observeAsState(emptyList())
             // Local
             val clientSelected = remember { mutableStateOf<Long?>(null) }
             val serviceSelected = remember { mutableStateOf<Long?>(null) }
             var messageHeader by remember { mutableStateOf("") }
             var messageFooter by remember { mutableStateOf("") }
-            val serviceList by dbAll.selectedServices.observeAsState(emptyList())
+            var serviceNameWI by remember { mutableStateOf("") }
+            var servicePriceWI by remember { mutableStateOf("") }
 
+            val resetDropdown1 = remember { mutableStateOf<(() -> Unit)?>(null) }
+            val resetDropdown2 = remember { mutableStateOf<(() -> Unit)?>(null) }
             messageHeader = bot.messageHeader
             messageFooter = bot.messageFooter
             // UI
             GTAMTheme {
-                Column() {
+                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                     banner.CustomHeader("Compose Message")
                     // Message Recipient
                     banner.LittleText("Message Recipient", modifier = Modifier)
-                    input.InputDropDown(optionsLiveData = clientOptions, selectedId = clientSelected, "Client")
+                    input.InputDropDown(optionsLiveData = clientOptions, selectedId = clientSelected, "Client", { resetDropdown1.value = it })
                     // Body 1
                     banner.LittleText("Message Header", Modifier)
                     input.InputFieldLarge(messageHeader, { messageHeader = it }, "Header")
 
                     // Add Services
                     banner.LittleText("Services", modifier = Modifier)
-                    input.InputDropDown(optionsLiveData = serviceOptions, selectedId = serviceSelected, "Add Service")
-                    button.ButtonGeneric({ dbAll.addService(serviceSelected) }, "Add Service")
+                    input.InputDropDown(optionsLiveData = serviceOptions, selectedId = serviceSelected, "Add Service", { resetDropdown2.value = it })
+                    input.InputField(serviceNameWI, { serviceNameWI = it }, "Write-in Service")
+                    input.InputField(servicePriceWI, { servicePriceWI = it }, "Write-in Price")
+
+                    button.ButtonGeneric({
+                        saveService(dbAll, serviceSelected, serviceNameWI, servicePriceWI)
+                        serviceSelected.value = null
+                        serviceNameWI = ""
+                        servicePriceWI = ""
+                        resetDropdown2.value?.invoke() }, "Add Service")
                     // Service Window
-                    Column(modifier = Modifier.verticalScroll(rememberScrollState())
+                    Column(modifier = Modifier
                         .fillMaxWidth().padding(10.dp)) {
                         var itemCount = 0
                         serviceList.forEach {
@@ -101,6 +114,14 @@ class Activity4 : ComponentActivity() {
     }
 }
 
+private fun saveService(database: AllViewModel, serviceSelected: MutableState<Long?>, serviceNameWI: String, servicePriceWI: String) {
+    if (serviceSelected.value != null) {
+        database.addService(serviceSelected)
+    } else if (serviceNameWI.isNotBlank() && servicePriceWI.toDouble() > 0) {
+        val newService = Service(id = -System.currentTimeMillis(), serviceName = serviceNameWI, servicePrice = servicePriceWI.toDouble(), serviceDate = null)
+        database.addService(newService)
+    }
+}
 
 // Window to view the list of Services
 @Composable

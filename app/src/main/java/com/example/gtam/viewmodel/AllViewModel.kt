@@ -59,6 +59,10 @@ class AllViewModel : ViewModel() {
         }
     }
 
+    fun addService(service: Service) {
+        _selectedServices.value = _selectedServices.value?.plus(service) ?: listOf(service)
+    }
+
     fun removeService(serviceId: Long) {
         viewModelScope.launch {
             val service = serviceById(serviceId)
