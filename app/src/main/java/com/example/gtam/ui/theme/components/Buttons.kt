@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
@@ -108,7 +109,26 @@ class Buttons {
         ) {
             Icon(
                 imageVector = Icons.Filled.Clear,
-                contentDescription = "Delete",
+                contentDescription = "Remove",
+                modifier = Modifier.size(24.dp)
+            )
+        }
+    }
+
+    @Composable
+    fun TodayButton(onClick: () -> Unit) {
+        Button(
+            onClick = onClick,
+            contentPadding = PaddingValues(0.dp),
+            modifier = Modifier.size(24.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Transparent,
+                contentColor = Color.DarkGray
+            )
+        ) {
+            Icon(
+                imageVector = Icons.Filled.DateRange,
+                contentDescription = "Today's Date",
                 modifier = Modifier.size(24.dp)
             )
         }

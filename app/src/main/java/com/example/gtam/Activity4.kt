@@ -22,7 +22,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.readable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,6 +34,8 @@ import com.example.gtam.ui.theme.components.*
 import com.example.gtam.ui.theme.GTAMTheme
 import com.example.gtam.viewmodel.AllViewModel
 import java.util.Locale
+import java.text.SimpleDateFormat
+import java.util.Calendar
 
 
 // Compose Message
@@ -89,6 +90,7 @@ class Activity4 : ComponentActivity() {
                         serviceNameWI = ""
                         servicePriceWI = ""
                         resetDropdown2.value?.invoke() }, "Add Service")
+
                     // Service Window
                     Column(modifier = Modifier
                         .fillMaxWidth().padding(10.dp)) {
@@ -123,6 +125,12 @@ private fun saveService(database: AllViewModel, serviceSelected: MutableState<Lo
     }
 }
 
+private fun getTodayDate(): String {
+    val calendar = Calendar.getInstance()
+    val dateFormat = SimpleDateFormat("MM/dd/yy", Locale.getDefault())
+    return dateFormat.format(calendar.time)
+}
+
 // Window to view the list of Services
 @Composable
 private fun ServiceWindow(counter: Int, iterable: Service, database: AllViewModel, input: Input, button: Buttons) {
@@ -149,6 +157,8 @@ private fun ServiceRow(modifier: Modifier, iterable: Service, database: AllViewM
         Text(text = "$${rounded}",
             modifier = Modifier.weight(1F),
             fontSize = 20.sp)
+        button.TodayButton { iterable.serviceDate = getTodayDate()
+        serviceDateState.value = getTodayDate() }
         input.InputFieldSmall(
             serviceDateState.value,
             { serviceDateState.value = it

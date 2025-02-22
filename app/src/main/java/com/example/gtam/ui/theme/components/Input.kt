@@ -2,6 +2,9 @@ package com.example.gtam.ui.theme.components
 
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -80,8 +83,8 @@ class Input {
             ) },
             textStyle = TextStyle(fontSize = 20.sp),
             modifier = Modifier
-                .width(120.dp)
-                .padding(2.dp)
+                .width(140.dp)
+                .padding(10.dp)
         )
     }
 
@@ -171,6 +174,7 @@ class Input {
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentSize(Alignment.TopStart)
+                .padding(10.dp, 0.dp)
         ) {
             OutlinedTextField(
                 value = selectedName,
@@ -195,7 +199,7 @@ class Input {
             ) {
                 options.forEach { (id, name) ->
                     DropdownMenuItem(
-                        text = { Text(name) },
+                        text = { Text(name, fontSize = 20.sp) },
                         onClick = {
                             selectedId.value = id  // Store the selected ID
                             selectedName = name    // Display the selected name
