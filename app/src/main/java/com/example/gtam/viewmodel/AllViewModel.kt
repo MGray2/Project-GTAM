@@ -35,6 +35,15 @@ class AllViewModel : ViewModel() {
     private val _clientDropdownList = MutableLiveData<List<Pair<Long, String>>>()
     val clientDropdownList: LiveData<List<Pair<Long, String>>> get() = _clientDropdownList
 
+    fun clientById(clientId: MutableState<Long?>): LiveData<Client?> {
+        val nonNullLong: Long = clientId.value ?: 0L
+        return clientDAO.getClientById(nonNullLong).asLiveData()
+    }
+
+    fun clientById(clientId: Long): LiveData<Client?> {
+        return clientDAO.getClientById(clientId).asLiveData()
+    }
+
     // Service
     private val _serviceDropdownList = MutableLiveData<List<Pair<Long, String>>>()
     val serviceDropdownList: LiveData<List<Pair<Long, String>>> = _serviceDropdownList
@@ -77,7 +86,9 @@ class AllViewModel : ViewModel() {
                 val defaultBot = UserBot(
                     id = 1,
                     gmail = null,
+                    gmailPassword = null,
                     outlook = null,
+                    outlookPassword = null,
                     phoneNumber = null,
                     messageHeader = "",
                     messageFooter = ""

@@ -24,7 +24,9 @@ class BotViewModel : ViewModel() {
                 val defaultBot = UserBot(
                     id = 1,
                     gmail = null,
+                    gmailPassword = null,
                     outlook = null,
+                    outlookPassword = null,
                     phoneNumber = null,
                     messageHeader = "",
                     messageFooter = ""
@@ -39,10 +41,13 @@ class BotViewModel : ViewModel() {
 
 
     // Update changes to UserBot
-    fun updateBot(gmail: String, outlook: String, phoneNumber: String, messageHeader: String, messageFooter: String) {
+    fun updateBot(gmail: String, gmailPassword: String, outlook: String, outlookPassword: String, phoneNumber: String, messageHeader: String, messageFooter: String) {
         viewModelScope.launch {
-            botDAO.updateUserBot(gmail = gmail,
+            botDAO.updateUserBot(
+                gmail = gmail,
+                gmailPassword = gmailPassword,
                 outlook = outlook,
+                outlookPassword = outlookPassword,
                 phoneNumber = phoneNumber,
                 messageHeader = messageHeader,
                 messageFooter = messageFooter)

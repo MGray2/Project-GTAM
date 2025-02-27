@@ -16,8 +16,8 @@ interface UserBotDao {
     @Query("SELECT * FROM user_bot WHERE id = 1 LIMIT 1")
     fun getUserBot(): Flow<UserBot?>
 
-    @Query("UPDATE user_bot SET gmail = :gmail, outlook = :outlook, phoneNumber = :phoneNumber, messageHeader = :messageHeader, messageFooter = :messageFooter WHERE id = 1")
-    suspend fun updateUserBot(gmail: String, outlook: String, phoneNumber: String, messageHeader: String, messageFooter: String)
+    @Query("UPDATE user_bot SET gmail = :gmail, gmailPassword = :gmailPassword, outlook = :outlook, outlookPassword = :outlookPassword, phoneNumber = :phoneNumber, messageHeader = :messageHeader, messageFooter = :messageFooter WHERE id = 1")
+    suspend fun updateUserBot(gmail: String, gmailPassword: String, outlook: String, outlookPassword: String, phoneNumber: String, messageHeader: String, messageFooter: String)
 
     @Delete
     suspend fun deleteUserBot(userBot: UserBot)

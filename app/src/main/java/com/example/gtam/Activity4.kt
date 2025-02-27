@@ -51,13 +51,14 @@ class Activity4 : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             // Database
-            val bot by dbAll.userBot.observeAsState(initial = UserBot(id = 1, gmail = "", outlook = "", phoneNumber = "", messageHeader = "", messageFooter = ""))
+            val bot by dbAll.userBot.observeAsState(initial = UserBot(id = 1, gmail = null, gmailPassword = null, outlook = null, outlookPassword = null, phoneNumber = null, messageHeader = "", messageFooter = ""))
             val clientOptions: LiveData<List<Pair<Long, String>>> = dbAll.clientDropdownList
             val serviceOptions: LiveData<List<Pair<Long, String>>> = dbAll.serviceDropdownList
             val serviceList by dbAll.selectedServices.observeAsState(emptyList())
             // Local
             val clientSelected = remember { mutableStateOf<Long?>(null) }
             val serviceSelected = remember { mutableStateOf<Long?>(null) }
+            var messageSubject by remember { mutableStateOf("") }
             var messageHeader by remember { mutableStateOf("") }
             var messageFooter by remember { mutableStateOf("") }
             var serviceNameWI by remember { mutableStateOf("") }
@@ -74,8 +75,12 @@ class Activity4 : ComponentActivity() {
                     // Message Recipient
                     banner.LittleText("Message Recipient", modifier = Modifier)
                     input.InputDropDown(optionsLiveData = clientOptions, selectedId = clientSelected, "Client", { resetDropdown1.value = it })
+                    // Subject
+                    banner.LittleText("Subject", modifier = Modifier)
+                    input.InputField(messageSubject, { messageSubject = it }, "Subject")
+
                     // Body 1
-                    banner.LittleText("Message Header", Modifier)
+                    banner.LittleText("Message Header", modifier = Modifier)
                     input.InputFieldLarge(messageHeader, { messageHeader = it }, "Header")
 
                     // Add Services
@@ -97,7 +102,6 @@ class Activity4 : ComponentActivity() {
                         var itemCount = 0
                         serviceList.forEach {
                             service -> ServiceWindow(itemCount, service, dbAll, input, button)
-                            Log.d("DataTest", "$service")
                             itemCount++
                         }
                     }
@@ -108,12 +112,26 @@ class Activity4 : ComponentActivity() {
                     input.InputFieldLarge(messageFooter, { messageFooter = it }, "Footer")
 
                     // Test Button
-                    button.ButtonGeneric({ Log.d("DataTest", "${serviceList[0].serviceDate}") }, "Test")
+                    button.ButtonGeneric({ sendMessage(dbAll, bot, clientSelected, serviceList, messageSubject, messageHeader, messageFooter) }, "Send")
                 }
 
             }
         }
     }
+}
+
+private fun ultimateDataTest(clientSelected: MutableState<Long?>, serviceList: List<Service>, header: String, footer: String) {
+    Log.d("DataTest", "Client ID: ${clientSelected.value}")
+    Log.d("DataTest", "Message Header: $header")
+    Log.d("DataTest", "Message Footer: $footer")
+    serviceList.forEach { service -> Log.d("DataTest", "Service, ID: ${service.id}, Name: ${service.serviceName}, Price: ${service.servicePrice}, Date: ${service.serviceDate}") }
+}
+
+private fun sendMessage(database: AllViewModel, userBot: UserBot, clientSelected: MutableState<Long?>, serviceList: List<Service>, subject: String, header: String, footer: String) {
+    val client = database.clientById(clientSelected)
+    val messenger = Messenger()
+    val body = "$header \n $footer"
+    messenger.sendEmail(userBot.gmail!!, userBot.gmailPassword!!, client.value!!.clientEmail!!, subject, body)
 }
 
 private fun saveService(database: AllViewModel, serviceSelected: MutableState<Long?>, serviceNameWI: String, servicePriceWI: String) {

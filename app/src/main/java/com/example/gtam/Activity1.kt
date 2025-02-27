@@ -7,6 +7,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -37,14 +39,20 @@ class Activity1 : ComponentActivity() {
         setContent {
             // Local
             var botGmail by remember { mutableStateOf("") }
+            var botGmailPassword by remember { mutableStateOf("") }
             var botOutlook by remember { mutableStateOf("") }
+            var botOutlookPassword by remember { mutableStateOf("") }
             var botPhoneNumber by remember { mutableStateOf("") }
+            var messageSubject by remember { mutableStateOf("") }
             var messageHeader by remember { mutableStateOf("") }
             var messageFooter by remember { mutableStateOf("") }
             // Database
-            val bot by dbBot.userBot.observeAsState(initial = UserBot(id = 1, gmail = "", outlook = "", phoneNumber = "", messageHeader = "", messageFooter = ""))
+            val bot by dbBot.userBot.observeAsState(initial = UserBot(id = 1, gmail = null, gmailPassword = null, outlook = null, outlookPassword = null, phoneNumber = null, messageHeader = "", messageFooter = ""))
             if (bot.gmail != null) {
                 botGmail = bot.gmail!!
+            }
+            if (bot.gmailPassword != null) {
+                botGmailPassword = bot.gmailPassword!!
             }
             if (bot.outlook != null) {
                 botOutlook = bot.outlook!!
@@ -57,23 +65,30 @@ class Activity1 : ComponentActivity() {
 
             // UI
             GTAMTheme {
-                Column(modifier = Modifier) {
+                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                     banner.CustomHeader("Bot Account Setup")
                     // Bot Email
-                    banner.LittleText("Bot Email", modifier = Modifier, button, message1)
-                    input.InputField(botGmail, { botGmail = it },"Gmail")
-                    input.InputField(botOutlook, { botOutlook = it }, placeholder = "Outlook")
+                    banner.LittleText("Gmail", modifier = Modifier, button, message1)
+                    input.InputField(botGmail, { botGmail = it },"Email")
+                    input.InputField(botGmailPassword, { botGmailPassword = it}, "Password")
+
+                    banner.LittleText("Outlook", modifier = Modifier)
+                    input.InputField(botOutlook, { botOutlook = it }, placeholder = "Email")
+                    input.InputField(botOutlookPassword, { botOutlookPassword = it }, "Password")
                     // Bot Phone Number
                     banner.LittleText("Bot Phone Number", modifier = Modifier, button, message2)
                     input.InputFieldNumber(botPhoneNumber, { botPhoneNumber = it },"Phone Number", KeyboardType.Number)
                     // Message Header
+                    banner.LittleText("Subject", modifier = Modifier)
+                    input.InputField(messageSubject, { messageSubject = it }, "Subject")
+
                     banner.LittleText("Message Header", modifier = Modifier, button, message3)
                     input.InputFieldLarge(messageHeader, { messageHeader = it },"Message")
                     // Message Footer
                     banner.LittleText("Message Footer", modifier = Modifier, button, message4)
                     input.InputFieldLarge(messageFooter, { messageFooter = it },"Message")
                     // Save Button
-                    button.ButtonGeneric({ dbBot.updateBot(botGmail, botOutlook, botPhoneNumber, messageHeader, messageFooter) }, "Save")
+                    button.ButtonGeneric({ dbBot.updateBot(botGmail, botGmailPassword, botOutlook, botOutlookPassword, botPhoneNumber, messageHeader, messageFooter) }, "Save")
                 }
             }
         }

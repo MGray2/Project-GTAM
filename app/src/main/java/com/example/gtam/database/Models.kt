@@ -8,7 +8,9 @@ import androidx.room.PrimaryKey
 data class UserBot(
     @PrimaryKey val id: Long = 1,
     val gmail: String?,
+    val gmailPassword: String?,
     val outlook: String?,
+    val outlookPassword: String?,
     val phoneNumber: String?,
     val messageHeader: String,
     val messageFooter: String
