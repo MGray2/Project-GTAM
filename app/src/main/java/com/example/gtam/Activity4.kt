@@ -33,6 +33,9 @@ import com.example.gtam.database.UserBot
 import com.example.gtam.ui.theme.components.*
 import com.example.gtam.ui.theme.GTAMTheme
 import com.example.gtam.viewmodel.AllViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.Locale
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -120,18 +123,23 @@ class Activity4 : ComponentActivity() {
     }
 }
 
-private fun ultimateDataTest(clientSelected: MutableState<Long?>, serviceList: List<Service>, header: String, footer: String) {
-    Log.d("DataTest", "Client ID: ${clientSelected.value}")
-    Log.d("DataTest", "Message Header: $header")
-    Log.d("DataTest", "Message Footer: $footer")
-    serviceList.forEach { service -> Log.d("DataTest", "Service, ID: ${service.id}, Name: ${service.serviceName}, Price: ${service.servicePrice}, Date: ${service.serviceDate}") }
-}
-
 private fun sendMessage(database: AllViewModel, userBot: UserBot, clientSelected: MutableState<Long?>, serviceList: List<Service>, subject: String, header: String, footer: String) {
-    val client = database.clientById(clientSelected)
-    val messenger = Messenger()
-    val body = "$header \n $footer"
-    messenger.sendEmail(userBot.gmail!!, userBot.gmailPassword!!, client.value!!.clientEmail!!, subject, body)
+    CoroutineScope(Dispatchers.IO).launch {
+        val clientId = clientSelected.value ?: return@launch
+        val client = database.clientById(clientId)
+
+        if (client?.clientEmail.isNullOrBlank()) {
+            Log.e("sendMessage", "Client email is null or empty")
+            return@launch
+        }
+
+        Messenger().sendEmail(
+            userBot.gmail ?: return@launch,
+            userBot.gmailPassword ?: return@launch,
+            client!!.clientEmail!!,
+            subject, header, serviceList, footer
+        )
+    }
 }
 
 private fun saveService(database: AllViewModel, serviceSelected: MutableState<Long?>, serviceNameWI: String, servicePriceWI: String) {

@@ -3,10 +3,30 @@ import android.util.Log
 import java.util.*
 import javax.mail.*
 import javax.mail.internet.*
+import com.example.gtam.database.Service
 
 class Messenger {
+    private fun formatBody(header: String, footer: String, services: List<Service>): String {
+        val body = StringBuilder("")
+        var total = 0.00
+        body.append("$header\n")
 
-    fun sendEmail(sender: String, appPassword: String, recipient: String, sub: String, body: String): Boolean {
+        services.forEach {
+                service -> body.append("${service.serviceName}: ${String.format(Locale.US,"%.2f", service.servicePrice)}\n")
+        }
+
+        if (services.size > 1) {
+            services.forEach {
+                    service -> total += service.servicePrice
+                body.append(String.format(Locale.US,"%.2f", total))
+            }
+        }
+        body.append(footer)
+
+        return body.toString()
+    }
+
+    private fun sendGmail(sender: String, appPassword: String, recipient: String, sub: String, body: String): Boolean {
 
         val properties = Properties().apply {
             put("mail.smtp.auth", "true")
@@ -33,5 +53,10 @@ class Messenger {
             e.printStackTrace()
             false
         }
+    }
+
+    fun sendEmail(sender: String, appPassword: String, recipient: String, sub: String, header: String, services: List<Service>, footer: String) {
+        val body = formatBody(header, footer, services)
+        sendGmail(sender, appPassword, recipient, sub, body)
     }
 }

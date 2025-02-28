@@ -35,13 +35,8 @@ class AllViewModel : ViewModel() {
     private val _clientDropdownList = MutableLiveData<List<Pair<Long, String>>>()
     val clientDropdownList: LiveData<List<Pair<Long, String>>> get() = _clientDropdownList
 
-    fun clientById(clientId: MutableState<Long?>): LiveData<Client?> {
-        val nonNullLong: Long = clientId.value ?: 0L
-        return clientDAO.getClientById(nonNullLong).asLiveData()
-    }
-
-    fun clientById(clientId: Long): LiveData<Client?> {
-        return clientDAO.getClientById(clientId).asLiveData()
+    suspend fun clientById(clientId: Long): Client? {
+        return clientDAO.getClientById(clientId).firstOrNull()
     }
 
     // Service
