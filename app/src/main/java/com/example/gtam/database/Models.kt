@@ -7,10 +7,9 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "user_bot")
 data class UserBot(
     @PrimaryKey val id: Long = 1,
-    val gmail: String?,
-    val gmailPassword: String?,
-    val outlook: String?,
-    val outlookPassword: String?,
+    val email: String?,
+    val username: String?, // API key
+    val password: String?, // API secret key
     val phoneNumber: String?,
     val messageHeader: String,
     val messageFooter: String

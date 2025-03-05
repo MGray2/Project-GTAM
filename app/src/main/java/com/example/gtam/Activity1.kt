@@ -38,24 +38,23 @@ class Activity1 : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             // Local
-            var botGmail by remember { mutableStateOf("") }
-            var botGmailPassword by remember { mutableStateOf("") }
-            var botOutlook by remember { mutableStateOf("") }
-            var botOutlookPassword by remember { mutableStateOf("") }
+            var botEmail by remember { mutableStateOf("") }
+            var botUsername by remember { mutableStateOf("") }
+            var botPassword by remember { mutableStateOf("") }
             var botPhoneNumber by remember { mutableStateOf("") }
             var messageSubject by remember { mutableStateOf("") }
             var messageHeader by remember { mutableStateOf("") }
             var messageFooter by remember { mutableStateOf("") }
             // Database
-            val bot by dbBot.userBot.observeAsState(initial = UserBot(id = 1, gmail = null, gmailPassword = null, outlook = null, outlookPassword = null, phoneNumber = null, messageHeader = "", messageFooter = ""))
-            if (bot.gmail != null) {
-                botGmail = bot.gmail!!
+            val bot by dbBot.userBot.observeAsState(initial = UserBot(id = 1, email = null, username = null, password = null, phoneNumber = null, messageHeader = "", messageFooter = ""))
+            if (bot.email != null) {
+                botEmail = bot.email!!
             }
-            if (bot.gmailPassword != null) {
-                botGmailPassword = bot.gmailPassword!!
+            if (bot.username != null) {
+                botUsername = bot.username!!
             }
-            if (bot.outlook != null) {
-                botOutlook = bot.outlook!!
+            if (bot.password != null) {
+                botPassword = bot.password!!
             }
             if (bot.phoneNumber != null) {
                 botPhoneNumber = bot.phoneNumber!!
@@ -68,13 +67,13 @@ class Activity1 : ComponentActivity() {
                 Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                     banner.CustomHeader("Bot Account Setup")
                     // Bot Email
-                    banner.LittleText("Gmail", modifier = Modifier, button, message1)
-                    input.InputField(botGmail, { botGmail = it },"Email")
-                    input.InputField(botGmailPassword, { botGmailPassword = it}, "Password")
+                    banner.LittleText("Email", modifier = Modifier, button, message1)
+                    input.InputField(botEmail, { botEmail = it },"Email")
+                    // API
+                    banner.LittleText("Api Setup", modifier = Modifier, button, message2)
+                    input.InputField(botUsername, { botUsername = it}, "Api Key")
+                    input.InputField(botPassword, { botPassword = it }, placeholder = "Api Secret Key")
 
-                    banner.LittleText("Outlook", modifier = Modifier)
-                    input.InputField(botOutlook, { botOutlook = it }, placeholder = "Email")
-                    input.InputField(botOutlookPassword, { botOutlookPassword = it }, "Password")
                     // Bot Phone Number
                     banner.LittleText("Bot Phone Number", modifier = Modifier, button, message2)
                     input.InputFieldNumber(botPhoneNumber, { botPhoneNumber = it },"Phone Number", KeyboardType.Number)
@@ -88,7 +87,7 @@ class Activity1 : ComponentActivity() {
                     banner.LittleText("Message Footer", modifier = Modifier, button, message4)
                     input.InputFieldLarge(messageFooter, { messageFooter = it },"Message")
                     // Save Button
-                    button.ButtonGeneric({ dbBot.updateBot(botGmail, botGmailPassword, botOutlook, botOutlookPassword, botPhoneNumber, messageHeader, messageFooter) }, "Save")
+                    button.ButtonGeneric({ dbBot.updateBot(botEmail, botUsername, botPassword, botPhoneNumber, messageHeader, messageFooter) }, "Save")
                 }
             }
         }

@@ -55,8 +55,38 @@ class Messenger {
         }
     }
 
-    fun sendEmail(sender: String, appPassword: String, recipient: String, sub: String, header: String, services: List<Service>, footer: String) {
+    private fun sendMailjetEmail(sender: String, recipient: String, sub: String, body: String, username: String, password: String): Boolean {
+
+        val properties = Properties().apply {
+            put("mail.smtp.auth", "true")
+            put("mail.smtp.starttls.enable", "true")
+            put("mail.smtp.host", "in-v3.mailjet.com")
+            put("mail.smtp.port", "587")
+        }
+
+        val session = Session.getInstance(properties, object : Authenticator() {
+            override fun getPasswordAuthentication() = PasswordAuthentication(username, password)
+        })
+
+        return try {
+            val message = MimeMessage(session).apply {
+                setFrom(InternetAddress(sender))
+                setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipient))
+                subject = sub
+                setText(body)
+            }
+            Transport.send(message)
+            Log.d("DataTest","Email sent successfully!") // Debug
+            true
+        } catch (e: MessagingException) {
+            e.printStackTrace()
+            false
+        }
+    }
+
+    // Username is an api key, password is the secret key and sender and recipient are email addresses
+    fun sendEmail(username: String, password: String, sender: String, recipient: String, sub: String, header: String, services: List<Service>, footer: String) {
         val body = formatBody(header, footer, services)
-        sendGmail(sender, appPassword, recipient, sub, body)
+        sendMailjetEmail(sender, recipient, sub, body, username, password)
     }
 }

@@ -54,7 +54,7 @@ class Activity4 : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             // Database
-            val bot by dbAll.userBot.observeAsState(initial = UserBot(id = 1, gmail = null, gmailPassword = null, outlook = null, outlookPassword = null, phoneNumber = null, messageHeader = "", messageFooter = ""))
+            val bot by dbAll.userBot.observeAsState(initial = UserBot(id = 1, email = null, username = null, password = null, phoneNumber = null, messageHeader = "", messageFooter = ""))
             val clientOptions: LiveData<List<Pair<Long, String>>> = dbAll.clientDropdownList
             val serviceOptions: LiveData<List<Pair<Long, String>>> = dbAll.serviceDropdownList
             val serviceList by dbAll.selectedServices.observeAsState(emptyList())
@@ -134,10 +134,14 @@ private fun sendMessage(database: AllViewModel, userBot: UserBot, clientSelected
         }
 
         Messenger().sendEmail(
-            userBot.gmail ?: return@launch,
-            userBot.gmailPassword ?: return@launch,
-            client!!.clientEmail!!,
-            subject, header, serviceList, footer
+            sender = userBot.email ?: return@launch,
+            username = userBot.username ?: return@launch,
+            password = userBot.password ?: return@launch,
+            recipient = client!!.clientEmail!!,
+            sub = subject,
+            header = header,
+            services = serviceList,
+            footer = footer
         )
     }
 }

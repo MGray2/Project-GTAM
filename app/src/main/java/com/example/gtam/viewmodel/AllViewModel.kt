@@ -80,10 +80,9 @@ class AllViewModel : ViewModel() {
             if (existingBot == null) {
                 val defaultBot = UserBot(
                     id = 1,
-                    gmail = null,
-                    gmailPassword = null,
-                    outlook = null,
-                    outlookPassword = null,
+                    email = null,
+                    username = null,
+                    password = null,
                     phoneNumber = null,
                     messageHeader = "",
                     messageFooter = ""
