@@ -18,8 +18,9 @@ import com.example.gtam.ui.theme.components.*
 import com.example.gtam.ui.theme.GTAMTheme
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
-import com.example.gtam.database.UserBot
-import com.example.gtam.viewmodel.BotViewModel
+import com.example.gtam.database.entities.UserBot
+import com.example.gtam.database.factory.UserBotFactory
+import com.example.gtam.database.viewmodel.BotViewModel
 
 // Bot Account Setup
 class Activity1 : ComponentActivity() {
@@ -27,7 +28,7 @@ class Activity1 : ComponentActivity() {
     private val input = Input()
     private val button = Buttons()
     private val banner = Banners()
-    private val dbBot: BotViewModel by viewModels()
+    private val dbBot: BotViewModel by viewModels { UserBotFactory(MyApp.userBotRepository) }
     private val message1 = "This will be the email that the system uses for messaging."
     private val message2 = "This will be the phone number that the system uses for texting."
     private val message3 = "The system will default to this starting message should no additional input be included."

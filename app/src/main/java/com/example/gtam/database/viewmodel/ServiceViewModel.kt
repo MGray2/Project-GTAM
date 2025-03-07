@@ -1,11 +1,11 @@
-package com.example.gtam.viewmodel
+package com.example.gtam.database.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.gtam.MyApp
-import com.example.gtam.database.Service
+import com.example.gtam.database.entities.Service
 import kotlinx.coroutines.launch
 
 class ServiceViewModel : ViewModel() {

@@ -3,7 +3,7 @@ import android.util.Log
 import java.util.*
 import javax.mail.*
 import javax.mail.internet.*
-import com.example.gtam.database.Service
+import com.example.gtam.database.entities.Service
 
 class Messenger {
     private fun formatBody(header: String, footer: String, services: List<Service>): String {

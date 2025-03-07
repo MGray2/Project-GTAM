@@ -25,14 +25,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.LiveData
-import com.example.gtam.database.Service
-import com.example.gtam.database.UserBot
+import com.example.gtam.database.entities.Service
+import com.example.gtam.database.entities.UserBot
 import com.example.gtam.ui.theme.components.*
 import com.example.gtam.ui.theme.GTAMTheme
-import com.example.gtam.viewmodel.AllViewModel
+import com.example.gtam.database.viewmodel.AllViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -59,6 +60,7 @@ class Activity4 : ComponentActivity() {
             val serviceOptions: LiveData<List<Pair<Long, String>>> = dbAll.serviceDropdownList
             val serviceList by dbAll.selectedServices.observeAsState(emptyList())
             // Local
+            val context = LocalContext.current
             val clientSelected = remember { mutableStateOf<Long?>(null) }
             val serviceSelected = remember { mutableStateOf<Long?>(null) }
             var messageSubject by remember { mutableStateOf("") }
@@ -66,6 +68,7 @@ class Activity4 : ComponentActivity() {
             var messageFooter by remember { mutableStateOf("") }
             var serviceNameWI by remember { mutableStateOf("") }
             var servicePriceWI by remember { mutableStateOf("") }
+            var rememberThis by remember { mutableStateOf(true) }
 
             val resetDropdown1 = remember { mutableStateOf<(() -> Unit)?>(null) }
             val resetDropdown2 = remember { mutableStateOf<(() -> Unit)?>(null) }
@@ -114,8 +117,12 @@ class Activity4 : ComponentActivity() {
                     banner.LittleText("Message Footer", modifier = Modifier)
                     input.InputFieldLarge(messageFooter, { messageFooter = it }, "Footer")
 
+                    input.InputSwitch(rememberThis, { rememberThis = it }, "Remember this interaction")
                     // Test Button
-                    button.ButtonGeneric({ sendMessage(dbAll, bot, clientSelected, serviceList, messageSubject, messageHeader, messageFooter) }, "Send")
+                    button.ButtonGeneric({
+                        sendMessage(dbAll, bot, clientSelected, serviceList, messageSubject, messageHeader, messageFooter)
+                        button.showToast("Sending Message", context)
+                                         }, "Send")
                 }
 
             }

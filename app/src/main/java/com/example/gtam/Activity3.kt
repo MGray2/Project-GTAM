@@ -27,12 +27,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.gtam.database.Service
+import com.example.gtam.database.entities.Service
 import com.example.gtam.ui.theme.components.*
 import com.example.gtam.ui.theme.GTAMTheme
 import androidx.compose.ui.platform.LocalContext
 import java.util.Locale
-import com.example.gtam.viewmodel.ServiceViewModel
+import com.example.gtam.database.viewmodel.ServiceViewModel
 
 // Manage Services
 class Activity3 : ComponentActivity() {

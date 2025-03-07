@@ -1,12 +1,11 @@
 package com.example.gtam.ui.theme.components
 
-import android.content.Context
-import android.widget.Toast
-import androidx.compose.foundation.BorderStroke
+
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,6 +20,8 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchColors
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -32,11 +33,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.LiveData
+import com.example.gtam.ui.theme.Green194
+import com.example.gtam.ui.theme.Green240
 
 class Input {
 
@@ -264,6 +270,38 @@ class Input {
                     )
                 }
             }
+        }
+    }
+
+    @Composable
+    fun InputSwitch(checked: Boolean, onCheckedChange: (Boolean) -> Unit, placeholder: String) {
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .padding(10.dp)
+            .background(Color.LightGray),
+            Arrangement.SpaceBetween,
+            Alignment.CenterVertically) {
+            Text(placeholder, textAlign = TextAlign.Center, fontSize = 20.sp)
+            Switch(checked = checked,
+                onCheckedChange = onCheckedChange,
+                colors = SwitchColors(
+                    checkedThumbColor = Green194,
+                    checkedTrackColor = Color.Transparent,
+                    checkedBorderColor = Green194,
+                    checkedIconColor = Color.Transparent,
+                    uncheckedThumbColor = Color.Gray,
+                    uncheckedTrackColor = Color.Transparent,
+                    uncheckedBorderColor = Color.DarkGray,
+                    uncheckedIconColor = Color.Transparent,
+                    disabledCheckedThumbColor = Color.Transparent,
+                    disabledCheckedTrackColor = Color.Transparent,
+                    disabledCheckedBorderColor = Color.Transparent,
+                    disabledCheckedIconColor = Color.Transparent,
+                    disabledUncheckedThumbColor = Color.Transparent,
+                    disabledUncheckedTrackColor = Color.Transparent,
+                    disabledUncheckedBorderColor = Color.Transparent,
+                    disabledUncheckedIconColor = Color.Transparent
+                ))
         }
     }
 

@@ -1,4 +1,4 @@
-package com.example.gtam.viewmodel
+package com.example.gtam.database.viewmodel
 
 import android.annotation.SuppressLint
 import android.util.Log
@@ -9,14 +9,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.gtam.MyApp
-import com.example.gtam.database.Client
-import com.example.gtam.database.Service
-import com.example.gtam.database.UserBot
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
+import com.example.gtam.database.entities.*
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 @SuppressLint("NullSafeMutableLiveData")
@@ -24,6 +18,8 @@ class AllViewModel : ViewModel() {
     private val clientDAO = MyApp.database.clientDao()
     private val botDAO = MyApp.database.userBotDao()
     private val serviceDAO = MyApp.database.serviceDao()
+    private val memoryDAO = MyApp.database.memoryDao()
+
     private val allClients: LiveData<List<Client>> = clientDAO.getAllClients().asLiveData()
     private val allServices: LiveData<List<Service>> = serviceDAO.getAllServices().asLiveData()
 

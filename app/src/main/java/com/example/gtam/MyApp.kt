@@ -4,11 +4,13 @@ import android.app.Application
 import androidx.room.Room
 import com.example.gtam.database.AppDatabase
 import com.example.gtam.database.Migrations
+import com.example.gtam.database.repository.UserBotRepository
 
 
 class MyApp : Application() {
     companion object {
         lateinit var database: AppDatabase
+        lateinit var userBotRepository: UserBotRepository
     }
 
     override fun onCreate() {
@@ -18,5 +20,7 @@ class MyApp : Application() {
             AppDatabase::class.java,
             "app_database"
         ).addMigrations().build()
+
+        userBotRepository = UserBotRepository(database.userBotDao())
     }
 }

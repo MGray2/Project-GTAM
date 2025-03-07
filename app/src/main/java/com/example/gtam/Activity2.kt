@@ -28,10 +28,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.gtam.database.Client
+import com.example.gtam.database.entities.Client
 import com.example.gtam.ui.theme.GTAMTheme
 import com.example.gtam.ui.theme.components.*
-import com.example.gtam.viewmodel.ClientViewModel
+import com.example.gtam.database.viewmodel.ClientViewModel
 
 // Manage Clients
 class Activity2 : ComponentActivity() {
