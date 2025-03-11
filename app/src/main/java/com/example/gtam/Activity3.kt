@@ -31,6 +31,7 @@ import com.example.gtam.database.entities.Service
 import com.example.gtam.ui.theme.components.*
 import com.example.gtam.ui.theme.GTAMTheme
 import androidx.compose.ui.platform.LocalContext
+import com.example.gtam.database.factory.ServiceFactory
 import java.util.Locale
 import com.example.gtam.database.viewmodel.ServiceViewModel
 
@@ -42,7 +43,7 @@ class Activity3 : ComponentActivity() {
     private val input = Input()
     private val message1 = "Write the name of your service to be selected at message composition."
     private val message2 = "This is the cost of your service, you can also add the same name with a different price."
-    private val dbServices: ServiceViewModel by viewModels()
+    private val dbServices: ServiceViewModel by viewModels { ServiceFactory(MyApp.serviceRepository) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

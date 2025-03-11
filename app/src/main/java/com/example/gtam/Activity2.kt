@@ -29,6 +29,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.gtam.database.entities.Client
+import com.example.gtam.database.factory.ClientFactory
 import com.example.gtam.ui.theme.GTAMTheme
 import com.example.gtam.ui.theme.components.*
 import com.example.gtam.database.viewmodel.ClientViewModel
@@ -39,7 +40,7 @@ class Activity2 : ComponentActivity() {
     private val banner = Banners()
     private val input = Input()
     private val button = Buttons()
-    private val dbClients: ClientViewModel by viewModels()
+    private val dbClients: ClientViewModel by viewModels { ClientFactory(MyApp.clientRepository) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

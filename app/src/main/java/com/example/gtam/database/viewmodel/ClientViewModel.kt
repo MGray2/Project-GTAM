@@ -6,12 +6,13 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.gtam.MyApp
 import com.example.gtam.database.entities.Client
+import com.example.gtam.database.repository.ClientRepository
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
-class ClientViewModel : ViewModel() {
-    private val clientDAO = MyApp.database.clientDao()
+class ClientViewModel(private val repository: ClientRepository) : ViewModel() {
 
-    val allClients: LiveData<List<Client>> = clientDAO.getAllClients().asLiveData()
+    val allClients: LiveData<List<Client>> = repository.getAllClients().asLiveData()
 
     fun insertClient(name: String?, address: String?, email: String?, phoneNumber: String?) {
         if (name.isNullOrBlank() && address.isNullOrBlank() && email.isNullOrBlank() && phoneNumber.isNullOrBlank()) {
@@ -23,17 +24,24 @@ class ClientViewModel : ViewModel() {
                 clientAddress = address,
                 clientEmail = email,
                 clientPhoneNumber = phoneNumber)
-            clientDAO.insertClient(newClient)
+            repository.insertClient(newClient)
         }
     }
 
     fun deleteClient(clientId: Long) {
         viewModelScope.launch {
-            clientDAO.getClientById(clientId).collect { targetClient ->
+            repository.getClientById(clientId).collect { targetClient ->
                 if (targetClient != null) {
-                    clientDAO.deleteClient(targetClient)
+                    repository.deleteClient(targetClient)
                 }
             }
+        }
+    }
+
+    fun getClientById(clientId: Long, onResult: (Flow<Client?>) -> Unit) {
+        viewModelScope.launch {
+            val client = repository.getClientById(clientId)
+            onResult(client)
         }
     }
 }

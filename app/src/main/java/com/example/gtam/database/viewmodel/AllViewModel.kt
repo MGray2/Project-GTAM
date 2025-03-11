@@ -83,7 +83,7 @@ class AllViewModel : ViewModel() {
                     messageHeader = "",
                     messageFooter = ""
                 )
-                botDAO.insertOrUpdate(defaultBot)
+                botDAO.insertUserBot(defaultBot)
                 _userBot.postValue(defaultBot)
             } else {
                 _userBot.postValue(existingBot)

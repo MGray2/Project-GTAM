@@ -12,12 +12,13 @@ interface ServiceDao {
     @Insert
     suspend fun insertService(service: Service)
 
+    @Delete
+    suspend fun deleteService(service: Service)
+
     @Query("SELECT * FROM services")
     fun getAllServices(): Flow<List<Service>>
 
     @Query("SELECT * FROM services WHERE id = :target")
     fun getServiceById(target: Long): Flow<Service?>
 
-    @Delete
-    suspend fun deleteService(service: Service)
 }
