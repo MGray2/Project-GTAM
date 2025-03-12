@@ -3,8 +3,8 @@ package com.example.gtam
 import android.app.Application
 import androidx.room.Room
 import com.example.gtam.database.AppDatabase
-import com.example.gtam.database.Migrations
 import com.example.gtam.database.repository.ClientRepository
+import com.example.gtam.database.repository.MemoryRepository
 import com.example.gtam.database.repository.ServiceRepository
 import com.example.gtam.database.repository.UserBotRepository
 
@@ -15,6 +15,7 @@ class MyApp : Application() {
         lateinit var userBotRepository: UserBotRepository
         lateinit var clientRepository: ClientRepository
         lateinit var serviceRepository: ServiceRepository
+        lateinit var memoryRepository: MemoryRepository
     }
 
     override fun onCreate() {
@@ -28,5 +29,6 @@ class MyApp : Application() {
         userBotRepository = UserBotRepository(database.userBotDao())
         clientRepository = ClientRepository(database.clientDao())
         serviceRepository = ServiceRepository(database.serviceDao())
+        memoryRepository = MemoryRepository(database.memoryDao())
     }
 }

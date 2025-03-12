@@ -5,12 +5,12 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.example.gtam.database.converters.ServiceIdConverter
+import com.example.gtam.database.converters.ServiceListConverter
 import com.example.gtam.database.dao.*
 import com.example.gtam.database.entities.*
 
 @Database(entities = [UserBot::class, Service::class, Client::class, Memory::class], version = 1, exportSchema = false)
-@TypeConverters(ServiceIdConverter::class)
+@TypeConverters(ServiceListConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun userBotDao() : UserBotDao
     abstract fun serviceDao() : ServiceDao

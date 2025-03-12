@@ -1,10 +1,38 @@
 package com.example.gtam.database.viewmodel
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.gtam.MyApp
+import androidx.lifecycle.viewModelScope
+import com.example.gtam.database.entities.Memory
+import com.example.gtam.database.entities.Service
+import com.example.gtam.database.repository.MemoryRepository
+import kotlinx.coroutines.launch
 
-class MemoryViewModel : ViewModel() {
-    private val memoryDAO = MyApp.database.memoryDao()
+class MemoryViewModel(private val repository: MemoryRepository) : ViewModel() {
 
+    private val _memory = MutableLiveData<Memory?>()
+    val memory: LiveData<Memory?> get() = _memory
+
+    fun getMemoryByClient(clientId: Long) {
+        viewModelScope.launch {
+            val memoryData = repository.getMemoryByClient(clientId)
+            _memory.postValue(memoryData)
+        }
+    }
+
+    fun saveMemory(clientId: Long, subject: String, header: String, footer: String, serviceList: List<Service>) {
+        viewModelScope.launch {
+            val newMemory = Memory(
+                clientId = clientId,
+                subject = subject,
+                header = header,
+                footer = footer,
+                services = serviceList
+            )
+            repository.insertMemory(newMemory)
+            _memory.postValue(newMemory)
+        }
+    }
 
 }

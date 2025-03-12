@@ -4,7 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
-import com.example.gtam.database.converters.ServiceIdConverter
+import com.example.gtam.database.converters.ServiceListConverter
 
 // Database table for holding preference data for auto-filling forms
 @Entity(tableName = "memory")
@@ -14,5 +14,5 @@ data class Memory(
     val subject: String,
     val header: String,
     val footer: String,
-    @ColumnInfo(name = "serviceIds") @TypeConverters(ServiceIdConverter::class) val serviceIds: List<Long>
+    val services: List<Service>
 )
