@@ -25,6 +25,7 @@ class BotViewModel(private val repository: UserBotRepository) : ViewModel() {
                         username = null,
                         password = null,
                         phoneNumber = null,
+                        messageSubject = "",
                         messageHeader = "",
                         messageFooter = ""
                     )
@@ -44,6 +45,7 @@ class BotViewModel(private val repository: UserBotRepository) : ViewModel() {
         username: String,
         password: String,
         phoneNumber: String,
+        messageSubject: String,
         messageHeader: String,
         messageFooter: String
     ) {
@@ -54,6 +56,7 @@ class BotViewModel(private val repository: UserBotRepository) : ViewModel() {
                 username = username,
                 password = password,
                 phoneNumber = phoneNumber,
+                messageSubject = messageSubject,
                 messageHeader = messageHeader,
                 messageFooter = messageFooter
             )

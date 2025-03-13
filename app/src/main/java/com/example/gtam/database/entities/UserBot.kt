@@ -11,6 +11,7 @@ data class UserBot(
     val username: String?, // API key
     val password: String?, // API secret key
     val phoneNumber: String?,
+    val messageSubject: String,
     val messageHeader: String,
     val messageFooter: String
 )

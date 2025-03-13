@@ -28,7 +28,7 @@ class Activity1 : ComponentActivity() {
     private val input = Input()
     private val button = Buttons()
     private val banner = Banners()
-    private val dbBot: BotViewModel by viewModels { UserBotFactory(MyApp.userBotRepository) }
+    private val userBotVM: BotViewModel by viewModels { UserBotFactory(MyApp.userBotRepository) }
     private val message1 = "This will be the email that the system uses for messaging."
     private val message2 = "This will be the phone number that the system uses for texting."
     private val message3 = "The system will default to this starting message should no additional input be included."
@@ -47,7 +47,16 @@ class Activity1 : ComponentActivity() {
             var messageHeader by remember { mutableStateOf("") }
             var messageFooter by remember { mutableStateOf("") }
             // Database
-            val bot by dbBot.userBot.observeAsState(initial = UserBot(id = 1, email = null, username = null, password = null, phoneNumber = null, messageHeader = "", messageFooter = ""))
+            val bot by userBotVM.userBot.observeAsState(initial = UserBot(
+                id = 1,
+                email = null,
+                username = null,
+                password = null,
+                phoneNumber = null,
+                messageSubject = "",
+                messageHeader = "",
+                messageFooter = ""
+            ))
             if (bot.email != null) {
                 botEmail = bot.email!!
             }
@@ -60,6 +69,7 @@ class Activity1 : ComponentActivity() {
             if (bot.phoneNumber != null) {
                 botPhoneNumber = bot.phoneNumber!!
             }
+            messageSubject = bot.messageSubject
             messageHeader = bot.messageHeader
             messageFooter = bot.messageFooter
 
@@ -88,7 +98,7 @@ class Activity1 : ComponentActivity() {
                     banner.LittleText("Message Footer", modifier = Modifier, button, message4)
                     input.InputFieldLarge(messageFooter, { messageFooter = it },"Message")
                     // Save Button
-                    button.ButtonGeneric({ dbBot.updateBot(botEmail, botUsername, botPassword, botPhoneNumber, messageHeader, messageFooter) }, "Save")
+                    button.ButtonGeneric({ userBotVM.updateBot(botEmail, botUsername, botPassword, botPhoneNumber, messageSubject, messageHeader, messageFooter) }, "Save")
                 }
             }
         }

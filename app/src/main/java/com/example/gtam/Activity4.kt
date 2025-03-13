@@ -31,9 +31,14 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.LiveData
 import com.example.gtam.database.entities.Service
 import com.example.gtam.database.entities.UserBot
+import com.example.gtam.database.factory.ClientFactory
+import com.example.gtam.database.factory.ServiceFactory
+import com.example.gtam.database.factory.UserBotFactory
 import com.example.gtam.ui.theme.components.*
 import com.example.gtam.ui.theme.GTAMTheme
-import com.example.gtam.database.viewmodel.AllViewModel
+import com.example.gtam.database.viewmodel.BotViewModel
+import com.example.gtam.database.viewmodel.ClientViewModel
+import com.example.gtam.database.viewmodel.ServiceViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -48,17 +53,28 @@ class Activity4 : ComponentActivity() {
     private val banner = Banners()
     private val button = Buttons()
     private val input = Input()
-    private val dbAll: AllViewModel by viewModels()
+    private val userBotVM: BotViewModel by viewModels { UserBotFactory(MyApp.userBotRepository) }
+    private val clientVM: ClientViewModel by viewModels { ClientFactory(MyApp.clientRepository) }
+    private val serviceVM: ServiceViewModel by viewModels { ServiceFactory(MyApp.serviceRepository) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             // Database
-            val bot by dbAll.userBot.observeAsState(initial = UserBot(id = 1, email = null, username = null, password = null, phoneNumber = null, messageHeader = "", messageFooter = ""))
-            val clientOptions: LiveData<List<Pair<Long, String>>> = dbAll.clientDropdownList
-            val serviceOptions: LiveData<List<Pair<Long, String>>> = dbAll.serviceDropdownList
-            val serviceList by dbAll.selectedServices.observeAsState(emptyList())
+            val bot by userBotVM.userBot.observeAsState(initial = UserBot(
+                id = 1,
+                email = null,
+                username = null,
+                password = null,
+                phoneNumber = null,
+                messageSubject = "",
+                messageHeader = "",
+                messageFooter = ""
+            ))
+            val clientOptions: LiveData<List<Pair<Long, String>>> = clientVM.clientDropdownList
+            val serviceOptions: LiveData<List<Pair<Long, String>>> = serviceVM.serviceDropdownList
+            val serviceList by serviceVM.selectedServices.observeAsState(emptyList())
             // Local
             val context = LocalContext.current
             val clientSelected = remember { mutableStateOf<Long?>(null) }
@@ -72,6 +88,7 @@ class Activity4 : ComponentActivity() {
 
             val resetDropdown1 = remember { mutableStateOf<(() -> Unit)?>(null) }
             val resetDropdown2 = remember { mutableStateOf<(() -> Unit)?>(null) }
+            messageSubject = bot.messageSubject
             messageHeader = bot.messageHeader
             messageFooter = bot.messageFooter
             // UI
@@ -96,7 +113,7 @@ class Activity4 : ComponentActivity() {
                     input.InputField(servicePriceWI, { servicePriceWI = it }, "Write-in Price")
 
                     button.ButtonGeneric({
-                        saveService(dbAll, serviceSelected, serviceNameWI, servicePriceWI)
+                        saveService(serviceVM, serviceSelected, serviceNameWI, servicePriceWI)
                         serviceSelected.value = null
                         serviceNameWI = ""
                         servicePriceWI = ""
@@ -107,7 +124,7 @@ class Activity4 : ComponentActivity() {
                         .fillMaxWidth().padding(10.dp)) {
                         var itemCount = 0
                         serviceList.forEach {
-                            service -> ServiceWindow(itemCount, service, dbAll, input, button)
+                            service -> ServiceWindow(itemCount, service, serviceVM, input, button)
                             itemCount++
                         }
                     }
@@ -118,9 +135,9 @@ class Activity4 : ComponentActivity() {
                     input.InputFieldLarge(messageFooter, { messageFooter = it }, "Footer")
 
                     input.InputSwitch(rememberThis, { rememberThis = it }, "Remember this interaction")
-                    // Test Button
+                    // Send Button
                     button.ButtonGeneric({
-                        sendMessage(dbAll, bot, clientSelected, serviceList, messageSubject, messageHeader, messageFooter)
+                        sendMessage(clientVM, bot, clientSelected, serviceList, messageSubject, messageHeader, messageFooter)
                         button.showToast("Sending Message", context)
                                          }, "Send")
                 }
@@ -130,10 +147,10 @@ class Activity4 : ComponentActivity() {
     }
 }
 
-private fun sendMessage(database: AllViewModel, userBot: UserBot, clientSelected: MutableState<Long?>, serviceList: List<Service>, subject: String, header: String, footer: String) {
+private fun sendMessage(database: ClientViewModel, userBot: UserBot, clientSelected: MutableState<Long?>, serviceList: List<Service>, subject: String, header: String, footer: String) {
     CoroutineScope(Dispatchers.IO).launch {
         val clientId = clientSelected.value ?: return@launch
-        val client = database.clientById(clientId)
+        val client = database.getClientById(clientId).await()
 
         if (client?.clientEmail.isNullOrBlank()) {
             Log.e("sendMessage", "Client email is null or empty")
@@ -153,7 +170,7 @@ private fun sendMessage(database: AllViewModel, userBot: UserBot, clientSelected
     }
 }
 
-private fun saveService(database: AllViewModel, serviceSelected: MutableState<Long?>, serviceNameWI: String, servicePriceWI: String) {
+private fun saveService(database: ServiceViewModel, serviceSelected: MutableState<Long?>, serviceNameWI: String, servicePriceWI: String) {
     if (serviceSelected.value != null) {
         database.addService(serviceSelected)
     } else if (serviceNameWI.isNotBlank() && servicePriceWI.toDouble() > 0) {
@@ -170,7 +187,7 @@ private fun getTodayDate(): String {
 
 // Window to view the list of Services
 @Composable
-private fun ServiceWindow(counter: Int, iterable: Service, database: AllViewModel, input: Input, button: Buttons) {
+private fun ServiceWindow(counter: Int, iterable: Service, database: ServiceViewModel, input: Input, button: Buttons) {
     val serviceDateState = remember { mutableStateOf(iterable.serviceDate ?: "") }
     if (counter % 2 != 0) {
         ServiceRow(modifier = Modifier.background(Color.LightGray), iterable, database, input, button, serviceDateState)
@@ -181,7 +198,7 @@ private fun ServiceWindow(counter: Int, iterable: Service, database: AllViewMode
 
 // Additional styling for each Service
 @Composable
-private fun ServiceRow(modifier: Modifier, iterable: Service, database: AllViewModel, input: Input, button: Buttons, serviceDateState: MutableState<String>) {
+private fun ServiceRow(modifier: Modifier, iterable: Service, database: ServiceViewModel, input: Input, button: Buttons, serviceDateState: MutableState<String>) {
     val rounded = String.format(Locale.US,"%.2f", iterable.servicePrice)
     Row(modifier = modifier
         .fillMaxWidth()

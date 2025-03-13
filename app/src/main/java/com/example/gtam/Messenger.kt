@@ -12,14 +12,12 @@ class Messenger {
         body.append("$header\n")
 
         services.forEach {
-                service -> body.append("${service.serviceName}: ${String.format(Locale.US,"%.2f", service.servicePrice)}\n")
+                service -> body.append("${service.serviceName}: $${String.format(Locale.US,"%.2f", service.servicePrice)}   ${service.serviceDate}\n")
+                total += service.servicePrice
         }
 
         if (services.size > 1) {
-            services.forEach {
-                    service -> total += service.servicePrice
-                body.append(String.format(Locale.US,"%.2f", total))
-            }
+            body.append("Total: $${String.format(Locale.US,"%.2f", total)}\n")
         }
         body.append(footer)
 
