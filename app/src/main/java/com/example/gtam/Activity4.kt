@@ -16,6 +16,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -32,12 +33,14 @@ import androidx.lifecycle.LiveData
 import com.example.gtam.database.entities.Service
 import com.example.gtam.database.entities.UserBot
 import com.example.gtam.database.factory.ClientFactory
+import com.example.gtam.database.factory.MemoryFactory
 import com.example.gtam.database.factory.ServiceFactory
 import com.example.gtam.database.factory.UserBotFactory
 import com.example.gtam.ui.theme.components.*
 import com.example.gtam.ui.theme.GTAMTheme
 import com.example.gtam.database.viewmodel.BotViewModel
 import com.example.gtam.database.viewmodel.ClientViewModel
+import com.example.gtam.database.viewmodel.MemoryViewModel
 import com.example.gtam.database.viewmodel.ServiceViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -56,6 +59,7 @@ class Activity4 : ComponentActivity() {
     private val userBotVM: BotViewModel by viewModels { UserBotFactory(MyApp.userBotRepository) }
     private val clientVM: ClientViewModel by viewModels { ClientFactory(MyApp.clientRepository) }
     private val serviceVM: ServiceViewModel by viewModels { ServiceFactory(MyApp.serviceRepository) }
+    private val memoryVM: MemoryViewModel by viewModels { MemoryFactory(MyApp.memoryRepository) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,6 +79,7 @@ class Activity4 : ComponentActivity() {
             val clientOptions: LiveData<List<Pair<Long, String>>> = clientVM.clientDropdownList
             val serviceOptions: LiveData<List<Pair<Long, String>>> = serviceVM.serviceDropdownList
             val serviceList by serviceVM.selectedServices.observeAsState(emptyList())
+            val memory by memoryVM.memory.observeAsState()
             // Local
             val context = LocalContext.current
             val clientSelected = remember { mutableStateOf<Long?>(null) }
@@ -91,6 +96,21 @@ class Activity4 : ComponentActivity() {
             messageSubject = bot.messageSubject
             messageHeader = bot.messageHeader
             messageFooter = bot.messageFooter
+
+            LaunchedEffect(clientSelected.value) {
+                clientSelected.value?.let { clientId ->
+                    memoryVM.getMemoryByClient(clientId)
+                }
+            }
+
+            LaunchedEffect(memory) {
+                memory?.let {
+                    messageSubject = it.subject
+                    messageHeader = it.header
+                    messageFooter = it.footer
+                    serviceVM.getServiceFromMemory(it)
+                }
+            }
             // UI
             GTAMTheme {
                 Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
@@ -137,8 +157,15 @@ class Activity4 : ComponentActivity() {
                     input.InputSwitch(rememberThis, { rememberThis = it }, "Remember this interaction")
                     // Send Button
                     button.ButtonGeneric({
+                        // Send Email
                         sendMessage(clientVM, bot, clientSelected, serviceList, messageSubject, messageHeader, messageFooter)
                         button.showToast("Sending Message", context)
+                        // If rememberThis is true, attempt to save preference
+                        if (rememberThis) {
+                            clientSelected.value?.let {
+                                    clientId -> memoryVM.saveMemory(clientId, messageSubject, messageHeader, messageFooter, serviceList)
+                            } ?: run { button.showToast("Client not selected, could not save preference.", context)}
+                        }
                                          }, "Send")
                 }
 

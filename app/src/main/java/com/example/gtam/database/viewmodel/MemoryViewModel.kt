@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.gtam.database.entities.Memory
 import com.example.gtam.database.entities.Service
 import com.example.gtam.database.repository.MemoryRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class MemoryViewModel(private val repository: MemoryRepository) : ViewModel() {
@@ -15,7 +16,7 @@ class MemoryViewModel(private val repository: MemoryRepository) : ViewModel() {
     val memory: LiveData<Memory?> get() = _memory
 
     fun getMemoryByClient(clientId: Long) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val memoryData = repository.getMemoryByClient(clientId)
             _memory.postValue(memoryData)
         }
