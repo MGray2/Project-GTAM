@@ -69,9 +69,9 @@ class Activity4 : ComponentActivity() {
             val bot by userBotVM.userBot.observeAsState(initial = UserBot(
                 id = 1,
                 email = null,
-                username = null,
-                password = null,
-                phoneNumber = null,
+                mjApiKey = null,
+                mjSecretKey = null,
+                nvApiKey = null,
                 messageSubject = "",
                 messageHeader = "",
                 messageFooter = ""
@@ -179,21 +179,33 @@ private fun sendMessage(database: ClientViewModel, userBot: UserBot, clientSelec
         val clientId = clientSelected.value ?: return@launch
         val client = database.getClientById(clientId).await()
 
-        if (client?.clientEmail.isNullOrBlank()) {
-            Log.e("sendMessage", "Client email is null or empty")
-            return@launch
+        if (!client?.clientEmail.isNullOrBlank()) {
+            Log.d("DataTest", "Client Email Detected")
+            Messenger().sendEmail(
+                sender = userBot.email ?: return@launch,
+                username = userBot.mjApiKey ?: return@launch,
+                password = userBot.mjSecretKey ?: return@launch,
+                recipient = client!!.clientEmail!!,
+                sub = subject,
+                header = header,
+                services = serviceList,
+                footer = footer
+            )
+        }
+        if (!client?.clientPhoneNumber.isNullOrBlank()) {
+            Log.d("DataTest", "Client Phone Number Detected")
+            Messenger().sendSmsEmail(
+                sender = userBot.email ?: return@launch,
+                username = userBot.mjApiKey ?: return@launch,
+                password = userBot.mjSecretKey ?: return@launch,
+                recipient = client!!.clientPhoneNumber!!,
+                key = userBot.nvApiKey ?: return@launch,
+                header = header,
+                services = serviceList,
+                footer = footer
+                )
         }
 
-        Messenger().sendEmail(
-            sender = userBot.email ?: return@launch,
-            username = userBot.username ?: return@launch,
-            password = userBot.password ?: return@launch,
-            recipient = client!!.clientEmail!!,
-            sub = subject,
-            header = header,
-            services = serviceList,
-            footer = footer
-        )
     }
 }
 

@@ -22,9 +22,9 @@ class BotViewModel(private val repository: UserBotRepository) : ViewModel() {
                     val defaultBot = UserBot(
                         id = 1,
                         email = null,
-                        username = null,
-                        password = null,
-                        phoneNumber = null,
+                        mjApiKey = null,
+                        mjSecretKey = null,
+                        nvApiKey = null,
                         messageSubject = "",
                         messageHeader = "",
                         messageFooter = ""
@@ -42,9 +42,9 @@ class BotViewModel(private val repository: UserBotRepository) : ViewModel() {
     // Update changes to UserBot
     fun updateBot(
         email: String,
-        username: String,
-        password: String,
-        phoneNumber: String,
+        mailjetApiKey: String,
+        mailjetSecretKey: String,
+        numVerifyApiKey: String,
         messageSubject: String,
         messageHeader: String,
         messageFooter: String
@@ -53,9 +53,9 @@ class BotViewModel(private val repository: UserBotRepository) : ViewModel() {
             val updatedBot = UserBot(
                 id = 1,
                 email = email,
-                username = username,
-                password = password,
-                phoneNumber = phoneNumber,
+                mjApiKey = mailjetApiKey,
+                mjSecretKey = mailjetSecretKey,
+                nvApiKey = numVerifyApiKey,
                 messageSubject = messageSubject,
                 messageHeader = messageHeader,
                 messageFooter = messageFooter

@@ -40,9 +40,9 @@ class Activity1 : ComponentActivity() {
         setContent {
             // Local
             var botEmail by remember { mutableStateOf("") }
-            var botUsername by remember { mutableStateOf("") }
-            var botPassword by remember { mutableStateOf("") }
-            var botPhoneNumber by remember { mutableStateOf("") }
+            var botMJApiKey by remember { mutableStateOf("") }
+            var botMJSecretKey by remember { mutableStateOf("") }
+            var botNVApiKey by remember { mutableStateOf("") }
             var messageSubject by remember { mutableStateOf("") }
             var messageHeader by remember { mutableStateOf("") }
             var messageFooter by remember { mutableStateOf("") }
@@ -50,9 +50,9 @@ class Activity1 : ComponentActivity() {
             val bot by userBotVM.userBot.observeAsState(initial = UserBot(
                 id = 1,
                 email = null,
-                username = null,
-                password = null,
-                phoneNumber = null,
+                mjApiKey = null,
+                mjSecretKey = null,
+                nvApiKey = null,
                 messageSubject = "",
                 messageHeader = "",
                 messageFooter = ""
@@ -60,14 +60,14 @@ class Activity1 : ComponentActivity() {
             if (bot.email != null) {
                 botEmail = bot.email!!
             }
-            if (bot.username != null) {
-                botUsername = bot.username!!
+            if (bot.mjApiKey != null) {
+                botMJApiKey = bot.mjApiKey!!
             }
-            if (bot.password != null) {
-                botPassword = bot.password!!
+            if (bot.mjSecretKey != null) {
+                botMJSecretKey = bot.mjSecretKey!!
             }
-            if (bot.phoneNumber != null) {
-                botPhoneNumber = bot.phoneNumber!!
+            if (bot.nvApiKey != null) {
+                botNVApiKey = bot.nvApiKey!!
             }
             messageSubject = bot.messageSubject
             messageHeader = bot.messageHeader
@@ -82,12 +82,10 @@ class Activity1 : ComponentActivity() {
                     input.InputField(botEmail, { botEmail = it },"Email")
                     // API
                     banner.LittleText("Api Setup", modifier = Modifier, button, message2)
-                    input.InputField(botUsername, { botUsername = it}, "Api Key")
-                    input.InputField(botPassword, { botPassword = it }, placeholder = "Api Secret Key")
+                    input.InputField(botMJApiKey, { botMJApiKey = it}, "Mailjet Api Key")
+                    input.InputField(botMJSecretKey, { botMJSecretKey = it }, "Mailjet Secret Key")
+                    input.InputField(botNVApiKey, { botNVApiKey = it },"NumVerify Api Key")
 
-                    // Bot Phone Number
-                    banner.LittleText("Bot Phone Number", modifier = Modifier, button, message2)
-                    input.InputFieldNumber(botPhoneNumber, { botPhoneNumber = it },"Phone Number", KeyboardType.Number)
                     // Message Header
                     banner.LittleText("Subject", modifier = Modifier)
                     input.InputField(messageSubject, { messageSubject = it }, "Subject")
@@ -98,7 +96,7 @@ class Activity1 : ComponentActivity() {
                     banner.LittleText("Message Footer", modifier = Modifier, button, message4)
                     input.InputFieldLarge(messageFooter, { messageFooter = it },"Message")
                     // Save Button
-                    button.ButtonGeneric({ userBotVM.updateBot(botEmail, botUsername, botPassword, botPhoneNumber, messageSubject, messageHeader, messageFooter) }, "Save")
+                    button.ButtonGeneric({ userBotVM.updateBot(botEmail, botMJApiKey, botMJSecretKey, botNVApiKey, messageSubject, messageHeader, messageFooter) }, "Save")
                 }
             }
         }

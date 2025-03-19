@@ -8,9 +8,9 @@ import androidx.room.PrimaryKey
 data class UserBot(
     @PrimaryKey val id: Long = 1,
     val email: String?,
-    val username: String?, // API key
-    val password: String?, // API secret key
-    val phoneNumber: String?,
+    val mjApiKey: String?, // Mailjet API key
+    val mjSecretKey: String?, // Mailjet API secret key
+    val nvApiKey: String?, // NumVerify API key
     val messageSubject: String,
     val messageHeader: String,
     val messageFooter: String
