@@ -6,9 +6,7 @@ import javax.mail.internet.*
 import com.example.gtam.database.entities.Service
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import com.squareup.moshi.Json
 import com.squareup.moshi.Moshi
-import com.squareup.moshi.adapter
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -62,49 +60,33 @@ class Messenger {
         }
     }
 
+    // Constructs SMS gateway by reading the result of getProvider()
     @Suppress("SpellCheckingInspection")
     private fun getSmsGateway(phoneNumber: String, carrier: String?): String? {
-        val domain = when (carrier?.lowercase()) {
-            "at&t", "att wireless", "at&t mobility llc" -> "txt.att.net"
-            "verizon", "verizon wireless", "cellco partnership (verizon wireless)" -> "vtext.com"
-            "t-mobile", "tmobile" -> "tmomail.net"
-            "sprint", "sprint pcs" -> "messaging.sprintpcs.com"
-            "us cellular" -> "email.uscc.net"
+        val domain = when {
+            // AT&T
+            (carrier?.contains(Regex("at[&\\s]?t", RegexOption.IGNORE_CASE)) == true) -> "txt.att.net"
+            // Verizon Phones
+            (carrier?.contains(Regex("verizon|xfinity|visible", RegexOption.IGNORE_CASE)) == true) -> "vtext.com"
+            // T-Mobile
+            (carrier?.contains(Regex("t[-\\s]?mobile", RegexOption.IGNORE_CASE)) == true ) -> "tmomail.net"
+            // Sprint
+            (carrier?.contains(Regex("sprint", RegexOption.IGNORE_CASE)) == true) -> "messaging.sprintpcs.com"
+            // U.S. Cellular
+            (carrier?.contains(Regex("u[.\\s]?s[.\\s]?cellular", RegexOption.IGNORE_CASE)) == true) -> "email.uscc.net"
+            // Boost Mobile
+            (carrier?.contains(Regex("boost", RegexOption.IGNORE_CASE)) == true) -> "sms.myboostmobile.com"
+            // Cricket Wireless
+            (carrier?.contains(Regex("cricket", RegexOption.IGNORE_CASE)) == true) -> "sms.cricketwireless.net"
+            // Metro by T-Mobile
+            (carrier?.contains(Regex("metro", RegexOption.IGNORE_CASE)) == true) -> "mymetropcs.com"
+            // Google Fi
+            (carrier?.contains(Regex("google", RegexOption.IGNORE_CASE)) == true) -> "msg.fi.google.com"
             else -> null
         }
         Log.d("DataTest", "SMS Gateway: $domain")
 
         return domain?.let { "$phoneNumber@$it" }
-    }
-
-    // Send messages through Gmail API
-    private fun sendGmail(sender: String, appPassword: String, recipient: String, sub: String, body: String): Boolean {
-
-        val properties = Properties().apply {
-            put("mail.smtp.auth", "true")
-            put("mail.smtp.starttls.enable", "true")
-            put("mail.smtp.host", "smtp.gmail.com")
-            put("mail.smtp.port", "587")
-        }
-
-        val session = Session.getInstance(properties, object : Authenticator() {
-            override fun getPasswordAuthentication() = PasswordAuthentication(sender, appPassword)
-        })
-
-        return try {
-            val message = MimeMessage(session).apply {
-                setFrom(InternetAddress(sender))
-                setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipient))
-                subject = sub
-                setText(body)
-            }
-            Transport.send(message)
-            Log.d("DataTest","Email sent successfully to $recipient")
-            true
-        } catch (e: MessagingException) {
-            e.printStackTrace()
-            false
-        }
     }
 
     // Send messages using the Mailjet API
@@ -146,17 +128,15 @@ class Messenger {
     // Username is an api key, password is the secret key, sender is an email, recipient is a phone number
     fun sendSmsEmail(username: String, password: String, sender: String, recipient: String, key: String, header: String, services: List<Service>, footer: String) {
         var phoneNumber = recipient
-        Log.d("DataTest", "Phone# start:$phoneNumber")
-        if (phoneNumber.length == 10) {
-            phoneNumber = "1$phoneNumber"
-        }
-        Log.d("DataTest", "Phone# if:$phoneNumber")
+        if (phoneNumber.length == 10) phoneNumber = "1$phoneNumber" // Add country number
+
         CoroutineScope(Dispatchers.IO).launch {
             val body = formatBody(header, footer, services)
-            val provider = getProvider(phoneNumber, key) // needs 1+phoneNumber
-            if (phoneNumber.length == 11) phoneNumber = phoneNumber.substring(1)
-            Log.d("DataTest", "Phone# cs:$phoneNumber")
-            val smsGateway = getSmsGateway(phoneNumber, provider) // does not need 1+
+            var provider = getProvider(phoneNumber, key)
+            if (provider == null) provider = getProvider(recipient, key) // try original number
+            if (phoneNumber.length == 11) phoneNumber = phoneNumber.substring(1) // Remove country number
+
+            val smsGateway = getSmsGateway(phoneNumber, provider) // does not need country number
 
             if (smsGateway != null) {
                 sendMailjetEmail(sender, smsGateway, "", body, username, password)

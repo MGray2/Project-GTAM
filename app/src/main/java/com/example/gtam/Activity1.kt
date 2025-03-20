@@ -9,6 +9,7 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -17,7 +18,7 @@ import androidx.compose.runtime.setValue
 import com.example.gtam.ui.theme.components.*
 import com.example.gtam.ui.theme.GTAMTheme
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.platform.LocalContext
 import com.example.gtam.database.entities.UserBot
 import com.example.gtam.database.factory.UserBotFactory
 import com.example.gtam.database.viewmodel.BotViewModel
@@ -39,6 +40,7 @@ class Activity1 : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             // Local
+            val context = LocalContext.current
             var botEmail by remember { mutableStateOf("") }
             var botMJApiKey by remember { mutableStateOf("") }
             var botMJSecretKey by remember { mutableStateOf("") }
@@ -57,21 +59,17 @@ class Activity1 : ComponentActivity() {
                 messageHeader = "",
                 messageFooter = ""
             ))
-            if (bot.email != null) {
-                botEmail = bot.email!!
+            LaunchedEffect(bot) {
+                // Populate the fields
+                bot.email?.let { botEmail = it }
+                bot.mjApiKey?.let { botMJApiKey = it }
+                bot.mjSecretKey?.let { botMJSecretKey = it }
+                bot.nvApiKey?.let { botNVApiKey = it }
+
+                messageSubject = bot.messageSubject
+                messageHeader = bot.messageHeader
+                messageFooter = bot.messageFooter
             }
-            if (bot.mjApiKey != null) {
-                botMJApiKey = bot.mjApiKey!!
-            }
-            if (bot.mjSecretKey != null) {
-                botMJSecretKey = bot.mjSecretKey!!
-            }
-            if (bot.nvApiKey != null) {
-                botNVApiKey = bot.nvApiKey!!
-            }
-            messageSubject = bot.messageSubject
-            messageHeader = bot.messageHeader
-            messageFooter = bot.messageFooter
 
             // UI
             GTAMTheme {
@@ -96,7 +94,10 @@ class Activity1 : ComponentActivity() {
                     banner.LittleText("Message Footer", modifier = Modifier, button, message4)
                     input.InputFieldLarge(messageFooter, { messageFooter = it },"Message")
                     // Save Button
-                    button.ButtonGeneric({ userBotVM.updateBot(botEmail, botMJApiKey, botMJSecretKey, botNVApiKey, messageSubject, messageHeader, messageFooter) }, "Save")
+                    button.ButtonGeneric({
+                        userBotVM.updateBot(botEmail, botMJApiKey, botMJSecretKey, botNVApiKey, messageSubject, messageHeader, messageFooter)
+                        button.showToast("Account Saved", context)
+                                         }, "Save")
                 }
             }
         }

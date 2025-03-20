@@ -52,6 +52,7 @@ class Activity2 : ComponentActivity() {
             var clientAddress by remember { mutableStateOf("") }
             var clientEmail by remember { mutableStateOf("") }
             var clientPhoneNumber by remember { mutableStateOf("") }
+            val message1 = "You must include either the client's name or address to save this customer."
             // Database
             val clientList by dbClients.allClients.observeAsState(initial = emptyList())
 
@@ -60,15 +61,16 @@ class Activity2 : ComponentActivity() {
                 Column (modifier = Modifier) {
                     banner.CustomHeader("Manage Clients")
                     // Identity
-                    banner.LittleText("Client's Name / Address", modifier = Modifier)
-                    input.InputField(clientName, { clientName = it }, "Name")
-                    input.InputField(clientAddress, { clientAddress = it }, "Address")
+                    banner.LittleText("Name", modifier = Modifier, button, message1)
+                    input.InputField(clientName, { clientName = it }, "Client's Name")
+                    banner.LittleText("Address", modifier = Modifier)
+                    input.InputField(clientAddress, { clientAddress = it }, "Client's Address")
                     // Email
-                    banner.LittleText("Client's Email", modifier = Modifier)
-                    input.InputField(clientEmail,{ clientEmail = it },"Email")
+                    banner.LittleText("Email", modifier = Modifier)
+                    input.InputField(clientEmail,{ clientEmail = it },"Client's Email")
                     // Phone Number
-                    banner.LittleText("Client's Phone Number", modifier = Modifier)
-                    input.InputFieldNumber(clientPhoneNumber,{ clientPhoneNumber = it },"Phone Number", KeyboardType.Number)
+                    banner.LittleText("Phone", modifier = Modifier)
+                    input.InputFieldNumber(clientPhoneNumber,{ clientPhoneNumber = it },"Client's Phone (no spaces)", KeyboardType.Number)
                     // Save Button
                     button.ButtonGeneric({
                         saveClient(clientName, clientAddress, clientEmail, clientPhoneNumber, dbClients, context, button)
