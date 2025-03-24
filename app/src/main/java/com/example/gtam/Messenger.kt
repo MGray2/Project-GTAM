@@ -1,8 +1,6 @@
 package com.example.gtam
 import android.util.Log
 import java.util.*
-import javax.mail.*
-import javax.mail.internet.*
 import com.example.gtam.database.entities.Service
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -12,6 +10,15 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.net.HttpURLConnection
+import java.net.URL
+import android.util.Base64
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import org.json.JSONArray
+import org.json.JSONObject
+import java.io.IOException
+import java.io.OutputStreamWriter
 
 class Messenger {
 
@@ -90,56 +97,87 @@ class Messenger {
     }
 
     // Send messages using the Mailjet API
-    private fun sendMailjetEmail(sender: String, recipient: String, sub: String, body: String, username: String, password: String): Boolean {
+    private suspend fun sendMailjetEmail(
+        sender: String,
+        recipient: String,
+        subject: String,
+        body: String,
+        apiKey: String,
+        apiSecretKey: String
+    ): Boolean {
+        return withContext(Dispatchers.IO) {
+            try {
+                // incomplete API information
+                if (apiKey.isBlank() || apiSecretKey.isBlank()) {
+                    Log.e("MailjetError", "API key or Secret is missing!")
+                    return@withContext false
+                }
 
-        val properties = Properties().apply {
-            put("mail.smtp.auth", "true")
-            put("mail.smtp.starttls.enable", "true")
-            put("mail.smtp.host", "in-v3.mailjet.com")
-            put("mail.smtp.port", "587")
-        }
+                val url = URL("https://api.mailjet.com/v3.1/send")
+                val connection = url.openConnection() as HttpURLConnection
 
-        val session = Session.getInstance(properties, object : Authenticator() {
-            override fun getPasswordAuthentication() = PasswordAuthentication(username, password)
-        })
+                val credentials = "$apiKey:$apiSecretKey"
+                val authHeader = "Basic " + Base64.encodeToString(credentials.toByteArray(), Base64.NO_WRAP)
 
-        return try {
-            val message = MimeMessage(session).apply {
-                setFrom(InternetAddress(sender))
-                setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipient))
-                subject = sub
-                setText(body)
+                connection.requestMethod = "POST"
+                connection.setRequestProperty("Authorization", authHeader)
+                connection.setRequestProperty("Content-Type", "application/json")
+                connection.doOutput = true
+
+                val jsonBody = JSONObject().apply {
+                    put("Messages", JSONArray().put(
+                        JSONObject().apply {
+                            put("From", JSONObject().put("Email", sender))
+                            put("To", JSONArray().put(JSONObject().put("Email", recipient)))
+                            put("Subject", subject)
+                            put("TextPart", body)
+                        }
+                    ))
+                }.toString()
+
+                OutputStreamWriter(connection.outputStream).use { it.write(jsonBody) }
+
+                val responseCode = connection.responseCode
+                val responseMessage = try {
+                    connection.inputStream.bufferedReader().readText()
+                } catch (e: IOException) {
+                    connection.errorStream?.bufferedReader()?.readText() ?: "Unknown error"
+                }
+
+                Log.d("MailjetResponse", "Code: $responseCode, Message: $responseMessage")
+
+                return@withContext responseCode in 200..299 // success range
+            } catch (e: IOException) {
+                e.printStackTrace()
+                Log.e("MailjetError", "Error sending email: ${e.message}")
+                return@withContext false
             }
-            Transport.send(message)
-            Log.d("DataTest","Email sent successfully!") // Debug
-            true
-        } catch (e: MessagingException) {
-            e.printStackTrace()
-            false
         }
     }
 
-    // Username is an api key, password is the secret key and sender and recipient are email addresses
-    fun sendEmail(username: String, password: String, sender: String, recipient: String, sub: String, header: String, services: List<Service>, footer: String) {
+    // Mailjet ApiKey, Mailjet SecretKey and sender and recipient are email addresses
+    fun sendEmail(username: String, password: String, sender: String, recipient: String, subject: String, header: String, services: List<Service>, footer: String) {
         val body = formatBody(header, footer, services)
-        sendMailjetEmail(sender, recipient, sub, body, username, password)
+        CoroutineScope(Dispatchers.IO).launch {
+            sendMailjetEmail(sender, recipient, subject, body, username, password)
+        }
     }
 
-    // Username is an api key, password is the secret key, sender is an email, recipient is a phone number
-    fun sendSmsEmail(username: String, password: String, sender: String, recipient: String, key: String, header: String, services: List<Service>, footer: String) {
+    //  Mailjet apiKey, Mailjet SecretKey, sender is an email, recipient is a phone number
+    fun sendSmsEmail(apiKey: String, apiSecretKey: String, sender: String, recipient: String, numVerifyKey: String, header: String, services: List<Service>, footer: String) {
         var phoneNumber = recipient
         if (phoneNumber.length == 10) phoneNumber = "1$phoneNumber" // Add country number
 
         CoroutineScope(Dispatchers.IO).launch {
             val body = formatBody(header, footer, services)
-            var provider = getProvider(phoneNumber, key)
-            if (provider == null) provider = getProvider(recipient, key) // try original number
+            var provider = getProvider(phoneNumber, numVerifyKey)
+            if (provider == null) provider = getProvider(recipient, numVerifyKey) // try original number
             if (phoneNumber.length == 11) phoneNumber = phoneNumber.substring(1) // Remove country number
 
             val smsGateway = getSmsGateway(phoneNumber, provider) // does not need country number
 
             if (smsGateway != null) {
-                sendMailjetEmail(sender, smsGateway, "", body, username, password)
+                sendMailjetEmail(sender, smsGateway, "", body, apiKey, apiSecretKey)
             }
         }
     }

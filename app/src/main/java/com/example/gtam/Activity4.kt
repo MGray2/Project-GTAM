@@ -196,10 +196,10 @@ private fun sendMessage(database: ClientViewModel, userBot: UserBot, clientSelec
             Log.d("DataTest", "Client Phone Number Detected")
             Messenger().sendSmsEmail(
                 sender = userBot.email ?: return@launch,
-                username = userBot.mjApiKey ?: return@launch,
-                password = userBot.mjSecretKey ?: return@launch,
+                apiKey = userBot.mjApiKey ?: return@launch,
+                apiSecretKey = userBot.mjSecretKey ?: return@launch,
                 recipient = client!!.clientPhoneNumber!!,
-                key = userBot.nvApiKey ?: return@launch,
+                numVerifyKey = userBot.nvApiKey ?: return@launch,
                 header = header,
                 services = serviceList,
                 footer = footer

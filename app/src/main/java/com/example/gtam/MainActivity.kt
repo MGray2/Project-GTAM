@@ -46,6 +46,8 @@ fun MainMenu() {
         button.MainMenuButton(context, Activity1::class.java, "Bot Account Setup")
         button.MainMenuButton(context, Activity2::class.java, "Manage Client Info")
         button.MainMenuButton(context, Activity3::class.java, "Manage Services")
+        button.MainMenuButton(context, Activity5::class.java, "Message History")
+
     }
 
 }
