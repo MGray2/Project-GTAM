@@ -33,6 +33,7 @@ import androidx.lifecycle.LiveData
 import com.example.gtam.database.entities.Service
 import com.example.gtam.database.entities.UserBot
 import com.example.gtam.database.factory.ClientFactory
+import com.example.gtam.database.factory.HistoryFactory
 import com.example.gtam.database.factory.MemoryFactory
 import com.example.gtam.database.factory.ServiceFactory
 import com.example.gtam.database.factory.UserBotFactory
@@ -40,6 +41,7 @@ import com.example.gtam.ui.theme.components.*
 import com.example.gtam.ui.theme.GTAMTheme
 import com.example.gtam.database.viewmodel.BotViewModel
 import com.example.gtam.database.viewmodel.ClientViewModel
+import com.example.gtam.database.viewmodel.HistoryViewModel
 import com.example.gtam.database.viewmodel.MemoryViewModel
 import com.example.gtam.database.viewmodel.ServiceViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -60,6 +62,7 @@ class Activity4 : ComponentActivity() {
     private val clientVM: ClientViewModel by viewModels { ClientFactory(MyApp.clientRepository) }
     private val serviceVM: ServiceViewModel by viewModels { ServiceFactory(MyApp.serviceRepository) }
     private val memoryVM: MemoryViewModel by viewModels { MemoryFactory(MyApp.memoryRepository) }
+    private val historyVM: HistoryViewModel by viewModels { HistoryFactory(MyApp.historyRepository)}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -158,7 +161,7 @@ class Activity4 : ComponentActivity() {
                     // Send Button
                     button.ButtonGeneric({
                         // Send Email
-                        sendMessage(clientVM, bot, clientSelected, serviceList, messageSubject, messageHeader, messageFooter)
+                        sendMessage(clientVM, bot, historyVM, clientSelected, serviceList, messageSubject, messageHeader, messageFooter)
                         button.showToast("Sending Message", context)
                         // If rememberThis is true, attempt to save preference
                         if (rememberThis) {
@@ -174,27 +177,31 @@ class Activity4 : ComponentActivity() {
     }
 }
 
-private fun sendMessage(database: ClientViewModel, userBot: UserBot, clientSelected: MutableState<Long?>, serviceList: List<Service>, subject: String, header: String, footer: String) {
+private fun sendMessage(database: ClientViewModel, userBot: UserBot, history: HistoryViewModel, clientSelected: MutableState<Long?>, serviceList: List<Service>, subject: String, header: String, footer: String) {
     CoroutineScope(Dispatchers.IO).launch {
         val clientId = clientSelected.value ?: return@launch
         val client = database.getClientById(clientId).await()
+        var response = Messenger.MessengerResponse(true, "No errors detected.")
+        var messageType = ""
+        var sub = subject // modifiable subject
 
         if (!client?.clientEmail.isNullOrBlank()) {
             Log.d("DataTest", "Client Email Detected")
-            Messenger().sendEmail(
+            response = Messenger().sendEmail(
                 sender = userBot.email ?: return@launch,
                 username = userBot.mjApiKey ?: return@launch,
                 password = userBot.mjSecretKey ?: return@launch,
                 recipient = client!!.clientEmail!!,
-                sub = subject,
+                subject = subject,
                 header = header,
                 services = serviceList,
                 footer = footer
             )
+            messageType = "Email"
         }
         if (!client?.clientPhoneNumber.isNullOrBlank()) {
             Log.d("DataTest", "Client Phone Number Detected")
-            Messenger().sendSmsEmail(
+            response = Messenger().sendSmsEmail(
                 sender = userBot.email ?: return@launch,
                 apiKey = userBot.mjApiKey ?: return@launch,
                 apiSecretKey = userBot.mjSecretKey ?: return@launch,
@@ -203,9 +210,20 @@ private fun sendMessage(database: ClientViewModel, userBot: UserBot, clientSelec
                 header = header,
                 services = serviceList,
                 footer = footer
-                )
+            )
+            messageType = "Text"
+            sub = "(subject ignored for text)"
         }
-
+        // Create a record of the message
+        history.insertHistory(
+            clientSelected.value ?: -1L,
+            messageType,
+            response.status,
+            response.message,
+            getTodayFullDate(),
+            sub,
+            Messenger().formatBody(header, footer, serviceList)
+        )
     }
 }
 
@@ -222,6 +240,14 @@ private fun getTodayDate(): String {
     val calendar = Calendar.getInstance()
     val dateFormat = SimpleDateFormat("MM/dd/yy", Locale.getDefault())
     return dateFormat.format(calendar.time)
+}
+
+private fun getTodayFullDate(): String {
+    val calendar = Calendar.getInstance()
+    val day = SimpleDateFormat("EEEE", Locale.getDefault()).format(calendar.time)
+    val date = SimpleDateFormat("MM/dd/yy", Locale.getDefault()).format(calendar.time)
+    val time = SimpleDateFormat("hh:mm:ss", Locale.getDefault()).format(calendar.time)
+    return "$day, Date: $date, Time: $time"
 }
 
 // Window to view the list of Services

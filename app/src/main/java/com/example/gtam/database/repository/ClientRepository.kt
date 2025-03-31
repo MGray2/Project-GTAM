@@ -3,7 +3,6 @@ package com.example.gtam.database.repository
 import com.example.gtam.database.dao.ClientDao
 import com.example.gtam.database.entities.Client
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 
 class ClientRepository(private val clientDao: ClientDao) {
 

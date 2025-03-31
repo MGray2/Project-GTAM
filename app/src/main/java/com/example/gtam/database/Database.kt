@@ -9,13 +9,14 @@ import com.example.gtam.database.converters.ServiceListConverter
 import com.example.gtam.database.dao.*
 import com.example.gtam.database.entities.*
 
-@Database(entities = [UserBot::class, Service::class, Client::class, Memory::class], version = 1, exportSchema = false)
+@Database(entities = [UserBot::class, Service::class, Client::class, Memory::class, History::class], version = 1, exportSchema = false)
 @TypeConverters(ServiceListConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun userBotDao() : UserBotDao
     abstract fun serviceDao() : ServiceDao
     abstract fun clientDao() : ClientDao
     abstract fun memoryDao() : MemoryDao
+    abstract fun historyDao() : HistoryDao
 
     companion object {
         @Volatile

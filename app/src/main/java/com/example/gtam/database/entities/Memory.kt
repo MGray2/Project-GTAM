@@ -3,8 +3,7 @@ package com.example.gtam.database.entities
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import androidx.room.TypeConverters
-import com.example.gtam.database.converters.ServiceListConverter
+
 
 // Database table for holding preference data for auto-filling forms
 @Entity(tableName = "memory")

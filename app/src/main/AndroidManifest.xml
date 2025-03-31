@@ -18,6 +18,7 @@
         <activity android:name=".Activity3" />
         <activity android:name=".Activity4" />
         <activity android:name=".Activity5" />
+        <activity android:name=".Activity6" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

@@ -13,23 +13,24 @@ import kotlinx.coroutines.withContext
 import java.net.HttpURLConnection
 import java.net.URL
 import android.util.Base64
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
+import androidx.lifecycle.ViewModel
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
 import java.io.OutputStreamWriter
 
 class Messenger {
-
     // Data class to hold information received from NumVerify
     private data class CarrierInfo(
         val valid: Boolean,
         val carrier: String
     )
 
+    // Data class to hold status information for history logging
+    data class MessengerResponse(val status: Boolean, val message: String)
+
     // Connects Header + Service List + Total? + Footer
-    private fun formatBody(header: String, footer: String, services: List<Service>): String {
+    fun formatBody(header: String, footer: String, services: List<Service>): String {
         val body = StringBuilder("")
         var total = 0.00
         body.append("$header\n")
@@ -104,13 +105,13 @@ class Messenger {
         body: String,
         apiKey: String,
         apiSecretKey: String
-    ): Boolean {
+    ): MessengerResponse {
         return withContext(Dispatchers.IO) {
             try {
                 // incomplete API information
                 if (apiKey.isBlank() || apiSecretKey.isBlank()) {
                     Log.e("MailjetError", "API key or Secret is missing!")
-                    return@withContext false
+                    return@withContext MessengerResponse(false, "API key or Secret Key is missing")
                 }
 
                 val url = URL("https://api.mailjet.com/v3.1/send")
@@ -146,39 +147,36 @@ class Messenger {
 
                 Log.d("MailjetResponse", "Code: $responseCode, Message: $responseMessage")
 
-                return@withContext responseCode in 200..299 // success range
+                return@withContext MessengerResponse(responseCode in 200..299, "") // success
             } catch (e: IOException) {
                 e.printStackTrace()
+                val errorMessage = "${e.message}"
                 Log.e("MailjetError", "Error sending email: ${e.message}")
-                return@withContext false
+                return@withContext MessengerResponse(false, errorMessage)
             }
         }
     }
 
-    // Mailjet ApiKey, Mailjet SecretKey and sender and recipient are email addresses
-    fun sendEmail(username: String, password: String, sender: String, recipient: String, subject: String, header: String, services: List<Service>, footer: String) {
+    // Mailjet ApiKey, Mailjet SecretKey and sender and recipient are email addresses. returns messenger response
+    suspend fun sendEmail(username: String, password: String, sender: String, recipient: String, subject: String, header: String, services: List<Service>, footer: String): MessengerResponse {
         val body = formatBody(header, footer, services)
-        CoroutineScope(Dispatchers.IO).launch {
-            sendMailjetEmail(sender, recipient, subject, body, username, password)
-        }
+        return sendMailjetEmail(sender, recipient, subject, body, username, password)
     }
 
-    //  Mailjet apiKey, Mailjet SecretKey, sender is an email, recipient is a phone number
-    fun sendSmsEmail(apiKey: String, apiSecretKey: String, sender: String, recipient: String, numVerifyKey: String, header: String, services: List<Service>, footer: String) {
+    //  Mailjet apiKey, Mailjet SecretKey, sender is an email, recipient is a phone number. returns messenger response
+    suspend fun sendSmsEmail(apiKey: String, apiSecretKey: String, sender: String, recipient: String, numVerifyKey: String, header: String, services: List<Service>, footer: String): MessengerResponse {
         var phoneNumber = recipient
         if (phoneNumber.length == 10) phoneNumber = "1$phoneNumber" // Add country number
 
-        CoroutineScope(Dispatchers.IO).launch {
-            val body = formatBody(header, footer, services)
-            var provider = getProvider(phoneNumber, numVerifyKey)
-            if (provider == null) provider = getProvider(recipient, numVerifyKey) // try original number
-            if (phoneNumber.length == 11) phoneNumber = phoneNumber.substring(1) // Remove country number
+        val body = formatBody(header, footer, services)
+        var provider = getProvider(phoneNumber, numVerifyKey)
+        if (provider == null) provider = getProvider(recipient, numVerifyKey) // try original number
+        if (phoneNumber.length == 11) phoneNumber = phoneNumber.substring(1) // Remove country number
 
-            val smsGateway = getSmsGateway(phoneNumber, provider) // does not need country number
+        val smsGateway = getSmsGateway(phoneNumber, provider) // does not need country number
 
-            if (smsGateway != null) {
-                sendMailjetEmail(sender, smsGateway, "", body, apiKey, apiSecretKey)
-            }
-        }
+        return if (smsGateway != null) {
+            sendMailjetEmail(sender, smsGateway, "", body, apiKey, apiSecretKey)
+        } else MessengerResponse(false, "Failed to create SMS gateway.")
     }
 }
