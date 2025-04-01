@@ -52,6 +52,7 @@ class Activity2 : ComponentActivity() {
             var clientAddress by remember { mutableStateOf("") }
             var clientEmail by remember { mutableStateOf("") }
             var clientPhoneNumber by remember { mutableStateOf("") }
+            var itemCount = 0
             val message1 = "You must include either the client's name or address to save this customer."
             // Database
             val clientList by dbClients.allClients.observeAsState(initial = emptyList())
@@ -80,7 +81,6 @@ class Activity2 : ComponentActivity() {
                         modifier = Modifier.verticalScroll(rememberScrollState())
                             .fillMaxWidth().padding(10.dp)
                     ) {
-                        var itemCount = 0
                         clientList.forEach { client ->
                             ClientWindow(itemCount, client, dbClients, button)
                             itemCount++

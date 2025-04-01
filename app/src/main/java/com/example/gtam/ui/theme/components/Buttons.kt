@@ -22,7 +22,9 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -62,6 +64,33 @@ class Buttons {
     @Composable
     fun ButtonGeneric(onClick: () -> Unit, placeholder: String) {
         Button(onClick = { onClick() },
+            modifier = Modifier.padding(10.dp)
+                .fillMaxWidth()
+                .height(70.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.LightGray,
+                contentColor = Color.Black,
+                disabledContentColor = Color.Transparent,
+                disabledContainerColor = Color.Transparent
+            ),
+            shape = RoundedCornerShape(0.dp)
+        ) {
+            Text(placeholder, fontSize = 24.sp)
+        }
+    }
+
+    @Composable
+    fun ButtonDoubleClick(onClick: () -> Unit, placeholder: String, successMessage: String, failMessage: String, context: Context) {
+        var lastClickTime by remember { mutableLongStateOf(0L) }
+        Button(onClick = {
+            val currentTime = System.currentTimeMillis()
+            if (currentTime - lastClickTime < 1000) {
+                onClick()
+                showToast(successMessage, context) // double-clicked in time
+            } else {
+                showToast(failMessage, context) // too slow
+            }
+            lastClickTime = currentTime },
             modifier = Modifier.padding(10.dp)
                 .fillMaxWidth()
                 .height(70.dp),
@@ -184,5 +213,23 @@ class Buttons {
 
     fun showToast(message: String, context: Context) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+    }
+
+    @Composable
+    fun HistoryButton(onClick: () -> Unit, placeholder: String) {
+        Button(onClick = { onClick() },
+            modifier = Modifier.padding(5.dp)
+                .fillMaxWidth()
+                .height(80.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.LightGray,
+                contentColor = Color.Black,
+                disabledContentColor = Color.Transparent,
+                disabledContainerColor = Color.Transparent
+            ),
+            shape = RoundedCornerShape(0.dp)
+        ) {
+            Text(placeholder, fontSize = 24.sp, lineHeight = 30.sp)
+        }
     }
 }

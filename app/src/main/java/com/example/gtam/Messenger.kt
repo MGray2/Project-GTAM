@@ -110,7 +110,6 @@ class Messenger {
             try {
                 // incomplete API information
                 if (apiKey.isBlank() || apiSecretKey.isBlank()) {
-                    Log.e("MailjetError", "API key or Secret is missing!")
                     return@withContext MessengerResponse(false, "API key or Secret Key is missing")
                 }
 
@@ -145,13 +144,10 @@ class Messenger {
                     connection.errorStream?.bufferedReader()?.readText() ?: "Unknown error"
                 }
 
-                Log.d("MailjetResponse", "Code: $responseCode, Message: $responseMessage")
-
                 return@withContext MessengerResponse(responseCode in 200..299, "") // success
             } catch (e: IOException) {
                 e.printStackTrace()
                 val errorMessage = "${e.message}"
-                Log.e("MailjetError", "Error sending email: ${e.message}")
                 return@withContext MessengerResponse(false, errorMessage)
             }
         }

@@ -19,6 +19,11 @@ class HistoryRepository(private val historyDao: HistoryDao) {
         historyDao.deleteHistory(history)
     }
 
+    // Delete All
+    suspend fun deleteAllHistory() {
+        historyDao.deleteAllHistory()
+    }
+
     // Get by id
     fun getHistoryById(historyId: Long): Flow<History?> {
         return historyDao.getHistoryById(historyId)

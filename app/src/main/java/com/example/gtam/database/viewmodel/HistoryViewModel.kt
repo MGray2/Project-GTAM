@@ -35,4 +35,10 @@ class HistoryViewModel(private val repository: HistoryRepository) : ViewModel() 
             }
         }
     }
+
+    fun deleteAllHistory() {
+        viewModelScope.launch {
+            repository.deleteAllHistory()
+        }
+    }
 }

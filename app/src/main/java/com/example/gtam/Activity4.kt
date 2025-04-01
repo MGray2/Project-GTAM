@@ -185,8 +185,8 @@ private fun sendMessage(database: ClientViewModel, userBot: UserBot, history: Hi
         var messageType = ""
         var sub = subject // modifiable subject
 
+        // If Email
         if (!client?.clientEmail.isNullOrBlank()) {
-            Log.d("DataTest", "Client Email Detected")
             response = Messenger().sendEmail(
                 sender = userBot.email ?: return@launch,
                 username = userBot.mjApiKey ?: return@launch,
@@ -199,6 +199,7 @@ private fun sendMessage(database: ClientViewModel, userBot: UserBot, history: Hi
             )
             messageType = "Email"
         }
+        // If Text
         if (!client?.clientPhoneNumber.isNullOrBlank()) {
             Log.d("DataTest", "Client Phone Number Detected")
             response = Messenger().sendSmsEmail(
@@ -247,7 +248,7 @@ private fun getTodayFullDate(): String {
     val day = SimpleDateFormat("EEEE", Locale.getDefault()).format(calendar.time)
     val date = SimpleDateFormat("MM/dd/yy", Locale.getDefault()).format(calendar.time)
     val time = SimpleDateFormat("hh:mm:ss", Locale.getDefault()).format(calendar.time)
-    return "$day, Date: $date, Time: $time"
+    return "$day,  $date,  $time"
 }
 
 // Window to view the list of Services

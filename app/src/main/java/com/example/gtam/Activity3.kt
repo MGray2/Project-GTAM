@@ -53,6 +53,7 @@ class Activity3 : ComponentActivity() {
             val context = LocalContext.current
             var service by remember { mutableStateOf("") }
             var price by remember { mutableStateOf("") }
+            var itemCount = 0
             // Database
             val serviceList by dbServices.allServices.observeAsState(initial = emptyList())
 
@@ -78,7 +79,6 @@ class Activity3 : ComponentActivity() {
                         modifier = Modifier.verticalScroll(rememberScrollState())
                             .fillMaxWidth().padding(10.dp)
                     ) {
-                        var itemCount = 0
                         serviceList.forEach { service ->
                             ServiceWindow(itemCount, service, dbServices, button)
                             itemCount++
