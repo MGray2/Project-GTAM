@@ -55,7 +55,7 @@ import java.util.Calendar
 // Compose Message
 class Activity4 : ComponentActivity() {
     // Global
-    private val banner = Banners()
+    private val banner = Banners(Styles())
     private val button = Buttons()
     private val input = Input()
     private val userBotVM: BotViewModel by viewModels { UserBotFactory(MyApp.userBotRepository) }

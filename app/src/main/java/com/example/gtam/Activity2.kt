@@ -37,7 +37,7 @@ import com.example.gtam.database.viewmodel.ClientViewModel
 // Manage Clients
 class Activity2 : ComponentActivity() {
     // Global
-    private val banner = Banners()
+    private val banner = Banners(Styles())
     private val input = Input()
     private val button = Buttons()
     private val dbClients: ClientViewModel by viewModels { ClientFactory(MyApp.clientRepository) }

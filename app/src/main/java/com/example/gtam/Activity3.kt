@@ -38,7 +38,7 @@ import com.example.gtam.database.viewmodel.ServiceViewModel
 // Manage Services
 class Activity3 : ComponentActivity() {
     // Global
-    private val banner = Banners()
+    private val banner = Banners(Styles())
     private val button = Buttons()
     private val input = Input()
     private val message1 = "Write the name of your service to be selected at message composition."

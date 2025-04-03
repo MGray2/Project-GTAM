@@ -35,8 +35,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.example.gtam.ui.theme.Green168
 import com.example.gtam.ui.theme.Green194
 
+// Class that holds different predefined button functions
 class Buttons {
     @Composable
     fun MainMenuButton(context: Context, activityClass: Class<out Activity>, text: String) {

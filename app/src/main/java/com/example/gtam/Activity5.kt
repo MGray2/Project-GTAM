@@ -28,10 +28,11 @@ import com.example.gtam.database.viewmodel.HistoryViewModel
 import com.example.gtam.ui.theme.GTAMTheme
 import com.example.gtam.ui.theme.components.Banners
 import com.example.gtam.ui.theme.components.Buttons
+import com.example.gtam.ui.theme.components.Styles
 
 class Activity5 : ComponentActivity() {
     // Global
-    private val banner = Banners()
+    private val banner = Banners(Styles())
     private val button = Buttons()
     private val historyVM: HistoryViewModel by viewModels { HistoryFactory(MyApp.historyRepository) }
 

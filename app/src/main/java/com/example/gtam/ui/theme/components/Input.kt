@@ -44,6 +44,7 @@ import androidx.lifecycle.LiveData
 import com.example.gtam.ui.theme.Green194
 import com.example.gtam.ui.theme.Green240
 
+// Class that holds different predefined input gathering functions
 class Input {
 
     // Text field for gathering input
