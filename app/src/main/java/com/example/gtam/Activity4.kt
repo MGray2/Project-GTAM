@@ -56,8 +56,8 @@ import java.util.Calendar
 class Activity4 : ComponentActivity() {
     // Global
     private val banner = Banners(Styles())
-    private val button = Buttons()
-    private val input = Input()
+    private val button = Buttons(Styles())
+    private val input = Input(Styles())
     private val userBotVM: BotViewModel by viewModels { UserBotFactory(MyApp.userBotRepository) }
     private val clientVM: ClientViewModel by viewModels { ClientFactory(MyApp.clientRepository) }
     private val serviceVM: ServiceViewModel by viewModels { ServiceFactory(MyApp.serviceRepository) }

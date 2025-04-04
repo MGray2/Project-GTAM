@@ -27,8 +27,8 @@ import com.example.gtam.database.viewmodel.BotViewModel
 class Activity1 : ComponentActivity() {
     // Global
     private val banner = Banners(Styles())
-    private val input = Input()
-    private val button = Buttons()
+    private val input = Input(Styles())
+    private val button = Buttons(Styles())
     private val userBotVM: BotViewModel by viewModels { UserBotFactory(MyApp.userBotRepository) }
     private val message1 = "This will be the email that the system uses for messaging."
     private val message2 = "This will be the phone number that the system uses for texting."

@@ -39,8 +39,8 @@ import com.example.gtam.database.viewmodel.ServiceViewModel
 class Activity3 : ComponentActivity() {
     // Global
     private val banner = Banners(Styles())
-    private val button = Buttons()
-    private val input = Input()
+    private val button = Buttons(Styles())
+    private val input = Input(Styles())
     private val message1 = "Write the name of your service to be selected at message composition."
     private val message2 = "This is the cost of your service, you can also add the same name with a different price."
     private val dbServices: ServiceViewModel by viewModels { ServiceFactory(MyApp.serviceRepository) }

@@ -31,17 +31,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.gtam.ui.theme.Green168
 import com.example.gtam.ui.theme.Green194
+import kotlin.reflect.jvm.internal.impl.descriptors.Visibilities.Local
 
 // Class that holds different predefined button functions
-class Buttons {
+class Buttons(private val styles: Styles) {
     @Composable
     fun MainMenuButton(context: Context, activityClass: Class<out Activity>, text: String) {
+        val config = LocalConfiguration.current
+
         Button(
             onClick = {
                 val intent = Intent(context, activityClass)
@@ -59,12 +63,14 @@ class Buttons {
                 .padding(10.dp, 0.dp, 10.dp, 20.dp)
 
         ) {
-            Text(text, fontSize = 30.sp)
+            Text(text, fontSize = styles.adaptiveLargeFont(config.screenWidthDp))
         }
     }
 
     @Composable
     fun ButtonGeneric(onClick: () -> Unit, placeholder: String) {
+        val config = LocalConfiguration.current
+
         Button(onClick = { onClick() },
             modifier = Modifier.padding(10.dp)
                 .fillMaxWidth()
@@ -77,13 +83,15 @@ class Buttons {
             ),
             shape = RoundedCornerShape(0.dp)
         ) {
-            Text(placeholder, fontSize = 24.sp)
+            Text(placeholder, fontSize = styles.adaptiveMediumFont(config.screenWidthDp))
         }
     }
 
     @Composable
     fun ButtonDoubleClick(onClick: () -> Unit, placeholder: String, successMessage: String, failMessage: String, context: Context) {
         var lastClickTime by remember { mutableLongStateOf(0L) }
+        val config = LocalConfiguration.current
+
         Button(onClick = {
             val currentTime = System.currentTimeMillis()
             if (currentTime - lastClickTime < 1000) {
@@ -104,7 +112,7 @@ class Buttons {
             ),
             shape = RoundedCornerShape(0.dp)
         ) {
-            Text(placeholder, fontSize = 24.sp)
+            Text(placeholder, fontSize = styles.adaptiveMediumFont(config.screenWidthDp))
         }
     }
 

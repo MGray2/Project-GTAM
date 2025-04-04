@@ -19,7 +19,7 @@ import com.example.gtam.ui.theme.components.*
 class MainActivity : ComponentActivity() {
     // Global
     private val banner = Banners(Styles())
-    private val button = Buttons()
+    private val button = Buttons(Styles())
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()

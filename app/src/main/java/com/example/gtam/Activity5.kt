@@ -33,7 +33,7 @@ import com.example.gtam.ui.theme.components.Styles
 class Activity5 : ComponentActivity() {
     // Global
     private val banner = Banners(Styles())
-    private val button = Buttons()
+    private val button = Buttons(Styles())
     private val historyVM: HistoryViewModel by viewModels { HistoryFactory(MyApp.historyRepository) }
 
     override fun onCreate(savedInstanceState: Bundle?) {

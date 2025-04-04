@@ -38,8 +38,8 @@ import com.example.gtam.database.viewmodel.ClientViewModel
 class Activity2 : ComponentActivity() {
     // Global
     private val banner = Banners(Styles())
-    private val input = Input()
-    private val button = Buttons()
+    private val input = Input(Styles())
+    private val button = Buttons(Styles())
     private val dbClients: ClientViewModel by viewModels { ClientFactory(MyApp.clientRepository) }
 
     override fun onCreate(savedInstanceState: Bundle?) {

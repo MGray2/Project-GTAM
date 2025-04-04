@@ -34,43 +34,44 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.LiveData
 import com.example.gtam.ui.theme.Green194
-import com.example.gtam.ui.theme.Green240
+
 
 // Class that holds different predefined input gathering functions
-class Input {
+class Input(private val styles: Styles) {
 
     // Text field for gathering input
     @Composable
     fun InputField(text: String, onValueChange: (String) -> Unit, placeholder: String) {
+        val config = LocalConfiguration.current
 
         TextField(
             value = text,
             onValueChange = onValueChange,
-            placeholder = { Text(placeholder, fontSize = 26.sp) },
-            textStyle = TextStyle(fontSize = 26.sp),
+            placeholder = { Text(placeholder, fontSize = styles.adaptiveMediumFont(config.screenWidthDp)) },
+            textStyle = TextStyle(fontSize = styles.adaptiveMediumFont(config.screenWidthDp)),
             modifier = Modifier.padding(9.dp, 0.dp)
                 .fillMaxWidth()
-                .height(70.dp)
+                .height(styles.adaptiveSmallHeight(config.screenHeightDp))
         )
     }
 
     // Text field with extended height and smaller text
     @Composable
     fun InputFieldLarge(text: String, onValueChange: (String) -> Unit, placeholder: String) {
+        val configuration = LocalConfiguration.current
 
         TextField(
             value = text,
             onValueChange = onValueChange,
-            placeholder = { Text(placeholder, fontSize = 24.sp) },
-            textStyle = TextStyle(fontSize = 24.sp),
+            placeholder = { Text(placeholder, fontSize = styles.adaptiveMediumFont(configuration.screenWidthDp)) },
+            textStyle = TextStyle(fontSize = styles.adaptiveMediumFont(configuration.screenWidthDp)),
             modifier = Modifier.padding(9.dp, 0.dp)
                 .fillMaxWidth()
                 .height(120.dp)
@@ -80,15 +81,16 @@ class Input {
     // Text field with reduced height and even smaller text
     @Composable
     fun InputFieldSmall(text: String, onValueChange: (String) -> Unit, placeholder: String) {
+        val config = LocalConfiguration.current
 
         TextField(
             value = text,
             onValueChange = onValueChange,
             placeholder = { Text(
-                placeholder, fontSize = 20.sp,
+                placeholder, fontSize = styles.adaptiveSmallFont(config.screenWidthDp),
                 modifier = Modifier.fillMaxHeight()
             ) },
-            textStyle = TextStyle(fontSize = 20.sp),
+            textStyle = TextStyle(fontSize = styles.adaptiveSmallFont(config.screenWidthDp)),
             modifier = Modifier
                 .width(140.dp)
                 .padding(10.dp)
@@ -98,69 +100,20 @@ class Input {
     // Text field with number keyboard instead of full keyboard
     @Composable
     fun InputFieldNumber(text: String, onValueChange: (String) -> Unit, placeholder: String, keyboardType: KeyboardType) {
+        val config = LocalConfiguration.current
 
         TextField(
             value = text,
             onValueChange = { newText -> if (newText.all { it.isDigit() }) {
                 onValueChange(newText)
             } },
-            placeholder = { Text(placeholder, fontSize = 26.sp) },
-            textStyle = TextStyle(fontSize = 26.sp),
+            placeholder = { Text(placeholder, fontSize = styles.adaptiveMediumFont(config.screenWidthDp)) },
+            textStyle = TextStyle(fontSize = styles.adaptiveMediumFont(config.screenWidthDp)),
             modifier = Modifier.padding(9.dp, 0.dp)
                 .fillMaxWidth()
                 .height(70.dp),
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType)
         )
-    }
-
-    // Composable dropdown function
-    @Composable
-    fun InputDropDown(
-        options: List<Pair<Long, String>>,
-        selectedId: MutableState<Long?>,
-        placeholder: String
-    ) {
-        var expanded by remember { mutableStateOf(false) }
-        var selectedName by remember { mutableStateOf(placeholder) }
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentSize(Alignment.TopStart)
-        ) {
-            OutlinedTextField(
-                value = selectedName,
-                onValueChange = {},
-                readOnly = true,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { expanded = true },
-                trailingIcon = {
-                    Icon(
-                        imageVector = if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
-                        contentDescription = "Dropdown Icon",
-                        modifier = Modifier.clickable { expanded = !expanded }
-                    )
-                }
-            )
-
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                modifier = Modifier.fillMaxWidth() // Ensures menu width matches text field
-            ) {
-                options.forEach { (id, name) ->
-                    DropdownMenuItem(
-                        text = { Text(name) },
-                        onClick = {
-                            selectedId.value = id  // Store the selected ID
-                            selectedName = name    // Display the selected name
-                            expanded = false
-                        }
-                    )
-                }
-            }
-        }
     }
 
     // Input dropdown that uses LiveData
@@ -173,6 +126,7 @@ class Input {
     ) {
         var expanded by remember { mutableStateOf(false) }
         var selectedName by remember { mutableStateOf(placeholder) }
+        val config = LocalConfiguration.current
 
         // Observe LiveData to get the latest options
         val options by optionsLiveData.observeAsState(initial = emptyList())
@@ -187,6 +141,7 @@ class Input {
                 value = selectedName,
                 onValueChange = {},
                 readOnly = true,
+                textStyle = TextStyle(fontSize = styles.adaptiveMediumFont(config.screenWidthDp)),
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { expanded = true },
@@ -206,7 +161,7 @@ class Input {
             ) {
                 options.forEach { (id, name) ->
                     DropdownMenuItem(
-                        text = { Text(name, fontSize = 20.sp) },
+                        text = { Text(name, fontSize = styles.adaptiveSmallFont(config.screenWidthDp)) },
                         onClick = {
                             selectedId.value = id  // Store the selected ID
                             selectedName = name    // Display the selected name
@@ -224,65 +179,22 @@ class Input {
         onReset { resetDropdown() }
     }
 
-    // Composable dropdown function
-    @Composable
-    fun InputDropDownNullable(
-        options: List<Pair<Long, String?>>,
-        selectedId: MutableState<Long?>,
-        placeholder: String
-    ) {
-        var expanded by remember { mutableStateOf(false) }
-        var selectedName by remember { mutableStateOf(placeholder) }
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentSize(Alignment.TopStart)
-        ) {
-            OutlinedTextField(
-                value = selectedName,
-                onValueChange = {},
-                readOnly = true,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { expanded = true },
-                trailingIcon = {
-                    Icon(
-                        imageVector = if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
-                        contentDescription = "Dropdown Icon",
-                        modifier = Modifier.clickable { expanded = !expanded }
-                    )
-                }
-            )
-
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                modifier = Modifier.fillMaxWidth() // Ensures menu width matches text field
-            ) {
-                options.forEach { (id, name) ->
-                    DropdownMenuItem(
-                        text = { Text(name!!) },
-                        onClick = {
-                            selectedId.value = id  // Store the selected ID
-                            selectedName = name!!    // Display the selected name
-                            expanded = false
-                        }
-                    )
-                }
-            }
-        }
-    }
-
+    // On or Off lightswitch input
     @Composable
     fun InputSwitch(checked: Boolean, onCheckedChange: (Boolean) -> Unit, placeholder: String) {
+        val config = LocalConfiguration.current
+
         Row(modifier = Modifier
             .fillMaxWidth()
             .padding(10.dp)
             .background(Color.LightGray),
             Arrangement.SpaceBetween,
             Alignment.CenterVertically) {
-            Text(placeholder, textAlign = TextAlign.Center, fontSize = 20.sp)
+            Text(placeholder,
+                textAlign = TextAlign.Center,
+                fontSize = styles.adaptiveSmallFont(config.screenWidthDp),
+                modifier = Modifier.padding(10.dp)
+            )
             Switch(checked = checked,
                 onCheckedChange = onCheckedChange,
                 colors = SwitchColors(
@@ -302,7 +214,8 @@ class Input {
                     disabledUncheckedTrackColor = Color.Transparent,
                     disabledUncheckedBorderColor = Color.Transparent,
                     disabledUncheckedIconColor = Color.Transparent
-                ))
+                ),
+                modifier = Modifier.padding(10.dp))
         }
     }
 
