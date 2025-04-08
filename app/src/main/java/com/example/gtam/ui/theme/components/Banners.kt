@@ -2,9 +2,12 @@ package com.example.gtam.ui.theme.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.Text
@@ -18,6 +21,7 @@ import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.gtam.ui.theme.Green168
@@ -32,16 +36,23 @@ class Banners(private val styles: Styles) {
 
     @Composable
     fun MainHeader() {
+        val config = LocalConfiguration.current
         val bannerColors = listOf(Green194, Green240)
-        Column (modifier = Modifier.fillMaxWidth()
+
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .height(styles.adaptiveBannerHeight(config.screenHeightDp))
             .background(
                 Brush.linearGradient(
                     bannerColors,
-                    start = Offset(Float.MIN_VALUE, Float.MIN_VALUE),
+                    start = Offset(0.0F, 0.0F),
                     end = Offset(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY)
-                ))) {
-            Text("Green Team", fontSize = 36.sp, textAlign = TextAlign.Center,
-                modifier = Modifier.padding(0.dp, 25.dp, 0.dp, 5.dp).fillMaxWidth(),
+                )
+            ),
+            contentAlignment = Alignment.Center) {
+            Text("Green Team\nAuto Messenger",
+                fontSize = styles.adaptiveBannerFont(config.screenWidthDp),
+                textAlign = TextAlign.Center,
                 style = TextStyle(
                     color = Color.White,
                     shadow = Shadow(
@@ -50,16 +61,7 @@ class Banners(private val styles: Styles) {
                     )
                 )
             )
-            Text("Auto Messenger", fontSize = 36.sp, textAlign = TextAlign.Center,
-                modifier = Modifier.padding(0.dp, 5.dp, 0.dp, 25.dp).fillMaxWidth(),
-                style = TextStyle(
-                    color = Color.White,
-                    shadow = Shadow(
-                        color = Color.Black,
-                        offset = Offset(8F, 8F)
-                    )
-                )
-            )
+
         }
     }
 
@@ -69,17 +71,23 @@ class Banners(private val styles: Styles) {
         val config = LocalConfiguration.current
         val bannerColors = listOf(Green240, Green255)
 
-        Text(text,
-            fontSize = styles.adaptiveBannerFont(config.screenWidthDp),
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
-                .background(
-                    Brush.linearGradient(
-                        bannerColors,
-                        start = Offset(0.0F, 0.0F),
-                        end = Offset(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY)
-                    ))
-                .padding(0.dp, 30.dp, 0.dp, 20.dp))
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .height(styles.adaptiveBannerHeight(config.screenHeightDp))
+            .background(
+                Brush.linearGradient(
+                    bannerColors,
+                    start = Offset(0.0F, 0.0F),
+                    end = Offset(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY)
+                )
+            ),
+            contentAlignment = Alignment.Center)
+        {
+            Text(text,
+                fontSize = styles.adaptiveBannerFont(config.screenWidthDp),
+                textAlign = TextAlign.Center,
+            )
+        }
     }
 
     // Little text banner

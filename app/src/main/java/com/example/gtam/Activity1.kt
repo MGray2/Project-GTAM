@@ -31,9 +31,10 @@ class Activity1 : ComponentActivity() {
     private val button = Buttons(Styles())
     private val userBotVM: BotViewModel by viewModels { UserBotFactory(MyApp.userBotRepository) }
     private val message1 = "This will be the email that the system uses for messaging."
-    private val message2 = "This will be the phone number that the system uses for texting."
-    private val message3 = "The system will default to this starting message should no additional input be included."
-    private val message4 = "The system will default to this closing message should no additional input be included."
+    private val message2 = "Api keys are needed to perform api calls. \n1: Mailjet Api Key\n2: Mailjet Secret Key\n3: NumVerify Api Key"
+    private val message3 = "Default system text for the subject of the email. The subject will be ignored if the message is a text."
+    private val message4 = "Default system text for the start of the email, before any listed services."
+    private val message5 = "Default system text for the end of the email, after any listed services."
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,15 +84,14 @@ class Activity1 : ComponentActivity() {
                     input.InputField(botMJApiKey, { botMJApiKey = it}, "Mailjet Api Key")
                     input.InputField(botMJSecretKey, { botMJSecretKey = it }, "Mailjet Secret Key")
                     input.InputField(botNVApiKey, { botNVApiKey = it },"NumVerify Api Key")
-
-                    // Message Header
-                    banner.LittleText("Subject", modifier = Modifier)
+                    // Message Subject
+                    banner.LittleText("Subject", modifier = Modifier, button, message3)
                     input.InputField(messageSubject, { messageSubject = it }, "Subject")
-
-                    banner.LittleText("Message Header", modifier = Modifier, button, message3)
+                    // Message Header
+                    banner.LittleText("Message Header", modifier = Modifier, button, message4)
                     input.InputFieldLarge(messageHeader, { messageHeader = it },"Message")
                     // Message Footer
-                    banner.LittleText("Message Footer", modifier = Modifier, button, message4)
+                    banner.LittleText("Message Footer", modifier = Modifier, button, message5)
                     input.InputFieldLarge(messageFooter, { messageFooter = it },"Message")
                     // Save Button
                     button.ButtonGeneric({

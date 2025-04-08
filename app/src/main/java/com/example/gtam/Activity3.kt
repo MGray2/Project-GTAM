@@ -59,7 +59,7 @@ class Activity3 : ComponentActivity() {
 
             // UI
             GTAMTheme {
-                Column(modifier = Modifier) {
+                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                     banner.CustomHeader("Manage Services")
                     // Service Name
                     banner.LittleText("Service", modifier = Modifier, button, message1)
@@ -76,8 +76,9 @@ class Activity3 : ComponentActivity() {
                         else { button.showToast("All fields must be filled.", context) } }, "Add Service")
                     // Window to view services
                     Column(
-                        modifier = Modifier.verticalScroll(rememberScrollState())
-                            .fillMaxWidth().padding(10.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(10.dp)
                     ) {
                         serviceList.forEach { service ->
                             ServiceWindow(itemCount, service, dbServices, button)

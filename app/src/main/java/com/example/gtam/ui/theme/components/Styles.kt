@@ -38,21 +38,29 @@ class Styles() {
 
     fun adaptiveBannerFont(screenWidth: Int): TextUnit {
         return when {
-            screenWidth < 600 -> 34.sp
-            screenWidth < 840 -> 38.sp
-            else -> 42.sp
+            screenWidth < 600 -> 38.sp
+            screenWidth < 840 -> 42.sp
+            else -> 46.sp
         }
     }
 
     fun adaptiveSmallHeight(screenHeight: Int): Dp {
         return when {
             screenHeight < 600 -> 70.dp
-            screenHeight < 840 -> 80.dp
-            else -> 90.dp
+            screenHeight < 840 -> 73.dp
+            else -> 78.dp
         }
     }
 
     fun adaptiveLargeHeight(screenHeight: Int): Dp {
+        return when {
+            screenHeight < 600 -> 130.dp
+            screenHeight < 840 -> 140.dp
+            else -> 150.dp
+        }
+    }
+
+    fun adaptiveBannerHeight(screenHeight: Int): Dp {
         return when {
             screenHeight < 600 -> 120.dp
             screenHeight < 840 -> 130.dp

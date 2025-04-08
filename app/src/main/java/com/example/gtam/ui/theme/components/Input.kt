@@ -65,16 +65,16 @@ class Input(private val styles: Styles) {
     // Text field with extended height and smaller text
     @Composable
     fun InputFieldLarge(text: String, onValueChange: (String) -> Unit, placeholder: String) {
-        val configuration = LocalConfiguration.current
+        val config = LocalConfiguration.current
 
         TextField(
             value = text,
             onValueChange = onValueChange,
-            placeholder = { Text(placeholder, fontSize = styles.adaptiveMediumFont(configuration.screenWidthDp)) },
-            textStyle = TextStyle(fontSize = styles.adaptiveMediumFont(configuration.screenWidthDp)),
+            placeholder = { Text(placeholder, fontSize = styles.adaptiveMediumFont(config.screenWidthDp)) },
+            textStyle = TextStyle(fontSize = styles.adaptiveMediumFont(config.screenWidthDp)),
             modifier = Modifier.padding(9.dp, 0.dp)
                 .fillMaxWidth()
-                .height(120.dp)
+                .height(styles.adaptiveLargeHeight(config.screenHeightDp))
         )
     }
 
