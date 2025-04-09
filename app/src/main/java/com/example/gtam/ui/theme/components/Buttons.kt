@@ -7,11 +7,9 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -22,9 +20,9 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -38,9 +36,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.example.gtam.ui.theme.Green168
 import com.example.gtam.ui.theme.Green194
-import kotlin.reflect.jvm.internal.impl.descriptors.Visibilities.Local
 
 // Class that holds different predefined button functions
 class Buttons(private val styles: Styles) {
@@ -54,8 +50,8 @@ class Buttons(private val styles: Styles) {
                 context.startActivity(intent)
             },
             colors = ButtonDefaults.buttonColors(
-                containerColor = Green194,
-                contentColor = Color.Black,
+                containerColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.onSecondary,
                 disabledContainerColor = Color.Transparent,
                 disabledContentColor = Color.Transparent
             ),
@@ -78,8 +74,8 @@ class Buttons(private val styles: Styles) {
                 .fillMaxWidth()
                 .height(70.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.LightGray,
-                contentColor = Color.Black,
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.onSurface,
                 disabledContentColor = Color.Transparent,
                 disabledContainerColor = Color.Transparent
             ),
@@ -107,8 +103,8 @@ class Buttons(private val styles: Styles) {
                 .fillMaxWidth()
                 .height(70.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.LightGray,
-                contentColor = Color.Black,
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.onSurface,
                 disabledContentColor = Color.Transparent,
                 disabledContainerColor = Color.Transparent
             ),

@@ -93,6 +93,7 @@ class Activity4 : ComponentActivity() {
             var serviceNameWI by remember { mutableStateOf("") }
             var servicePriceWI by remember { mutableStateOf("") }
             var rememberThis by remember { mutableStateOf(true) }
+            var serviceToggle by remember { mutableStateOf(false) }
 
             val resetDropdown1 = remember { mutableStateOf<(() -> Unit)?>(null) }
             val resetDropdown2 = remember { mutableStateOf<(() -> Unit)?>(null) }
@@ -124,16 +125,15 @@ class Activity4 : ComponentActivity() {
                     // Subject
                     banner.LittleText("Subject", modifier = Modifier)
                     input.InputField(messageSubject, { messageSubject = it }, "Subject")
-
                     // Body 1
                     banner.LittleText("Message Header", modifier = Modifier)
                     input.InputFieldLarge(messageHeader, { messageHeader = it }, "Header")
-
                     // Add Services
                     banner.LittleText("Services", modifier = Modifier)
-                    input.InputDropDown(optionsLiveData = serviceOptions, selectedId = serviceSelected, "Add Service", { resetDropdown2.value = it })
-                    input.InputField(serviceNameWI, { serviceNameWI = it }, "Write-in Service")
-                    input.InputField(servicePriceWI, { servicePriceWI = it }, "Write-in Price")
+                    input.InputSwitch(serviceToggle, { serviceToggle = it }, "Write-In")
+                    input.InputDropDown(optionsLiveData = serviceOptions, selectedId = serviceSelected, "Add Service", { resetDropdown2.value = it }, serviceToggle)
+                    input.InputField(serviceNameWI, { serviceNameWI = it }, "Write-in Service", serviceToggle)
+                    input.InputField(servicePriceWI, { servicePriceWI = it }, "Write-in Price", serviceToggle)
 
                     button.ButtonGeneric({
                         saveService(serviceVM, serviceSelected, serviceNameWI, servicePriceWI)
@@ -231,7 +231,7 @@ private fun sendMessage(database: ClientViewModel, userBot: UserBot, history: Hi
 private fun saveService(database: ServiceViewModel, serviceSelected: MutableState<Long?>, serviceNameWI: String, servicePriceWI: String) {
     if (serviceSelected.value != null) {
         database.addService(serviceSelected)
-    } else if (serviceNameWI.isNotBlank() && servicePriceWI.toDouble() > 0) {
+    } else if (serviceNameWI.isNotBlank() && servicePriceWI.isNotBlank()) {
         val newService = Service(id = -System.currentTimeMillis(), serviceName = serviceNameWI, servicePrice = servicePriceWI.toDouble(), serviceDate = null)
         database.addService(newService)
     }

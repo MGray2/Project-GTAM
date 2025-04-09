@@ -19,11 +19,14 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchColors
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
@@ -37,6 +40,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LiveData
@@ -58,8 +63,61 @@ class Input(private val styles: Styles) {
             textStyle = TextStyle(fontSize = styles.adaptiveMediumFont(config.screenWidthDp)),
             modifier = Modifier.padding(9.dp, 0.dp)
                 .fillMaxWidth()
-                .height(styles.adaptiveSmallHeight(config.screenHeightDp))
+                .height(styles.adaptiveSmallHeight(config.screenHeightDp)),
+            colors = TextFieldDefaults.colors(
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surface
+            )
         )
+    }
+
+    // InputField that hides content like a password field
+    @Composable
+    fun InputFieldSecure(text: String, onValueChange: (String) -> Unit, placeholder: String, isHidden: Boolean) {
+        val config = LocalConfiguration.current
+
+        TextField(
+            value = text,
+            onValueChange = onValueChange,
+            placeholder = { Text(placeholder, fontSize = styles.adaptiveMediumFont(config.screenWidthDp)) },
+            textStyle = TextStyle(fontSize = styles.adaptiveMediumFont(config.screenWidthDp)),
+            modifier = Modifier.padding(9.dp, 0.dp)
+                .fillMaxWidth()
+                .height(styles.adaptiveSmallHeight(config.screenHeightDp)),
+            visualTransformation = if (isHidden) PasswordVisualTransformation() else VisualTransformation.None,
+            colors = TextFieldDefaults.colors(
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surface
+            )
+        )
+    }
+
+    // Hide-able variant of the standard InputField (opposite value to InputDropdown)
+    @Composable
+    fun InputField(text: String, onValueChange: (String) -> Unit, placeholder: String, isHidden: Boolean) {
+        val config = LocalConfiguration.current
+
+        if (isHidden) {
+            TextField(
+                value = text,
+                onValueChange = onValueChange,
+                placeholder = { Text(placeholder, fontSize = styles.adaptiveMediumFont(config.screenWidthDp)) },
+                textStyle = TextStyle(fontSize = styles.adaptiveMediumFont(config.screenWidthDp)),
+                modifier = Modifier.padding(9.dp, 0.dp)
+                    .fillMaxWidth()
+                    .height(styles.adaptiveSmallHeight(config.screenHeightDp)),
+                colors = TextFieldDefaults.colors(
+                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    focusedContainerColor = MaterialTheme.colorScheme.surface,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                )
+            )
+        }
     }
 
     // Text field with extended height and smaller text
@@ -74,7 +132,13 @@ class Input(private val styles: Styles) {
             textStyle = TextStyle(fontSize = styles.adaptiveMediumFont(config.screenWidthDp)),
             modifier = Modifier.padding(9.dp, 0.dp)
                 .fillMaxWidth()
-                .height(styles.adaptiveLargeHeight(config.screenHeightDp))
+                .height(styles.adaptiveLargeHeight(config.screenHeightDp)),
+            colors = TextFieldDefaults.colors(
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surface
+            )
         )
     }
 
@@ -93,7 +157,13 @@ class Input(private val styles: Styles) {
             textStyle = TextStyle(fontSize = styles.adaptiveSmallFont(config.screenWidthDp)),
             modifier = Modifier
                 .width(140.dp)
-                .padding(10.dp)
+                .padding(10.dp),
+            colors = TextFieldDefaults.colors(
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surface
+            )
         )
     }
 
@@ -112,7 +182,13 @@ class Input(private val styles: Styles) {
             modifier = Modifier.padding(9.dp, 0.dp)
                 .fillMaxWidth()
                 .height(70.dp),
-            keyboardOptions = KeyboardOptions(keyboardType = keyboardType)
+            keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+            colors = TextFieldDefaults.colors(
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surface
+            )
         )
     }
 
@@ -177,6 +253,72 @@ class Input(private val styles: Styles) {
         }
 
         onReset { resetDropdown() }
+    }
+
+    // Hide-able variant of InputDropdown
+    @Composable
+    fun InputDropDown(
+        optionsLiveData: LiveData<List<Pair<Long, String>>>,
+        selectedId: MutableState<Long?>,
+        placeholder: String,
+        onReset: (() -> Unit) -> Unit,
+        isHidden: Boolean
+    ) {
+        var expanded by remember { mutableStateOf(false) }
+        var selectedName by remember { mutableStateOf(placeholder) }
+        val config = LocalConfiguration.current
+
+        // Observe LiveData to get the latest options
+        val options by optionsLiveData.observeAsState(initial = emptyList())
+
+        if (!isHidden) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentSize(Alignment.TopStart)
+                    .padding(10.dp, 0.dp)
+            ) {
+                OutlinedTextField(
+                    value = selectedName,
+                    onValueChange = {},
+                    readOnly = true,
+                    textStyle = TextStyle(fontSize = styles.adaptiveMediumFont(config.screenWidthDp)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { expanded = true },
+                    trailingIcon = {
+                        Icon(
+                            imageVector = if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                            contentDescription = "Dropdown Icon",
+                            modifier = Modifier.clickable { expanded = !expanded }
+                        )
+                    }
+                )
+
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    options.forEach { (id, name) ->
+                        DropdownMenuItem(
+                            text = { Text(name, fontSize = styles.adaptiveSmallFont(config.screenWidthDp)) },
+                            onClick = {
+                                selectedId.value = id  // Store the selected ID
+                                selectedName = name    // Display the selected name
+                                expanded = false
+                            }
+                        )
+                    }
+                }
+            }
+            fun resetDropdown() {
+                selectedId.value = null
+                selectedName = placeholder
+            }
+
+            onReset { resetDropdown() }
+        }
     }
 
     // On or Off lightswitch input

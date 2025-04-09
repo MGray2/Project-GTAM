@@ -1,5 +1,6 @@
 package com.example.gtam.database.viewmodel
 
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -74,8 +75,7 @@ class ServiceViewModel(private val repository: ServiceRepository) : ViewModel() 
     // Removes Service from _selectedServices by id
     fun removeService(serviceId: Long) {
         viewModelScope.launch {
-            val service = serviceById(serviceId)
-            _selectedServices.value = _selectedServices.value?.filterNot { it == service }
+            _selectedServices.value = _selectedServices.value?.filterNot { it.id == serviceId }
         }
     }
 

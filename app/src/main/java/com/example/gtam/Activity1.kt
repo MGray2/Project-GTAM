@@ -49,6 +49,7 @@ class Activity1 : ComponentActivity() {
             var messageSubject by remember { mutableStateOf("") }
             var messageHeader by remember { mutableStateOf("") }
             var messageFooter by remember { mutableStateOf("") }
+            var hideInfo by remember { mutableStateOf(true) }
             // Database
             val bot by userBotVM.userBot.observeAsState(initial = UserBot(
                 id = 1,
@@ -81,9 +82,10 @@ class Activity1 : ComponentActivity() {
                     input.InputField(botEmail, { botEmail = it },"Email")
                     // API
                     banner.LittleText("Api Setup", modifier = Modifier, button, message2)
-                    input.InputField(botMJApiKey, { botMJApiKey = it}, "Mailjet Api Key")
-                    input.InputField(botMJSecretKey, { botMJSecretKey = it }, "Mailjet Secret Key")
-                    input.InputField(botNVApiKey, { botNVApiKey = it },"NumVerify Api Key")
+                    input.InputFieldSecure(botMJApiKey, { botMJApiKey = it}, "Mailjet Api Key", hideInfo)
+                    input.InputFieldSecure(botMJSecretKey, { botMJSecretKey = it }, "Mailjet Secret Key", hideInfo)
+                    input.InputFieldSecure(botNVApiKey, { botNVApiKey = it },"NumVerify Api Key", hideInfo)
+                    input.InputSwitch(hideInfo, { hideInfo = it }, "Hide Api Information")
                     // Message Subject
                     banner.LittleText("Subject", modifier = Modifier, button, message3)
                     input.InputField(messageSubject, { messageSubject = it }, "Subject")
