@@ -48,7 +48,7 @@ class Banners(private val styles: Styles) {
                 fontSize = styles.adaptiveBannerFont(config.screenWidthDp),
                 textAlign = TextAlign.Center,
                 style = TextStyle(
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     shadow = Shadow(
                         color = Color.Black,
                         offset = Offset(8F, 8F)
@@ -80,6 +80,7 @@ class Banners(private val styles: Styles) {
             Text(text,
                 fontSize = styles.adaptiveBannerFont(config.screenWidthDp),
                 textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSecondary
             )
         }
     }

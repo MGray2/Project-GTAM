@@ -9,11 +9,14 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -52,7 +55,6 @@ class Activity2 : ComponentActivity() {
             var clientAddress by remember { mutableStateOf("") }
             var clientEmail by remember { mutableStateOf("") }
             var clientPhoneNumber by remember { mutableStateOf("") }
-            var itemCount = 0
             // Messages
             val message1 = "This is the client's name for finding it at composition. " +
                     "The client will not see this name, but a name or address must be provided to list this client."
@@ -67,36 +69,41 @@ class Activity2 : ComponentActivity() {
 
             // UI
             GTAMTheme {
-                Column (modifier = Modifier.verticalScroll(rememberScrollState())) {
-                    banner.CustomHeader("Manage Clients")
-                    // Identity
-                    banner.LittleText("Name", modifier = Modifier, button, message1)
-                    input.InputField(clientName, { clientName = it }, "Client's Name")
-                    banner.LittleText("Address", modifier = Modifier, button, message2)
-                    input.InputField(clientAddress, { clientAddress = it }, "Client's Address")
-                    // Email
-                    banner.LittleText("Email", modifier = Modifier, button, message3)
-                    input.InputField(clientEmail,{ clientEmail = it },"Client's Email")
-                    // Phone Number
-                    banner.LittleText("Phone", modifier = Modifier, button, message4)
-                    input.InputFieldNumber(clientPhoneNumber,{ clientPhoneNumber = it },"Client's Phone (no spaces)", KeyboardType.Number)
-                    // Save Button
-                    button.ButtonGeneric({
-                        saveClient(clientName, clientAddress, clientEmail, clientPhoneNumber, dbClients, context, button)
-                    }, "Save")
-                    // Window for viewing Clients
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(10.dp)
-                    ) {
-                        clientList.forEach { client ->
-                            ClientWindow(itemCount, client, dbClients, button)
-                            itemCount++
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    Column (modifier = Modifier.verticalScroll(rememberScrollState())) {
+                        banner.CustomHeader("Manage Clients")
+                        // Identity
+                        banner.LittleText("Name", modifier = Modifier, button, message1)
+                        input.InputField(clientName, { clientName = it }, "Client's Name")
+                        banner.LittleText("Address", modifier = Modifier, button, message2)
+                        input.InputField(clientAddress, { clientAddress = it }, "Client's Address")
+                        // Email
+                        banner.LittleText("Email", modifier = Modifier, button, message3)
+                        input.InputField(clientEmail,{ clientEmail = it },"Client's Email")
+                        // Phone Number
+                        banner.LittleText("Phone", modifier = Modifier, button, message4)
+                        input.InputField(clientPhoneNumber,{ clientPhoneNumber = it },"Client's Phone (no spaces)", KeyboardType.Number)
+                        // Save Button
+                        button.ButtonGeneric({
+                            saveClient(clientName, clientAddress, clientEmail, clientPhoneNumber, dbClients, context, button)
+                        }, "Save")
+                        // Window for viewing Clients
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(10.dp)
+                        ) {
+                            var itemCount = 0
+                            clientList.forEach { client ->
+                                ClientWindow(itemCount, client, dbClients, button)
+                                itemCount++
+                            }
                         }
                     }
                 }
-
             }
         }
     }
@@ -115,6 +122,7 @@ private fun saveClient(clientName: String?, clientAddress: String?, clientEmail:
     }
 }
 
+// Formats phone number for client window
 private fun phoneFormat(phoneNumber: String): String {
     val digits = phoneNumber.filter { it.isDigit() }
     if (digits.length < 10) return phoneNumber
@@ -134,11 +142,13 @@ private fun phoneFormat(phoneNumber: String): String {
     return formatted
 }
 
+// Validation check for email address
 private fun isEmail(email: String): Boolean {
     val emailRegex = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}(\\.[A-Za-z]{2,})?$")
     return emailRegex.matches(email)
 }
 
+// Validation check for phone number
 private fun isPhone(phone: String): Boolean {
     val phoneRegex = Regex("^\\+?1?[-.\\s]?\\(?\\d{3}\\)?[-.\\s]?\\d{3}[-.\\s]?\\d{4}$")
 
@@ -149,7 +159,7 @@ private fun isPhone(phone: String): Boolean {
 @Composable
 private fun ClientWindow(counter: Int, iterable: Client, database: ClientViewModel, button: Buttons) {
     if (counter % 2 != 0) {
-        ClientRow(modifier = Modifier.background(Color.LightGray), iterable, database, button)
+        ClientRow(modifier = Modifier.background(MaterialTheme.colorScheme.surface), iterable, database, button)
     } else {
         ClientRow(modifier = Modifier, iterable, database, button)
     }

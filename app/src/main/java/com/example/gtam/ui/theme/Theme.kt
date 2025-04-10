@@ -3,26 +3,30 @@ package com.example.gtam.ui.theme
 import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.pm.ShortcutInfoCompat
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Orange17,
-    onPrimary = Color.Black,
-    secondary = Orange32,
+    primary = Orange60,
+    onPrimary = Color.White,
+    secondary = Orange85,
     onSecondary = Color.Black,
-    tertiary = Orange50,
+    tertiary = Orange24,
     onTertiary = Color.Black,
-    background = Color.Black,
-    onBackground = Color.White,
-    surface = Color.Black,
-    onSurface = Color.White
+    background = Gray38,
+    onBackground = Gray230,
+    surface = Gray64,
+    onSurface = Gray230
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -32,16 +36,15 @@ private val LightColorScheme = lightColorScheme(
     onSecondary = Color.Black,
     tertiary = Green255,
     onTertiary = Color.Black,
-    background = Color.White,
+    background = Gray242,
     onBackground = Color.Black,
     surface = Gray217,
     onSurface = Color.Black
 )
 
-// isSystemInDarkTheme() -> temporarily removed
 @Composable
 fun GTAMTheme(
-    darkTheme: Boolean = false,
+    darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit

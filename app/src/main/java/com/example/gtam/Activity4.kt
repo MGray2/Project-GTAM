@@ -9,11 +9,14 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -27,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.LiveData
@@ -117,61 +121,70 @@ class Activity4 : ComponentActivity() {
             }
             // UI
             GTAMTheme {
-                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                    banner.CustomHeader("Compose Message")
-                    // Message Recipient
-                    banner.LittleText("Message Recipient", modifier = Modifier)
-                    input.InputDropDown(optionsLiveData = clientOptions, selectedId = clientSelected, "Client", { resetDropdown1.value = it })
-                    // Subject
-                    banner.LittleText("Subject", modifier = Modifier)
-                    input.InputField(messageSubject, { messageSubject = it }, "Subject")
-                    // Body 1
-                    banner.LittleText("Message Header", modifier = Modifier)
-                    input.InputFieldLarge(messageHeader, { messageHeader = it }, "Header")
-                    // Add Services
-                    banner.LittleText("Services", modifier = Modifier)
-                    input.InputSwitch(serviceToggle, { serviceToggle = it }, "Write-In")
-                    input.InputDropDown(optionsLiveData = serviceOptions, selectedId = serviceSelected, "Add Service", { resetDropdown2.value = it }, serviceToggle)
-                    input.InputField(serviceNameWI, { serviceNameWI = it }, "Write-in Service", serviceToggle)
-                    input.InputField(servicePriceWI, { servicePriceWI = it }, "Write-in Price", serviceToggle)
-
-                    button.ButtonGeneric({
-                        saveService(serviceVM, serviceSelected, serviceNameWI, servicePriceWI)
-                        serviceSelected.value = null
-                        serviceNameWI = ""
-                        servicePriceWI = ""
-                        resetDropdown2.value?.invoke() }, "Add Service")
-
-                    // Service Window
-                    Column(modifier = Modifier
-                        .fillMaxWidth().padding(10.dp)) {
-                        var itemCount = 0
-                        serviceList.forEach {
-                            service -> ServiceWindow(itemCount, service, serviceVM, input, button)
-                            itemCount++
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                        banner.CustomHeader("Compose Message")
+                        // Message Recipient
+                        banner.LittleText("Message Recipient", modifier = Modifier)
+                        input.InputDropDown(optionsLiveData = clientOptions, selectedId = clientSelected, "Client", { resetDropdown1.value = it })
+                        // Subject
+                        banner.LittleText("Subject", modifier = Modifier)
+                        input.InputField(messageSubject, { messageSubject = it }, "Subject")
+                        // Body 1
+                        banner.LittleText("Message Header", modifier = Modifier)
+                        input.InputFieldLarge(messageHeader, { messageHeader = it }, "Header")
+                        // Add Services
+                        banner.LittleText("Services", modifier = Modifier)
+                        input.InputSwitch(serviceToggle, { serviceToggle = it }, "Write-In")
+                        if (serviceToggle) {
+                            input.InputField(serviceNameWI, { serviceNameWI = it }, "Write-in Service")
+                            input.InputField(servicePriceWI, { servicePriceWI = it }, "Write-in Price", KeyboardType.Decimal)
+                        } else {
+                            input.InputDropDown(optionsLiveData = serviceOptions, selectedId = serviceSelected, "Add Service") {
+                                resetDropdown2.value = it
+                            }
                         }
+
+                        button.ButtonGeneric({
+                            saveService(serviceVM, serviceSelected, serviceNameWI, servicePriceWI)
+                            serviceSelected.value = null
+                            serviceNameWI = ""
+                            servicePriceWI = ""
+                            resetDropdown2.value?.invoke() }, "Add Service")
+
+                        // Service Window
+                        Column(modifier = Modifier
+                            .fillMaxWidth().padding(10.dp)) {
+                            var itemCount = 0
+                            serviceList.forEach {
+                                    service -> ServiceWindow(itemCount, service, serviceVM, input, button)
+                                itemCount++
+                            }
+                        }
+
+
+                        // Body 2
+                        banner.LittleText("Message Footer", modifier = Modifier)
+                        input.InputFieldLarge(messageFooter, { messageFooter = it }, "Footer")
+
+                        input.InputSwitch(rememberThis, { rememberThis = it }, "Remember this interaction")
+                        // Send Button
+                        button.ButtonGeneric({
+                            // Send Email
+                            sendMessage(clientVM, bot, historyVM, clientSelected, serviceList, messageSubject, messageHeader, messageFooter)
+                            button.showToast("Sending Message", context)
+                            // If rememberThis is true, attempt to save preference
+                            if (rememberThis) {
+                                clientSelected.value?.let {
+                                        clientId -> memoryVM.saveMemory(clientId, messageSubject, messageHeader, messageFooter, serviceList)
+                                } ?: run { button.showToast("Client not selected, could not save preference.", context)}
+                            }
+                        }, "Send")
                     }
-
-
-                    // Body 2
-                    banner.LittleText("Message Footer", modifier = Modifier)
-                    input.InputFieldLarge(messageFooter, { messageFooter = it }, "Footer")
-
-                    input.InputSwitch(rememberThis, { rememberThis = it }, "Remember this interaction")
-                    // Send Button
-                    button.ButtonGeneric({
-                        // Send Email
-                        sendMessage(clientVM, bot, historyVM, clientSelected, serviceList, messageSubject, messageHeader, messageFooter)
-                        button.showToast("Sending Message", context)
-                        // If rememberThis is true, attempt to save preference
-                        if (rememberThis) {
-                            clientSelected.value?.let {
-                                    clientId -> memoryVM.saveMemory(clientId, messageSubject, messageHeader, messageFooter, serviceList)
-                            } ?: run { button.showToast("Client not selected, could not save preference.", context)}
-                        }
-                                         }, "Send")
                 }
-
             }
         }
     }
@@ -256,7 +269,7 @@ private fun getTodayFullDate(): String {
 private fun ServiceWindow(counter: Int, iterable: Service, database: ServiceViewModel, input: Input, button: Buttons) {
     val serviceDateState = remember { mutableStateOf(iterable.serviceDate ?: "") }
     if (counter % 2 != 0) {
-        ServiceRow(modifier = Modifier.background(Color.LightGray), iterable, database, input, button, serviceDateState)
+        ServiceRow(modifier = Modifier.background(MaterialTheme.colorScheme.surface), iterable, database, input, button, serviceDateState)
     } else {
         ServiceRow(modifier = Modifier, iterable, database, input, button, serviceDateState)
     }

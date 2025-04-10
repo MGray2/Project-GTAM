@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.example.gtam.ui.theme.GTAMTheme
@@ -30,23 +32,28 @@ class MainActivity : ComponentActivity() {
             val context = LocalContext.current
             // UI
             GTAMTheme {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxSize()
-                        .verticalScroll(rememberScrollState()),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Top
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
                 ) {
-                    banner.MainHeader()
-                    banner.LittleText("Compose", modifier = Modifier)
-                    button.MainMenuButton(context, Activity4::class.java, "Compose Message")
-                    banner.LittleText("Setup", modifier = Modifier)
-                    button.MainMenuButton(context, Activity1::class.java, "Bot Account Setup")
-                    button.MainMenuButton(context, Activity2::class.java, "Manage Client Info")
-                    button.MainMenuButton(context, Activity3::class.java, "Manage Services")
-                    banner.LittleText("Misc", modifier = Modifier)
-                    button.MainMenuButton(context, Activity5::class.java, "Message History")
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState()),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Top
+                    ) {
+                        banner.MainHeader()
+                        banner.LittleText("Compose", modifier = Modifier)
+                        button.MainMenuButton(context, Activity4::class.java, "Compose Message")
+                        banner.LittleText("Setup", modifier = Modifier)
+                        button.MainMenuButton(context, Activity1::class.java, "Bot Account Setup")
+                        button.MainMenuButton(context, Activity2::class.java, "Manage Client Info")
+                        button.MainMenuButton(context, Activity3::class.java, "Manage Services")
+                        banner.LittleText("Misc", modifier = Modifier)
+                        button.MainMenuButton(context, Activity5::class.java, "Message History")
+                    }
                 }
             }
         }

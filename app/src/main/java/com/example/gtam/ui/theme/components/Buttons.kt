@@ -122,7 +122,7 @@ class Buttons(private val styles: Styles) {
             modifier = Modifier.size(24.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.Transparent,
-                contentColor = Color.DarkGray
+                contentColor = MaterialTheme.colorScheme.onSurface
             )
         ) {
             Icon(
@@ -141,7 +141,7 @@ class Buttons(private val styles: Styles) {
             modifier = Modifier.size(24.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.Transparent,
-                contentColor = Color.DarkGray
+                contentColor = MaterialTheme.colorScheme.onSurface
             )
         ) {
             Icon(
@@ -160,7 +160,7 @@ class Buttons(private val styles: Styles) {
             modifier = Modifier.size(24.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.Transparent,
-                contentColor = Color.DarkGray
+                contentColor = MaterialTheme.colorScheme.onSurface
             )
         ) {
             Icon(
@@ -180,7 +180,7 @@ class Buttons(private val styles: Styles) {
             modifier = Modifier.size(20.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.Transparent,
-                contentColor = Color.DarkGray
+                contentColor = MaterialTheme.colorScheme.onSurface
             )
         ) {
             Icon(imageVector = Icons.Filled.Info,
@@ -203,7 +203,7 @@ class Buttons(private val styles: Styles) {
             Dialog(onDismissRequest = { onDismiss() }) {
                 Box(
                     modifier = Modifier
-                        .background(Color.White, shape = RoundedCornerShape(16.dp))
+                        .background(MaterialTheme.colorScheme.surface, shape = RoundedCornerShape(16.dp))
                         .padding(20.dp),
                     contentAlignment = Alignment.Center
                 ) {
@@ -229,8 +229,8 @@ class Buttons(private val styles: Styles) {
                 .fillMaxWidth()
                 .height(80.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.LightGray,
-                contentColor = Color.Black,
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.onSurface,
                 disabledContentColor = Color.Transparent,
                 disabledContainerColor = Color.Transparent
             ),

@@ -96,30 +96,6 @@ class Input(private val styles: Styles) {
         )
     }
 
-    // Hide-able variant of the standard InputField (opposite value to InputDropdown)
-    @Composable
-    fun InputField(text: String, onValueChange: (String) -> Unit, placeholder: String, isHidden: Boolean) {
-        val config = LocalConfiguration.current
-
-        if (isHidden) {
-            TextField(
-                value = text,
-                onValueChange = onValueChange,
-                placeholder = { Text(placeholder, fontSize = styles.adaptiveMediumFont(config.screenWidthDp)) },
-                textStyle = TextStyle(fontSize = styles.adaptiveMediumFont(config.screenWidthDp)),
-                modifier = Modifier.padding(9.dp, 0.dp)
-                    .fillMaxWidth()
-                    .height(styles.adaptiveSmallHeight(config.screenHeightDp)),
-                colors = TextFieldDefaults.colors(
-                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-                    focusedContainerColor = MaterialTheme.colorScheme.surface,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surface
-                )
-            )
-        }
-    }
-
     // Text field with extended height and smaller text
     @Composable
     fun InputFieldLarge(text: String, onValueChange: (String) -> Unit, placeholder: String) {
@@ -167,9 +143,9 @@ class Input(private val styles: Styles) {
         )
     }
 
-    // Text field with number keyboard instead of full keyboard
+    // Text field overload with keyboard parameter
     @Composable
-    fun InputFieldNumber(text: String, onValueChange: (String) -> Unit, placeholder: String, keyboardType: KeyboardType) {
+    fun InputField(text: String, onValueChange: (String) -> Unit, placeholder: String, keyboardType: KeyboardType) {
         val config = LocalConfiguration.current
 
         TextField(
@@ -233,11 +209,16 @@ class Input(private val styles: Styles) {
             DropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                containerColor = MaterialTheme.colorScheme.surface
             ) {
                 options.forEach { (id, name) ->
                     DropdownMenuItem(
-                        text = { Text(name, fontSize = styles.adaptiveSmallFont(config.screenWidthDp)) },
+                        text = { Text(
+                                name,
+                                fontSize = styles.adaptiveSmallFont(config.screenWidthDp),
+                                color = MaterialTheme.colorScheme.onSurface
+                            ) },
                         onClick = {
                             selectedId.value = id  // Store the selected ID
                             selectedName = name    // Display the selected name
@@ -255,72 +236,6 @@ class Input(private val styles: Styles) {
         onReset { resetDropdown() }
     }
 
-    // Hide-able variant of InputDropdown
-    @Composable
-    fun InputDropDown(
-        optionsLiveData: LiveData<List<Pair<Long, String>>>,
-        selectedId: MutableState<Long?>,
-        placeholder: String,
-        onReset: (() -> Unit) -> Unit,
-        isHidden: Boolean
-    ) {
-        var expanded by remember { mutableStateOf(false) }
-        var selectedName by remember { mutableStateOf(placeholder) }
-        val config = LocalConfiguration.current
-
-        // Observe LiveData to get the latest options
-        val options by optionsLiveData.observeAsState(initial = emptyList())
-
-        if (!isHidden) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentSize(Alignment.TopStart)
-                    .padding(10.dp, 0.dp)
-            ) {
-                OutlinedTextField(
-                    value = selectedName,
-                    onValueChange = {},
-                    readOnly = true,
-                    textStyle = TextStyle(fontSize = styles.adaptiveMediumFont(config.screenWidthDp)),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { expanded = true },
-                    trailingIcon = {
-                        Icon(
-                            imageVector = if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
-                            contentDescription = "Dropdown Icon",
-                            modifier = Modifier.clickable { expanded = !expanded }
-                        )
-                    }
-                )
-
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    options.forEach { (id, name) ->
-                        DropdownMenuItem(
-                            text = { Text(name, fontSize = styles.adaptiveSmallFont(config.screenWidthDp)) },
-                            onClick = {
-                                selectedId.value = id  // Store the selected ID
-                                selectedName = name    // Display the selected name
-                                expanded = false
-                            }
-                        )
-                    }
-                }
-            }
-            fun resetDropdown() {
-                selectedId.value = null
-                selectedName = placeholder
-            }
-
-            onReset { resetDropdown() }
-        }
-    }
-
     // On or Off lightswitch input
     @Composable
     fun InputSwitch(checked: Boolean, onCheckedChange: (Boolean) -> Unit, placeholder: String) {
@@ -329,7 +244,7 @@ class Input(private val styles: Styles) {
         Row(modifier = Modifier
             .fillMaxWidth()
             .padding(10.dp)
-            .background(Color.LightGray),
+            .background(MaterialTheme.colorScheme.surface),
             Arrangement.SpaceBetween,
             Alignment.CenterVertically) {
             Text(placeholder,
@@ -340,13 +255,13 @@ class Input(private val styles: Styles) {
             Switch(checked = checked,
                 onCheckedChange = onCheckedChange,
                 colors = SwitchColors(
-                    checkedThumbColor = Green194,
+                    checkedThumbColor = MaterialTheme.colorScheme.secondary,
                     checkedTrackColor = Color.Transparent,
-                    checkedBorderColor = Green194,
+                    checkedBorderColor = MaterialTheme.colorScheme.secondary,
                     checkedIconColor = Color.Transparent,
-                    uncheckedThumbColor = Color.Gray,
+                    uncheckedThumbColor = MaterialTheme.colorScheme.onSurface,
                     uncheckedTrackColor = Color.Transparent,
-                    uncheckedBorderColor = Color.DarkGray,
+                    uncheckedBorderColor = MaterialTheme.colorScheme.onSurface,
                     uncheckedIconColor = Color.Transparent,
                     disabledCheckedThumbColor = Color.Transparent,
                     disabledCheckedTrackColor = Color.Transparent,

@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -43,24 +45,29 @@ class Activity5 : ComponentActivity() {
             // Local
             val context = LocalContext.current
             val historyList by historyVM.allHistory.observeAsState(initial = emptyList())
-            var itemCount = 0
             val messageSuccess = "History Cleared"
             val messageFail = "Double-Click to clear history."
 
             // UI
             GTAMTheme {
-                Column (modifier = Modifier.fillMaxSize()) {
-                    banner.CustomHeader("Message History")
-                    Column (modifier = Modifier
-                        .verticalScroll(rememberScrollState())
-                        .weight(1f)
-                    ) {
-                        historyList.forEach { history ->
-                            HistoryWindow(itemCount, history, button, context)
-                            itemCount++
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    Column (modifier = Modifier.fillMaxSize()) {
+                        banner.CustomHeader("Message History")
+                        Column (modifier = Modifier
+                            .verticalScroll(rememberScrollState())
+                            .weight(1f)
+                        ) {
+                            var itemCount = 0
+                            historyList.forEach { history ->
+                                HistoryWindow(itemCount, history, button, context)
+                                itemCount++
+                            }
                         }
+                        button.ButtonDoubleClick({ historyVM.deleteAllHistory() }, "Clear History", messageSuccess, messageFail, context)
                     }
-                    button.ButtonDoubleClick({ historyVM.deleteAllHistory() }, "Clear History", messageSuccess, messageFail, context)
                 }
             }
         }

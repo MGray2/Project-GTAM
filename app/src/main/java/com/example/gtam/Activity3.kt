@@ -9,11 +9,14 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -53,36 +56,41 @@ class Activity3 : ComponentActivity() {
             val context = LocalContext.current
             var service by remember { mutableStateOf("") }
             var price by remember { mutableStateOf("") }
-            var itemCount = 0
             // Database
             val serviceList by dbServices.allServices.observeAsState(initial = emptyList())
 
             // UI
             GTAMTheme {
-                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                    banner.CustomHeader("Manage Services")
-                    // Service Name
-                    banner.LittleText("Service", modifier = Modifier, button, message1)
-                    input.InputField(service, { service = it }, "Service")
-                    // Service Price
-                    banner.LittleText("Price", modifier = Modifier, button, message2)
-                    input.InputFieldNumber(price, { price = it }, "Price", KeyboardType.Decimal)
-                    // Save Button
-                    button.ButtonGeneric({
-                        if (service != "" && price != "") {
-                            dbServices.insertService(service, price.toDouble())
-                            service = ""
-                            price = "" }
-                        else { button.showToast("All fields must be filled.", context) } }, "Add Service")
-                    // Window to view services
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(10.dp)
-                    ) {
-                        serviceList.forEach { service ->
-                            ServiceWindow(itemCount, service, dbServices, button)
-                            itemCount++
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                        banner.CustomHeader("Manage Services")
+                        // Service Name
+                        banner.LittleText("Service", modifier = Modifier, button, message1)
+                        input.InputField(service, { service = it }, "Service")
+                        // Service Price
+                        banner.LittleText("Price", modifier = Modifier, button, message2)
+                        input.InputField(price, { price = it }, "Price", KeyboardType.Decimal)
+                        // Save Button
+                        button.ButtonGeneric({
+                            if (service != "" && price != "") {
+                                dbServices.insertService(service, price.toDouble())
+                                service = ""
+                                price = "" }
+                            else { button.showToast("All fields must be filled.", context) } }, "Add Service")
+                        // Window to view services
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(10.dp)
+                        ) {
+                            var itemCount = 0
+                            serviceList.forEach { service ->
+                                ServiceWindow(itemCount, service, dbServices, button)
+                                itemCount++
+                            }
                         }
                     }
                 }
@@ -95,7 +103,7 @@ class Activity3 : ComponentActivity() {
 @Composable
 private fun ServiceWindow(counter: Int, iterable: Service, database: ServiceViewModel, button: Buttons) {
     if (counter % 2 != 0) {
-        ServiceRow(modifier = Modifier.background(Color.LightGray), iterable, database, button)
+        ServiceRow(modifier = Modifier.background(MaterialTheme.colorScheme.surface), iterable, database, button)
     } else {
         ServiceRow(modifier = Modifier, iterable, database, button)
     }
