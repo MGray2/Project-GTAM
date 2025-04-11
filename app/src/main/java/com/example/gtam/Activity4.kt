@@ -98,6 +98,7 @@ class Activity4 : ComponentActivity() {
             var servicePriceWI by remember { mutableStateOf("") }
             var rememberThis by remember { mutableStateOf(true) }
             var serviceToggle by remember { mutableStateOf(false) }
+            var isText by remember { mutableStateOf(false) }
 
             val resetDropdown1 = remember { mutableStateOf<(() -> Unit)?>(null) }
             val resetDropdown2 = remember { mutableStateOf<(() -> Unit)?>(null) }
@@ -108,6 +109,8 @@ class Activity4 : ComponentActivity() {
             LaunchedEffect(clientSelected.value) {
                 clientSelected.value?.let { clientId ->
                     memoryVM.getMemoryByClient(clientId)
+                    val client = clientVM.getClientById(clientId).await()
+                    isText = client?.clientEmail.isNullOrBlank() && !client?.clientPhoneNumber.isNullOrBlank()
                 }
             }
 
@@ -131,8 +134,10 @@ class Activity4 : ComponentActivity() {
                         banner.LittleText("Message Recipient", modifier = Modifier)
                         input.InputDropDown(optionsLiveData = clientOptions, selectedId = clientSelected, "Client", { resetDropdown1.value = it })
                         // Subject
-                        banner.LittleText("Subject", modifier = Modifier)
-                        input.InputField(messageSubject, { messageSubject = it }, "Subject")
+                        if (!isText) {
+                            banner.LittleText("Subject", modifier = Modifier)
+                            input.InputField(messageSubject, { messageSubject = it }, "Subject")
+                        }
                         // Body 1
                         banner.LittleText("Message Header", modifier = Modifier)
                         input.InputFieldLarge(messageHeader, { messageHeader = it }, "Header")
@@ -261,7 +266,7 @@ private fun getTodayFullDate(): String {
     val day = SimpleDateFormat("EEEE", Locale.getDefault()).format(calendar.time)
     val date = SimpleDateFormat("MM/dd/yy", Locale.getDefault()).format(calendar.time)
     val time = SimpleDateFormat("hh:mm:ss", Locale.getDefault()).format(calendar.time)
-    return "$day,  $date,  $time"
+    return "$day, $date $time"
 }
 
 // Window to view the list of Services

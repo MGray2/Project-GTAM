@@ -1,19 +1,16 @@
 package com.example.gtam
-import android.util.Log
 import java.util.*
 import com.example.gtam.database.entities.Service
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.net.HttpURLConnection
 import java.net.URL
 import android.util.Base64
-import androidx.lifecycle.ViewModel
+import android.util.Patterns
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
@@ -62,7 +59,6 @@ class Messenger {
                 val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
                 val jsonAdapter = moshi.adapter(CarrierInfo::class.java)
                 val carrierInfo = jsonAdapter.fromJson(body)
-                Log.d("DataTest", "Acquired Carrier Info: ${carrierInfo?.carrier}")
                 return@withContext carrierInfo?.carrier
             }
         }
@@ -92,9 +88,13 @@ class Messenger {
             (carrier?.contains(Regex("google", RegexOption.IGNORE_CASE)) == true) -> "msg.fi.google.com"
             else -> null
         }
-        Log.d("DataTest", "SMS Gateway: $domain")
 
         return domain?.let { "$phoneNumber@$it" }
+    }
+
+    // Check if emails are correct
+    fun isValidEmail(email: String): Boolean {
+        return Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }
 
     // Send messages using the Mailjet API
@@ -111,6 +111,12 @@ class Messenger {
                 // incomplete API information
                 if (apiKey.isBlank() || apiSecretKey.isBlank()) {
                     return@withContext MessengerResponse(false, "API key or Secret Key is missing")
+                }
+                if (!isValidEmail(sender)) {
+                    return@withContext MessengerResponse(false, "Sender email is invalid")
+                }
+                if (!isValidEmail(recipient)) {
+                    return@withContext MessengerResponse(false, "Recipient email is invalid")
                 }
 
                 val url = URL("https://api.mailjet.com/v3.1/send")
@@ -138,11 +144,6 @@ class Messenger {
                 OutputStreamWriter(connection.outputStream).use { it.write(jsonBody) }
 
                 val responseCode = connection.responseCode
-                val responseMessage = try {
-                    connection.inputStream.bufferedReader().readText()
-                } catch (e: IOException) {
-                    connection.errorStream?.bufferedReader()?.readText() ?: "Unknown error"
-                }
 
                 return@withContext MessengerResponse(responseCode in 200..299, "") // success
             } catch (e: IOException) {

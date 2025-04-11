@@ -236,7 +236,7 @@ class Buttons(private val styles: Styles) {
             ),
             shape = RoundedCornerShape(0.dp)
         ) {
-            Text(placeholder, fontSize = 24.sp, lineHeight = 30.sp)
+            Text(placeholder, fontSize = 24.sp, lineHeight = 30.sp, softWrap = false)
         }
     }
 }

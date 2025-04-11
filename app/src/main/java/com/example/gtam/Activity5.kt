@@ -24,8 +24,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.example.gtam.database.entities.Client
 import com.example.gtam.database.entities.History
+import com.example.gtam.database.factory.ClientFactory
 import com.example.gtam.database.factory.HistoryFactory
+import com.example.gtam.database.viewmodel.ClientViewModel
 import com.example.gtam.database.viewmodel.HistoryViewModel
 import com.example.gtam.ui.theme.GTAMTheme
 import com.example.gtam.ui.theme.components.Banners
@@ -37,6 +40,7 @@ class Activity5 : ComponentActivity() {
     private val banner = Banners(Styles())
     private val button = Buttons(Styles())
     private val historyVM: HistoryViewModel by viewModels { HistoryFactory(MyApp.historyRepository) }
+    private val clientVM: ClientViewModel by viewModels { ClientFactory(MyApp.clientRepository)}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,6 +49,7 @@ class Activity5 : ComponentActivity() {
             // Local
             val context = LocalContext.current
             val historyList by historyVM.allHistory.observeAsState(initial = emptyList())
+            val clientList by clientVM.allClients.observeAsState(initial = emptyList())
             val messageSuccess = "History Cleared"
             val messageFail = "Double-Click to clear history."
 
@@ -62,7 +67,7 @@ class Activity5 : ComponentActivity() {
                         ) {
                             var itemCount = 0
                             historyList.forEach { history ->
-                                HistoryWindow(itemCount, history, button, context)
+                                HistoryWindow(itemCount, history, clientList, button, context)
                                 itemCount++
                             }
                         }
@@ -75,29 +80,31 @@ class Activity5 : ComponentActivity() {
 }
 
 // Go to activity 6
-private fun historyButton(context: Context, history: History) {
+private fun historyButton(context: Context, history: History, clientList: List<Client>) {
+    val client = clientList.find { client -> history.clientId == client.id }
     val intent = Intent(context, Activity6::class.java).apply {
         putExtra("historyInstance", history)
+        putExtra("clientInstance", client)
     }
     context.startActivity(intent)
 }
 
 @Composable
-private fun HistoryWindow(counter: Int, iterable: History, button: Buttons, context: Context) {
+private fun HistoryWindow(counter: Int, iterable: History, clientList: List<Client>, button: Buttons, context: Context) {
     if (counter % 2 != 0) {
-        HistoryRow(modifier = Modifier, iterable, button, context)
+        HistoryRow(modifier = Modifier, iterable, clientList, button, context)
     } else {
-        HistoryRow(modifier = Modifier, iterable, button, context)
+        HistoryRow(modifier = Modifier, iterable, clientList, button, context)
     }
 }
 
 @Composable
-private fun HistoryRow(modifier: Modifier, iterable: History, button: Buttons, context: Context) {
+private fun HistoryRow(modifier: Modifier, iterable: History, clientList: List<Client>, button: Buttons, context: Context) {
     Row(modifier = modifier
         .fillMaxWidth()
         .wrapContentHeight()
         .padding(10.dp),
         verticalAlignment = Alignment.CenterVertically) {
-        button.HistoryButton({ historyButton(context, iterable) }, iterable.date)
+        button.HistoryButton({ historyButton(context, iterable, clientList) }, iterable.date)
     }
 }
