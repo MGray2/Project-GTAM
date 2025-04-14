@@ -30,8 +30,8 @@ class HistoryRepository(private val historyDao: HistoryDao) {
     }
 
     // Get by timestamp: last 30 days
-    fun getEmailCountLast30Days(clientId: Long): Flow<Int> {
+    /* fun getEmailCountLast30Days(clientId: Long): Flow<Int> {
         val cutoffTime = System.currentTimeMillis() - (30L * 24 * 60 * 60 * 1000) // 30 days in milliseconds
         return historyDao.getEmailCountLast30Days(clientId, cutoffTime)
-    }
+    } */
 }

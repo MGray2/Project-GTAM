@@ -33,10 +33,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.gtam.ui.theme.Green194
+import kotlin.reflect.jvm.internal.impl.descriptors.Visibilities.Local
 
 // Class that holds different predefined button functions
 class Buttons(private val styles: Styles) {
@@ -224,10 +226,11 @@ class Buttons(private val styles: Styles) {
 
     @Composable
     fun HistoryButton(onClick: () -> Unit, placeholder: String) {
+        val config = LocalConfiguration.current
         Button(onClick = { onClick() },
-            modifier = Modifier.padding(5.dp)
+            modifier = Modifier.padding(2.dp, 0.dp)
                 .fillMaxWidth()
-                .height(80.dp),
+                .height(styles.adaptiveSmallHeight(config.screenHeightDp)),
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.surface,
                 contentColor = MaterialTheme.colorScheme.onSurface,

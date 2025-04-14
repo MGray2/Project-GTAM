@@ -10,7 +10,10 @@ import kotlinx.parcelize.Parcelize
 @Entity(tableName = "history")
 data class History(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val clientId: Long,
+    val clientName: String?,
+    val clientAddress: String?,
+    val clientEmail: String?,
+    val clientPhone: String?,
     val type: String,
     val status: Boolean,
     val errorMessage: String?,

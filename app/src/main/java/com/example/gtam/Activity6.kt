@@ -40,12 +40,6 @@ class Activity6 : ComponentActivity() {
                 @Suppress("DEPRECATION")
                 intent.getParcelableExtra("historyInstance")
             }
-            val client: Client? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                intent.getParcelableExtra("clientInstance", Client::class.java)
-            } else {
-                @Suppress("DEPRECATION")
-                intent.getParcelableExtra("clientInstance")
-            }
             // UI
             GTAMTheme {
                 Surface(
@@ -56,7 +50,7 @@ class Activity6 : ComponentActivity() {
                         .padding(10.dp)
                         .verticalScroll(rememberScrollState())
                     ) {
-                        HistoryFormat(history, client)
+                        HistoryFormat(history)
                     }
                 }
             }
@@ -65,17 +59,16 @@ class Activity6 : ComponentActivity() {
 }
 
 @Composable
-private fun HistoryFormat(history: History?, client: Client?) {
+private fun HistoryFormat(history: History?) {
     val config = LocalConfiguration.current
     val body = buildAnnotatedString {
-        client?.let {
-            append("\n")
-            append("Name: ${client.clientName}\n")
-            append("Address: ${client.clientAddress}\n")
-            append("Email: ${client.clientEmail}\n")
-            append("Phone: ${client.clientPhoneNumber}\n")
-        }
         history?.let {
+            append("\n")
+            append("Name: ${history.clientName}\n")
+            append("Address: ${history.clientAddress}\n")
+            append("Email: ${history.clientEmail}\n")
+            append("Phone: ${history.clientPhone}\n")
+
             val status = if (history.status) "Success" else "Failure"
             append("Type: ${history.type}\n")
 

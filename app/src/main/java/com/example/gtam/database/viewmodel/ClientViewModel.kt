@@ -21,8 +21,8 @@ class ClientViewModel(private val repository: ClientRepository) : ViewModel() {
     private val _clientDropdownList = MutableLiveData<List<Pair<Long, String>>>()
     val clientDropdownList: LiveData<List<Pair<Long, String>>> get() = _clientDropdownList
 
-    fun insertClient(name: String?, address: String?, email: String?, phoneNumber: String?) {
-        if (name.isNullOrBlank() && address.isNullOrBlank() && email.isNullOrBlank() && phoneNumber.isNullOrBlank()) {
+    fun insertClient(name: String?, address: String?, email: String?, phone: String?) {
+        if (name.isNullOrBlank() && address.isNullOrBlank() && email.isNullOrBlank() && phone.isNullOrBlank()) {
             return
         }
         viewModelScope.launch {
@@ -30,7 +30,7 @@ class ClientViewModel(private val repository: ClientRepository) : ViewModel() {
                 clientName = name,
                 clientAddress = address,
                 clientEmail = email,
-                clientPhoneNumber = phoneNumber)
+                clientPhone = phone)
             repository.insertClient(newClient)
         }
     }

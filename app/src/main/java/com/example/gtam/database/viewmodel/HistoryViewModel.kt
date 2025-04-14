@@ -12,9 +12,23 @@ class HistoryViewModel(private val repository: HistoryRepository) : ViewModel() 
 
     val allHistory: LiveData<List<History>> = repository.getAllHistory().asLiveData()
 
-    fun insertHistory(clientId: Long, type: String, status: Boolean, errorMessage: String?, date: String, subject: String, body: String) {
+    fun insertHistory(
+        clientName: String?,
+        clientAddress: String?,
+        clientEmail: String?,
+        clientPhone: String? ,
+        type: String,
+        status: Boolean,
+        errorMessage: String?,
+        date: String,
+        subject: String,
+        body: String
+    ) {
         val newHistory = History(
-            clientId = clientId,
+            clientName = clientName,
+            clientAddress = clientAddress,
+            clientEmail = clientEmail,
+            clientPhone = clientPhone,
             type = type,
             status = status,
             errorMessage = errorMessage,

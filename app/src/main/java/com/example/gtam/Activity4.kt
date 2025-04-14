@@ -96,9 +96,9 @@ class Activity4 : ComponentActivity() {
             var messageFooter by remember { mutableStateOf("") }
             var serviceNameWI by remember { mutableStateOf("") }
             var servicePriceWI by remember { mutableStateOf("") }
-            var rememberThis by remember { mutableStateOf(true) }
-            var serviceToggle by remember { mutableStateOf(false) }
-            var isText by remember { mutableStateOf(false) }
+            var rememberThis by remember { mutableStateOf(true) } // toggle remembering
+            var serviceToggle by remember { mutableStateOf(false) } // toggle write-in
+            var isText by remember { mutableStateOf(false) } // Hide subject if client uses text
 
             val resetDropdown1 = remember { mutableStateOf<(() -> Unit)?>(null) }
             val resetDropdown2 = remember { mutableStateOf<(() -> Unit)?>(null) }
@@ -110,7 +110,7 @@ class Activity4 : ComponentActivity() {
                 clientSelected.value?.let { clientId ->
                     memoryVM.getMemoryByClient(clientId)
                     val client = clientVM.getClientById(clientId).await()
-                    isText = client?.clientEmail.isNullOrBlank() && !client?.clientPhoneNumber.isNullOrBlank()
+                    isText = client?.clientEmail.isNullOrBlank() && !client?.clientPhone.isNullOrBlank()
                 }
             }
 
@@ -218,13 +218,12 @@ private fun sendMessage(database: ClientViewModel, userBot: UserBot, history: Hi
             messageType = "Email"
         }
         // If Text
-        if (!client?.clientPhoneNumber.isNullOrBlank()) {
-            Log.d("DataTest", "Client Phone Number Detected")
+        if (!client?.clientPhone.isNullOrBlank()) {
             response = Messenger().sendSmsEmail(
                 sender = userBot.email ?: return@launch,
                 apiKey = userBot.mjApiKey ?: return@launch,
                 apiSecretKey = userBot.mjSecretKey ?: return@launch,
-                recipient = client!!.clientPhoneNumber!!,
+                recipient = client!!.clientPhone!!,
                 numVerifyKey = userBot.nvApiKey ?: return@launch,
                 header = header,
                 services = serviceList,
@@ -235,13 +234,16 @@ private fun sendMessage(database: ClientViewModel, userBot: UserBot, history: Hi
         }
         // Create a record of the message
         history.insertHistory(
-            clientSelected.value ?: -1L,
-            messageType,
-            response.status,
-            response.message,
-            getTodayFullDate(),
-            sub,
-            Messenger().formatBody(header, footer, serviceList)
+            clientName = client?.clientName,
+            clientAddress = client?.clientAddress,
+            clientEmail = client?.clientEmail,
+            clientPhone = client?.clientPhone,
+            type = messageType,
+            status = response.status,
+            errorMessage = response.message,
+            date = getTodayFullDate(),
+            subject = sub,
+            body = Messenger().formatBody(header, footer, serviceList)
         )
     }
 }

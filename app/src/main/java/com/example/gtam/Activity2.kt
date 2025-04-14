@@ -194,14 +194,14 @@ private fun ClientRow(modifier: Modifier, iterable: Client, database: ClientView
                     fontSize = 20.sp)
             }
         }
-        if (!iterable.clientPhoneNumber.isNullOrBlank()) {
-            if (!isPhone(iterable.clientPhoneNumber)) {
-                Text(text = phoneFormat(iterable.clientPhoneNumber),
+        if (!iterable.clientPhone.isNullOrBlank()) {
+            if (!isPhone(iterable.clientPhone)) {
+                Text(text = phoneFormat(iterable.clientPhone),
                     modifier = Modifier.weight(1F),
                     fontSize = 20.sp,
                     color = Color.Red)
             } else {
-                Text(text = phoneFormat(iterable.clientPhoneNumber),
+                Text(text = phoneFormat(iterable.clientPhone),
                     modifier = Modifier.weight(1F),
                     fontSize = 20.sp)
             }
