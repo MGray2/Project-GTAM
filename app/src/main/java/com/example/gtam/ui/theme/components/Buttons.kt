@@ -33,12 +33,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.example.gtam.ui.theme.Green194
-import kotlin.reflect.jvm.internal.impl.descriptors.Visibilities.Local
 
 // Class that holds different predefined button functions
 class Buttons(private val styles: Styles) {
@@ -74,7 +71,26 @@ class Buttons(private val styles: Styles) {
         Button(onClick = { onClick() },
             modifier = Modifier.padding(10.dp)
                 .fillMaxWidth()
-                .height(70.dp),
+                .height(styles.adaptiveSmallHeight(config.screenHeightDp)),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.onSurface,
+                disabledContentColor = Color.Transparent,
+                disabledContainerColor = Color.Transparent
+            ),
+            shape = RoundedCornerShape(0.dp)
+        ) {
+            Text(placeholder, fontSize = styles.adaptiveMediumFont(config.screenWidthDp))
+        }
+    }
+
+    @Composable
+    fun ButtonGeneric(onClick: () -> Unit, placeholder: String, modifier: Modifier) {
+        val config = LocalConfiguration.current
+
+        Button(onClick = { onClick() },
+            modifier = modifier.padding(10.dp)
+                .height(styles.adaptiveSmallHeight(config.screenHeightDp)),
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.surface,
                 contentColor = MaterialTheme.colorScheme.onSurface,

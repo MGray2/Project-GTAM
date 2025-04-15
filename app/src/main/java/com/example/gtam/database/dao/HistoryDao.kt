@@ -24,6 +24,6 @@ interface HistoryDao {
     @Query("SELECT * FROM history WHERE id = :historyId")
     fun getHistoryById(historyId: Long): Flow<History?>
 
-    /* @Query("SELECT COUNT(*) FROM history WHERE clientId = :clientId AND timestamp >= :cutoffTime")
-    fun getEmailCountLast30Days(clientId: Long, cutoffTime: Long): Flow<Int> */
+    @Query("SELECT * FROM history ORDER BY timestamp DESC LIMIT :limit OFFSET :offset")
+    fun getHistoryPaged(limit: Int, offset: Int): Flow<List<History>>
 }

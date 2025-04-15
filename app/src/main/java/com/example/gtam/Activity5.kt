@@ -7,6 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,6 +19,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -44,7 +46,9 @@ class Activity5 : ComponentActivity() {
         setContent {
             // Local
             val context = LocalContext.current
-            val historyList by historyVM.allHistory.observeAsState(initial = emptyList())
+            val historyList by historyVM.pagedHistory.collectAsState()
+            val isEndReached by historyVM.isEndReached
+            val isStartReached by historyVM.isStartReached
             val messageSuccess = "History Cleared"
             val messageFail = "Double-Click to clear history."
 
@@ -65,6 +69,10 @@ class Activity5 : ComponentActivity() {
                                 HistoryWindow(itemCount, history, button, context)
                                 itemCount++
                             }
+                        }
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            if (!isStartReached) button.ButtonGeneric({ historyVM.loadPage(false)}, "Previous Page", modifier = Modifier.weight(1F))
+                            if (!isEndReached) button.ButtonGeneric({ historyVM.loadPage(true) }, "Next Page", modifier = Modifier.weight(1F))
                         }
                         button.ButtonDoubleClick({ historyVM.deleteAllHistory() }, "Clear History", messageSuccess, messageFail, context)
                     }

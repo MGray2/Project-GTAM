@@ -29,9 +29,8 @@ class HistoryRepository(private val historyDao: HistoryDao) {
         return historyDao.getHistoryById(historyId)
     }
 
-    // Get by timestamp: last 30 days
-    /* fun getEmailCountLast30Days(clientId: Long): Flow<Int> {
-        val cutoffTime = System.currentTimeMillis() - (30L * 24 * 60 * 60 * 1000) // 30 days in milliseconds
-        return historyDao.getEmailCountLast30Days(clientId, cutoffTime)
-    } */
+    // Get a limited amount from an offset
+    fun getHistoryPaged(limit: Int, offset: Int): Flow<List<History>> {
+        return historyDao.getHistoryPaged(limit, offset)
+    }
 }
