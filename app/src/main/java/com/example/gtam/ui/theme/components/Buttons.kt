@@ -1,6 +1,7 @@
 package com.example.gtam.ui.theme.components
 
 import android.app.Activity
+import android.app.DatePickerDialog
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
@@ -30,12 +31,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.example.gtam.R
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.util.Calendar
+import java.util.Locale
 
 // Class that holds different predefined button functions
 class Buttons(private val styles: Styles) {
@@ -236,19 +245,58 @@ class Buttons(private val styles: Styles) {
         }
     }
 
+    @Composable
+    fun DatePickerButton(
+        onDateSelected: (String) -> Unit
+    ) {
+        val context = LocalContext.current
+        val calendar = remember { Calendar.getInstance() }
+
+        val datePickerDialog = remember {
+            DatePickerDialog(
+                context,
+                { _, year, month, dayOfMonth ->
+                    val cal = Calendar.getInstance()
+                    cal.set(year, month, dayOfMonth)
+
+                    val sdf = SimpleDateFormat("MM/dd/yy", Locale.getDefault())
+                    val formattedDate = sdf.format(cal.time)
+                    onDateSelected(formattedDate)
+                },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+            )
+        }
+
+        TodayButton { datePickerDialog.show() }
+    }
+
     fun showToast(message: String, context: Context) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
 
     @Composable
-    fun HistoryButton(onClick: () -> Unit, placeholder: String) {
+    fun HistoryButton(onClick: () -> Unit, placeholder: String, status: Boolean) {
         val config = LocalConfiguration.current
+        val colors = listOf(
+            MaterialTheme.colorScheme.surface,
+            if (status) MaterialTheme.colorScheme.surfaceBright
+            else MaterialTheme.colorScheme.surfaceDim)
+
         Button(onClick = { onClick() },
             modifier = Modifier.padding(2.dp, 0.dp)
                 .fillMaxWidth()
-                .height(styles.adaptiveSmallHeight(config.screenHeightDp)),
+                .height(styles.adaptiveSmallHeight(config.screenHeightDp))
+                .background(
+                    Brush.linearGradient(
+                        colors,
+                        start = Offset(0.0F, 0.0F),
+                        end = Offset(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY)
+                    )
+                ),
             colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.surface,
+                containerColor = Color.Transparent,
                 contentColor = MaterialTheme.colorScheme.onSurface,
                 disabledContentColor = Color.Transparent,
                 disabledContainerColor = Color.Transparent

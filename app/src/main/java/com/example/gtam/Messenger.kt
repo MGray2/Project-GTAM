@@ -11,6 +11,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 import android.util.Base64
 import android.util.Patterns
+import androidx.compose.ui.text.buildAnnotatedString
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
@@ -28,20 +29,23 @@ class Messenger {
 
     // Connects Header + Service List + Total? + Footer
     fun formatBody(header: String, footer: String, services: List<Service>): String {
-        val body = StringBuilder("")
         var total = 0.00
-        body.append("$header\n")
-
-        services.forEach {
-                service -> body.append("${service.serviceName}: $${String.format(Locale.US,"%.2f", service.servicePrice)}   ${service.serviceDate}\n")
+        val body = buildAnnotatedString {
+            // Header paragraph
+            append("$header\n")
+            // Services
+            services.forEach { service ->
+                append("${service.serviceName}:  $${String.format(Locale.US,"%.2f", service.servicePrice)}")
+                append( if(!service.serviceDate.isNullOrBlank()) "  ${service.serviceDate}\n" else "\n")
                 total += service.servicePrice
+            }
+            // Total, if necessary
+            if (services.size > 1) {
+                append("Total:  $${String.format(Locale.US,"%.2f", total)}\n")
+            }
+            // Footer paragraph
+            append(footer)
         }
-
-        if (services.size > 1) {
-            body.append("Total: $${String.format(Locale.US,"%.2f", total)}\n")
-        }
-        body.append(footer)
-
         return body.toString()
     }
 
@@ -94,7 +98,7 @@ class Messenger {
 
     // Check if emails are correct
     private fun isValidEmail(email: String): Boolean {
-        return Patterns.EMAIL_ADDRESS.matcher(email).matches()
+        return Patterns.EMAIL_ADDRESS.matcher(email.trim()).matches()
     }
 
     // Send messages using the Mailjet API

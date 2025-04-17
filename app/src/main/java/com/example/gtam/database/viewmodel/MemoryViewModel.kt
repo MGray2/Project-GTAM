@@ -23,8 +23,10 @@ class MemoryViewModel(private val repository: MemoryRepository) : ViewModel() {
     }
 
     fun saveMemory(clientId: Long, subject: String, header: String, footer: String, serviceList: List<Service>) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
+            val current = repository.getMemoryByClient(clientId)
             val newMemory = Memory(
+                id = current?.id ?: 0,
                 clientId = clientId,
                 subject = subject,
                 header = header,

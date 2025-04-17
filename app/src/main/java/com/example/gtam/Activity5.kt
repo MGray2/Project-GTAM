@@ -112,6 +112,6 @@ private fun HistoryRow(modifier: Modifier, iterable: History, button: Buttons, c
         .wrapContentHeight()
         .padding(10.dp),
         verticalAlignment = Alignment.CenterVertically) {
-        button.HistoryButton({ historyButton(context, iterable) }, "$name\n${iterable.date}")
+        button.HistoryButton({ historyButton(context, iterable) }, "$name\n${iterable.date}", iterable.status)
     }
 }

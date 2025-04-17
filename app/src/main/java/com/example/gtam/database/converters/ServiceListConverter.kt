@@ -6,16 +6,20 @@ import com.google.firebase.crashlytics.buildtools.reloc.com.google.common.reflec
 import com.google.gson.Gson
 
 class ServiceListConverter {
-    private val gson = Gson()
+
+    companion object {
+        private val serviceListType = object : TypeToken<List<Service>>() {}.type
+    }
 
     @TypeConverter
     fun fromServiceList(services: List<Service>?): String {
-        return gson.toJson(services)
+        val stripped = services?.map { it.copy(serviceDate = null) }
+        return Gson().toJson(stripped)
     }
 
     @TypeConverter
     fun toServiceList(servicesJson: String?): List<Service> {
         return if (servicesJson.isNullOrEmpty()) emptyList()
-        else gson.fromJson(servicesJson, object : TypeToken<List<Service>>() {}.type)
+        else Gson().fromJson(servicesJson, serviceListType)
     }
 }

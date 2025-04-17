@@ -1,5 +1,6 @@
 package com.example.gtam
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -120,6 +121,10 @@ class Activity4 : ComponentActivity() {
                     messageHeader = it.header
                     messageFooter = it.footer
                     serviceVM.getServiceFromMemory(it)
+                    Log.d("DataTest", "${it.subject}\n${it.header}\n${it.footer}\n")
+                    it.services.forEach { service ->
+                        Log.d("DataTest", "Service Name: ${service.serviceName}, Service Price: ${service.servicePrice}, Service Date: ${service.serviceDate}")
+                    }
                 }
             }
             // UI
@@ -178,16 +183,17 @@ class Activity4 : ComponentActivity() {
                         input.InputSwitch(rememberThis, { rememberThis = it }, "Remember this interaction")
                         // Send Button
                         button.ButtonGeneric({
+                            saveMessage(clientSelected, memoryVM, messageSubject, messageHeader, messageFooter, serviceList, button, context)
+                        }, "Save as Draft")
+                        button.ButtonGeneric({
                             // Send Email
                             sendMessage(clientVM, bot, historyVM, clientSelected, serviceList, messageSubject, messageHeader, messageFooter)
                             button.showToast("Sending Message", context)
                             // If rememberThis is true, attempt to save preference
                             if (rememberThis) {
-                                clientSelected.value?.let {
-                                        clientId -> memoryVM.saveMemory(clientId, messageSubject, messageHeader, messageFooter, serviceList)
-                                } ?: run { button.showToast("Client not selected, could not save preference.", context)}
+                                saveMessage(clientSelected, memoryVM, messageSubject, messageHeader, messageFooter, serviceList, button, context)
                             }
-                        }, "Send")
+                        }, "Send Message")
                     }
                 }
             }
@@ -195,7 +201,38 @@ class Activity4 : ComponentActivity() {
     }
 }
 
-private fun sendMessage(database: ClientViewModel, userBot: UserBot, history: HistoryViewModel, clientSelected: MutableState<Long?>, serviceList: List<Service>, subject: String, header: String, footer: String) {
+private fun saveMessage(
+    clientSelected: MutableState<Long?>,
+    memoryVM: MemoryViewModel,
+    messageSubject: String,
+    messageHeader: String,
+    messageFooter: String,
+    serviceList: List<Service>,
+    button: Buttons,
+    context: Context
+) {
+    clientSelected.value?.let { clientId ->
+        memoryVM.saveMemory(
+        clientId,
+        messageSubject,
+        messageHeader,
+        messageFooter,
+        serviceList
+            )
+    } ?: run { button.showToast("Client not selected, could not save preference.", context)}
+
+}
+
+private fun sendMessage(
+    database: ClientViewModel,
+    userBot: UserBot,
+    history: HistoryViewModel,
+    clientSelected: MutableState<Long?>,
+    serviceList: List<Service>,
+    subject: String,
+    header: String,
+    footer: String
+) {
     CoroutineScope(Dispatchers.IO).launch {
         val clientId = clientSelected.value ?: return@launch
         val client = database.getClientById(clientId).await()
@@ -297,8 +334,8 @@ private fun ServiceRow(modifier: Modifier, iterable: Service, database: ServiceV
         Text(text = "$${rounded}",
             modifier = Modifier.weight(1F),
             fontSize = 20.sp)
-        button.TodayButton { iterable.serviceDate = getTodayDate()
-        serviceDateState.value = getTodayDate() }
+        button.DatePickerButton { iterable.serviceDate = it
+        serviceDateState.value = it }
         input.InputFieldSmall(
             serviceDateState.value,
             { serviceDateState.value = it
