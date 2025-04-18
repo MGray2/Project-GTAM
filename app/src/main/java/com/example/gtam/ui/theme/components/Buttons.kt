@@ -5,6 +5,7 @@ import android.app.DatePickerDialog
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
+import androidx.appcompat.view.ContextThemeWrapper
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -251,10 +252,11 @@ class Buttons(private val styles: Styles) {
     ) {
         val context = LocalContext.current
         val calendar = remember { Calendar.getInstance() }
+        val themedContext = ContextThemeWrapper(context, R.style.DatePickerThemeCustom)
 
         val datePickerDialog = remember {
             DatePickerDialog(
-                context,
+                themedContext,
                 { _, year, month, dayOfMonth ->
                     val cal = Calendar.getInstance()
                     cal.set(year, month, dayOfMonth)
@@ -291,7 +293,7 @@ class Buttons(private val styles: Styles) {
                 .background(
                     Brush.linearGradient(
                         colors,
-                        start = Offset(0.0F, 0.0F),
+                        start = Offset(500.0F, 0.0F),
                         end = Offset(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY)
                     )
                 ),

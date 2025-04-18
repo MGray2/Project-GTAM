@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <style name="Theme.GTAM" parent="Theme.MaterialComponents.DayNight.NoActionBar" />
-    <style name="CalendarOverlay" parent="ThemeOverlay.MaterialComponents.MaterialCalendar">
-        <item name="materialCalendarTheme">@style/DatePickerThemeCustom</item>
-    </style>
     <style name="DatePickerThemeCustom" parent="ThemeOverlay.MaterialComponents.MaterialCalendar">
         <item name="colorPrimary">@color/primary</item>
         <item name="colorOnPrimary">@color/onSurface</item>

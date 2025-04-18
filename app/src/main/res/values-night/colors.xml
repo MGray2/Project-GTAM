@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary">#F0A000</color> <!--orange60-->
+    <color name="secondary">#FF6A00</color> <!-- Orange149 -->
+    <color name="surface">#404040</color> <!--Gray64-->
+    <color name="onSurface">#E6E6E6</color> <!--Gray230-->
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+</resources>
