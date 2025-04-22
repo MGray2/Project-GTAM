@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="primary">#00F000</color> <!--Green240-->
-    <color name="secondary">#95FF00</color> <!-- Green255 -->
+    <color name="secondary">#FF29A30A</color> <!--Green194-->
     <color name="surface">#DADADA</color> <!--Gray217-->
     <color name="onSurface">#FF000000</color>
     <color name="black">#FF000000</color>
