@@ -38,6 +38,15 @@ class Activity1 : ComponentActivity() {
     private val message3 = "Default system text for the subject of the email. The subject will be ignored if the message is a text."
     private val message4 = "Default system text for the start of the email, before any listed services."
     private val message5 = "Default system text for the end of the email, after any listed services."
+    private val defaultS = "The Green Team of Saltillo"
+    private val defaultH = "Hello, this is Michael Gray." +
+            "\nI just wanted to follow up with a quick summary of the work completed and provide payment details. " +
+            "Below is a breakdown of the work completed.\n"
+    private val defaultF = "You can send the payment to:\n141 CR 963, Saltillo MS, 38866" +
+            "\n\nIf you have any questions or need anything else, feel free to reach out. Thanks again for your business!" +
+            "\nBest regards,\nMichael Gray" +
+            "\n\nThis message was sent automatically. If you have any questions, " +
+            "just reach out at gray.michael2011@gmail.com — I’ll get back to you soon."
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,9 +80,9 @@ class Activity1 : ComponentActivity() {
                 bot.mjSecretKey?.let { botMJSecretKey = it }
                 bot.nvApiKey?.let { botNVApiKey = it }
 
-                messageSubject = bot.messageSubject
-                messageHeader = bot.messageHeader
-                messageFooter = bot.messageFooter
+                messageSubject = bot.messageSubject.ifBlank { defaultS }
+                messageHeader = bot.messageHeader.ifBlank { defaultH }
+                messageFooter = bot.messageFooter.ifBlank { defaultF }
             }
 
             // UI

@@ -12,6 +12,7 @@ import java.net.URL
 import android.util.Base64
 import android.util.Patterns
 import androidx.compose.ui.text.buildAnnotatedString
+import kotlinx.coroutines.delay
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
@@ -41,12 +42,61 @@ class Messenger {
             }
             // Total, if necessary
             if (services.size > 1) {
-                append("Total:  $${String.format(Locale.US,"%.2f", total)}\n")
+                append("Total Due:  $${String.format(Locale.US,"%.2f", total)}\n")
             }
             // Footer paragraph
             append(footer)
         }
         return body.toString()
+    }
+
+    // Watch for special characters, they reduce sending char limit
+    @Suppress("SpellCheckingInspection")
+    private fun String.containsNonGsmCharacters(): Boolean {
+        val gsmCharacters = "@£\$¥èéùìòÇ\nØø\rÅåΔ_ΦΓΛΩΠΨΣΘΞ" +
+                "ÆæßÉ !\"#¤%&'()*+,-./0123456789:;<=>?" +
+                "¡ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÑÜ`abcdefghijklmnopqrstuvwxyzäöñüà"
+
+        return this.any { it !in gsmCharacters }
+    }
+
+    /* Turns out theres a character limit to SMS,
+    this function aims to fragment message into pieces */
+    private fun splitSmsMessage(message: String, maxLength: Int = 153): List<String> {
+        val parts = mutableListOf<String>()
+        var currentPart = StringBuilder()
+        val tokens = message.split(" ")
+
+        // Split the message into chunks of maxLength
+        for (word in tokens) {
+            // Handle very long words (longer than maxLength)
+            if (word.length > maxLength) {
+                if (currentPart.isNotEmpty()) {
+                    parts.add(currentPart.toString().trim())
+                    currentPart = StringBuilder()
+                }
+
+                var index = 0
+                while (index < word.length) {
+                    val end = minOf(index + maxLength, word.length)
+                    parts.add(word.substring(index, end))
+                    index = end
+                }
+
+            } else if (currentPart.length + word.length + 1 > maxLength) {
+                // Handle case where adding the word would overflow the current part
+                parts.add(currentPart.toString().trim())
+                currentPart = StringBuilder("$word ")
+            } else {
+                currentPart.append("$word ")
+            }
+        }
+
+        if (currentPart.isNotEmpty()) {
+            parts.add(currentPart.toString().trim())
+        }
+
+        return parts
     }
 
     // Uses NumVerify API to find the provider of a phone number
@@ -174,10 +224,19 @@ class Messenger {
         if (provider == null) provider = getProvider(recipient, numVerifyKey) // try original number
         if (phoneNumber.length == 11) phoneNumber = phoneNumber.substring(1) // Remove country number
 
-        val smsGateway = getSmsGateway(phoneNumber, provider) // does not need country number
+        val smsGateway = getSmsGateway(phoneNumber, provider)
+            ?: return MessengerResponse(false, "Failed to create SMS gateway.") // does not need country number
 
-        return if (smsGateway != null) {
-            sendMailjetEmail(sender, smsGateway, "", body, apiKey, apiSecretKey)
-        } else MessengerResponse(false, "Failed to create SMS gateway.")
+        val parts = splitSmsMessage(body)
+
+        val totalParts = parts.size
+        for ((index, part) in parts.withIndex()) {
+            val partNumberedMessage = "(${index + 1}/$totalParts: $part)\n"
+            val response = sendMailjetEmail(sender, smsGateway, "", partNumberedMessage, apiKey, apiSecretKey)
+            if (!response.status) return response
+            delay(2000) // Delay for ordering
+        }
+
+        return MessengerResponse(true, "")
     }
 }

@@ -13,8 +13,7 @@ class ServiceListConverter {
 
     @TypeConverter
     fun fromServiceList(services: List<Service>?): String {
-        val stripped = services?.map { it.copy(serviceDate = null) }
-        return Gson().toJson(stripped)
+        return Gson().toJson(services)
     }
 
     @TypeConverter

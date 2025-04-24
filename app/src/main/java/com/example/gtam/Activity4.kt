@@ -135,17 +135,21 @@ class Activity4 : ComponentActivity() {
                 ) {
                     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                         banner.CustomHeader("Compose Message")
+
                         // Message Recipient
                         banner.LittleText("Message Recipient", modifier = Modifier)
                         input.InputDropDown(optionsLiveData = clientOptions, selectedId = clientSelected, "Client", { resetDropdown1.value = it })
+
                         // Subject
                         if (!isText) {
                             banner.LittleText("Subject", modifier = Modifier)
                             input.InputField(messageSubject, { messageSubject = it }, "Subject")
                         }
+
                         // Body 1
                         banner.LittleText("Message Header", modifier = Modifier)
                         input.InputFieldLarge(messageHeader, { messageHeader = it }, "Header")
+
                         // Add Services
                         banner.LittleText("Services", modifier = Modifier)
                         input.InputSwitch(serviceToggle, { serviceToggle = it }, "Write-In")
@@ -175,18 +179,21 @@ class Activity4 : ComponentActivity() {
                             }
                         }
 
-
                         // Body 2
                         banner.LittleText("Message Footer", modifier = Modifier)
                         input.InputFieldLarge(messageFooter, { messageFooter = it }, "Footer")
 
                         input.InputSwitch(rememberThis, { rememberThis = it }, "Remember this interaction")
-                        // Send Button
+
+                        // Save as draft
                         button.ButtonGeneric({
-                            saveMessage(clientSelected, memoryVM, messageSubject, messageHeader, messageFooter, serviceList, button, context)
+                            if (saveMessage(clientSelected, memoryVM, messageSubject, messageHeader, messageFooter, serviceList, button, context))
+                                button.showToast("Message saved as draft.", context)
                         }, "Save as Draft")
+
+                        // Send Message
                         button.ButtonGeneric({
-                            // Send Email
+                            // Send email
                             sendMessage(clientVM, bot, historyVM, clientSelected, serviceList, messageSubject, messageHeader, messageFooter)
                             button.showToast("Sending Message", context)
                             // If rememberThis is true, attempt to save preference
@@ -210,7 +217,7 @@ private fun saveMessage(
     serviceList: List<Service>,
     button: Buttons,
     context: Context
-) {
+): Boolean {
     clientSelected.value?.let { clientId ->
         memoryVM.saveMemory(
         clientId,
@@ -219,8 +226,11 @@ private fun saveMessage(
         messageFooter,
         serviceList
             )
-    } ?: run { button.showToast("Client not selected, could not save preference.", context)}
-
+        return true
+    } ?: run {
+        button.showToast("Client not selected, could not save preference.", context)
+    return false
+    }
 }
 
 private fun sendMessage(
