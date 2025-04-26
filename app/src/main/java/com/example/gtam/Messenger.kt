@@ -10,6 +10,7 @@ import kotlinx.coroutines.withContext
 import java.net.HttpURLConnection
 import java.net.URL
 import android.util.Base64
+import android.util.Log
 import android.util.Patterns
 import androidx.compose.ui.text.buildAnnotatedString
 import kotlinx.coroutines.delay
@@ -60,43 +61,60 @@ class Messenger {
         return this.any { it !in gsmCharacters }
     }
 
+    // Replaces or removes strange characters not supported by sms
+    private fun normalizeSmsText(text: String): String {
+        return text
+            .replace('’', '\'')    // Replace fancy apostrophe with simple apostrophe
+            .replace('‘', '\'')
+            .replace('“', '"')     // Replace fancy quotes with simple quotes
+            .replace('”', '"')
+            .replace('–', '-')     // Replace fancy dash with simple hyphen
+            .replace('—', '-')
+            .replace(Regex("[^\\x20-\\x7E\\n]"), "") // Remove any other weird Unicode chars (but keep newlines)
+    }
+
     /* Turns out theres a character limit to SMS,
     this function aims to fragment message into pieces */
-    private fun splitSmsMessage(message: String, maxLength: Int = 153): List<String> {
+    private fun splitSmsMessage(message: String, maxLength: Int = 130): List<String> {
+        val words = message.split(Regex("\\s+")) // split by whitespace
         val parts = mutableListOf<String>()
-        var currentPart = StringBuilder()
-        val tokens = message.split(" ")
+        val currentPart = StringBuilder()
 
-        // Split the message into chunks of maxLength
-        for (word in tokens) {
-            // Handle very long words (longer than maxLength)
-            if (word.length > maxLength) {
-                if (currentPart.isNotEmpty()) {
-                    parts.add(currentPart.toString().trim())
-                    currentPart = StringBuilder()
-                }
-
-                var index = 0
-                while (index < word.length) {
-                    val end = minOf(index + maxLength, word.length)
-                    parts.add(word.substring(index, end))
-                    index = end
-                }
-
-            } else if (currentPart.length + word.length + 1 > maxLength) {
-                // Handle case where adding the word would overflow the current part
+        for (word in words) {
+            // +1 for the space
+            if (currentPart.length + word.length + 1 > maxLength) {
                 parts.add(currentPart.toString().trim())
-                currentPart = StringBuilder("$word ")
-            } else {
-                currentPart.append("$word ")
+                currentPart.clear()
             }
+            if (currentPart.isNotEmpty()) currentPart.append(' ')
+            currentPart.append(word)
         }
-
         if (currentPart.isNotEmpty()) {
             parts.add(currentPart.toString().trim())
         }
 
         return parts
+    }
+
+    private fun addPartNumbers(parts: List<String>): List<String> {
+        if (parts.size <= 1) return parts
+
+        val total = parts.size
+        return parts.mapIndexed { index, part ->
+            val prefix = "(${index + 1}/$total)\n"
+            // Make sure adding prefix won't break limit
+            if (prefix.length + part.length > 130) {
+                prefix + part.take(130 - prefix.length)
+            } else {
+                prefix + part
+            }
+        }
+    }
+
+    private fun prepareSmsMessages(body: String): List<String> {
+        val normalized = normalizeSmsText(body)
+        val rawParts = splitSmsMessage(normalized)
+        return addPartNumbers(rawParts)
     }
 
     // Uses NumVerify API to find the provider of a phone number
@@ -227,14 +245,11 @@ class Messenger {
         val smsGateway = getSmsGateway(phoneNumber, provider)
             ?: return MessengerResponse(false, "Failed to create SMS gateway.") // does not need country number
 
-        val parts = splitSmsMessage(body)
+        val parts = prepareSmsMessages(body)
 
-        val totalParts = parts.size
-        for ((index, part) in parts.withIndex()) {
-            val partNumberedMessage = "(${index + 1}/$totalParts: $part)\n"
-            val response = sendMailjetEmail(sender, smsGateway, "", partNumberedMessage, apiKey, apiSecretKey)
-            if (!response.status) return response
-            delay(2000) // Delay for ordering
+        parts.forEach { part ->
+            sendMailjetEmail(sender, smsGateway, "", part, apiKey, apiSecretKey)
+            delay(2000)
         }
 
         return MessengerResponse(true, "")
