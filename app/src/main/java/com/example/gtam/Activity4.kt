@@ -29,7 +29,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -80,9 +79,11 @@ class Activity4 : ComponentActivity() {
                 mjApiKey = null,
                 mjSecretKey = null,
                 nvApiKey = null,
-                messageSubject = "",
-                messageHeader = "",
-                messageFooter = ""
+                emailSubject = "",
+                emailHeader = "",
+                emailFooter = "",
+                textHeader = "",
+                textFooter = ""
             ))
             val clientOptions: LiveData<List<Pair<Long, String>>> = clientVM.clientDropdownList
             val serviceOptions: LiveData<List<Pair<Long, String>>> = serviceVM.serviceDropdownList
@@ -103,28 +104,47 @@ class Activity4 : ComponentActivity() {
 
             val resetDropdown1 = remember { mutableStateOf<(() -> Unit)?>(null) }
             val resetDropdown2 = remember { mutableStateOf<(() -> Unit)?>(null) }
-            messageSubject = bot.messageSubject
-            messageHeader = bot.messageHeader
-            messageFooter = bot.messageFooter
+            messageSubject = bot.emailSubject
+            messageHeader = bot.emailHeader
+            messageFooter = bot.emailFooter
 
+            // Listen for changes in clientSelected
             LaunchedEffect(clientSelected.value) {
+                // Remove persisting data when dropdown clears
+                if (clientSelected.value == null) {
+                    memoryVM.clearMemory()
+                    serviceVM.clearServiceSelected()
+                }
                 clientSelected.value?.let { clientId ->
                     memoryVM.getMemoryByClient(clientId)
                     val client = clientVM.getClientById(clientId).await()
                     isText = client?.clientEmail.isNullOrBlank() && !client?.clientPhone.isNullOrBlank()
+
+                    if (memory == null) {
+                        serviceVM.clearServiceSelected()
+                        // Use default data based on client contact
+                        userBotVM.userBot.value?.let { bot ->
+                            if (!isText) {
+                                messageSubject = bot.emailSubject
+                                messageHeader = bot.emailHeader
+                                messageFooter = bot.emailFooter
+                            } else {
+                                messageSubject = "" // texts don’t use a subject
+                                messageHeader = bot.textHeader
+                                messageFooter = bot.textFooter
+                            }
+                        }
+                    }
                 }
             }
 
+            // Listen for changes in memory
             LaunchedEffect(memory) {
                 memory?.let {
                     messageSubject = it.subject
                     messageHeader = it.header
                     messageFooter = it.footer
                     serviceVM.getServiceFromMemory(it)
-                    Log.d("DataTest", "${it.subject}\n${it.header}\n${it.footer}\n")
-                    it.services.forEach { service ->
-                        Log.d("DataTest", "Service Name: ${service.serviceName}, Service Price: ${service.servicePrice}, Service Date: ${service.serviceDate}")
-                    }
                 }
             }
             // UI
@@ -189,7 +209,7 @@ class Activity4 : ComponentActivity() {
                         button.ButtonGeneric({
                             if (saveMessage(clientSelected, memoryVM, messageSubject, messageHeader, messageFooter, serviceList, button, context))
                                 button.showToast("Message saved as draft.", context)
-                        }, "Save as Draft")
+                            resetDropdown1.value?.invoke() }, "Save as Draft")
 
                         // Send Message
                         button.ButtonGeneric({
@@ -200,6 +220,7 @@ class Activity4 : ComponentActivity() {
                             if (rememberThis) {
                                 saveMessage(clientSelected, memoryVM, messageSubject, messageHeader, messageFooter, serviceList, button, context)
                             }
+                            resetDropdown1.value?.invoke()
                         }, "Send Message")
                     }
                 }

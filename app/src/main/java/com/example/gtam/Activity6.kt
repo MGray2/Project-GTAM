@@ -22,7 +22,6 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
-import com.example.gtam.database.entities.Client
 import com.example.gtam.database.entities.History
 import com.example.gtam.ui.theme.GTAMTheme
 import com.example.gtam.ui.theme.components.Styles

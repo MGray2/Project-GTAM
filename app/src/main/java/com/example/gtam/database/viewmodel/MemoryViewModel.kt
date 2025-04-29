@@ -15,6 +15,10 @@ class MemoryViewModel(private val repository: MemoryRepository) : ViewModel() {
     private val _memory = MutableLiveData<Memory?>()
     val memory: LiveData<Memory?> get() = _memory
 
+    fun clearMemory() {
+        _memory.value = null
+    }
+
     fun getMemoryByClient(clientId: Long) {
         viewModelScope.launch(Dispatchers.IO) {
             val memoryData = repository.getMemoryByClient(clientId)
@@ -37,5 +41,4 @@ class MemoryViewModel(private val repository: MemoryRepository) : ViewModel() {
             _memory.postValue(newMemory)
         }
     }
-
 }

@@ -11,7 +11,9 @@ data class UserBot(
     val mjApiKey: String?, // Mailjet API key
     val mjSecretKey: String?, // Mailjet API secret key
     val nvApiKey: String?, // NumVerify API key
-    val messageSubject: String,
-    val messageHeader: String,
-    val messageFooter: String
+    val emailSubject: String,
+    val emailHeader: String,
+    val emailFooter: String,
+    val textHeader: String,
+    val textFooter: String
 )

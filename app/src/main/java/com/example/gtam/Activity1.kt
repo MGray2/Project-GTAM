@@ -26,27 +26,15 @@ import com.example.gtam.database.entities.UserBot
 import com.example.gtam.database.factory.UserBotFactory
 import com.example.gtam.database.viewmodel.BotViewModel
 
-// Bot Account Setup
+// Message Defaults
 class Activity1 : ComponentActivity() {
     // Global
     private val banner = Banners(Styles())
     private val input = Input(Styles())
     private val button = Buttons(Styles())
+    private val messages = Strings()
     private val userBotVM: BotViewModel by viewModels { UserBotFactory(MyApp.userBotRepository) }
-    private val message1 = "This will be the email that the system uses for messaging."
-    private val message2 = "Api keys are needed to perform api calls. \n1: Mailjet Api Key\n2: Mailjet Secret Key\n3: NumVerify Api Key"
-    private val message3 = "Default system text for the subject of the email. The subject will be ignored if the message is a text."
-    private val message4 = "Default system text for the start of the email, before any listed services."
-    private val message5 = "Default system text for the end of the email, after any listed services."
-    private val defaultS = "The Green Team of Saltillo"
-    private val defaultH = "Hello, this is Michael Gray." +
-            "\nI just wanted to follow up with a quick summary of the work completed and provide payment details. " +
-            "Below is a breakdown of the work completed.\n"
-    private val defaultF = "You can send the payment to:\n141 CR 963, Saltillo MS, 38866" +
-            "\n\nIf you have any questions or need anything else, feel free to reach out. Thanks again for your business!" +
-            "\nBest regards,\nMichael Gray" +
-            "\n\nThis message was sent automatically. If you have any questions, " +
-            "just reach out at gray.michael2011@gmail.com — I’ll get back to you soon."
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,14 +42,12 @@ class Activity1 : ComponentActivity() {
         setContent {
             // Local
             val context = LocalContext.current
-            var botEmail by remember { mutableStateOf("") }
-            var botMJApiKey by remember { mutableStateOf("") }
-            var botMJSecretKey by remember { mutableStateOf("") }
-            var botNVApiKey by remember { mutableStateOf("") }
-            var messageSubject by remember { mutableStateOf("") }
-            var messageHeader by remember { mutableStateOf("") }
-            var messageFooter by remember { mutableStateOf("") }
-            var hideInfo by remember { mutableStateOf(true) }
+            var emailSubject by remember { mutableStateOf("") }
+            var emailHeader by remember { mutableStateOf("") }
+            var emailFooter by remember { mutableStateOf("") }
+            var textHeader by remember { mutableStateOf("") }
+            var textFooter by remember { mutableStateOf("") }
+            var textSwitch by remember { mutableStateOf(false) }
             // Database
             val bot by userBotVM.userBot.observeAsState(initial = UserBot(
                 id = 1,
@@ -69,20 +55,19 @@ class Activity1 : ComponentActivity() {
                 mjApiKey = null,
                 mjSecretKey = null,
                 nvApiKey = null,
-                messageSubject = "",
-                messageHeader = "",
-                messageFooter = ""
+                emailSubject = "",
+                emailHeader = "",
+                emailFooter = "",
+                textHeader = "",
+                textFooter = ""
             ))
             LaunchedEffect(bot) {
                 // Populate the fields
-                bot.email?.let { botEmail = it }
-                bot.mjApiKey?.let { botMJApiKey = it }
-                bot.mjSecretKey?.let { botMJSecretKey = it }
-                bot.nvApiKey?.let { botNVApiKey = it }
-
-                messageSubject = bot.messageSubject.ifBlank { defaultS }
-                messageHeader = bot.messageHeader.ifBlank { defaultH }
-                messageFooter = bot.messageFooter.ifBlank { defaultF }
+                emailSubject = bot.emailSubject.ifBlank { messages.a1p1 }
+                emailHeader = bot.emailHeader.ifBlank { messages.a1p2 }
+                emailFooter = bot.emailFooter.ifBlank { messages.a1p3 }
+                textHeader = bot.textHeader.ifBlank { "" }
+                textFooter = bot.textFooter.ifBlank { "" }
             }
 
             // UI
@@ -92,29 +77,37 @@ class Activity1 : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                        banner.CustomHeader("Bot Account Setup")
-                        // Bot Email
-                        banner.LittleText("Email", modifier = Modifier, button, message1)
-                        input.InputField(botEmail, { botEmail = it },"Email")
-                        // API
-                        banner.LittleText("Api Setup", modifier = Modifier, button, message2)
-                        input.InputFieldSecure(botMJApiKey, { botMJApiKey = it}, "Mailjet Api Key", hideInfo)
-                        input.InputFieldSecure(botMJSecretKey, { botMJSecretKey = it }, "Mailjet Secret Key", hideInfo)
-                        input.InputFieldSecure(botNVApiKey, { botNVApiKey = it },"NumVerify Api Key", hideInfo)
-                        input.InputSwitch(hideInfo, { hideInfo = it }, "Hide Api Information")
-                        // Message Subject
-                        banner.LittleText("Subject", modifier = Modifier, button, message3)
-                        input.InputField(messageSubject, { messageSubject = it }, "Subject")
-                        // Message Header
-                        banner.LittleText("Message Header", modifier = Modifier, button, message4)
-                        input.InputFieldLarge(messageHeader, { messageHeader = it },"Message")
-                        // Message Footer
-                        banner.LittleText("Message Footer", modifier = Modifier, button, message5)
-                        input.InputFieldLarge(messageFooter, { messageFooter = it },"Message")
+                        banner.CustomHeader("Message Defaults")
+                        input.InputSwitch(textSwitch, {textSwitch = it}, "Text Specific Message")
+                        if (!textSwitch) {
+                            // Message Subject
+                            banner.LittleText("Message Subject", modifier = Modifier, button, messages.a1m1)
+                            input.InputField(emailSubject, { emailSubject = it }, "Subject")
+                            // Message Header
+                            banner.LittleText("Message Header", modifier = Modifier, button, messages.a1m2)
+                            input.InputFieldLarge(emailHeader, { emailHeader = it },"Message")
+                            // Message Footer
+                            banner.LittleText("Message Footer", modifier = Modifier, button, messages.a1m3)
+                            input.InputFieldLarge(emailFooter, { emailFooter = it },"Message")
+                        } else {
+                            // Message Header (text)
+                            banner.LittleText("Message Header", modifier = Modifier, button, messages.a1m2)
+                            input.InputFieldLarge(textHeader, { textHeader = it },"Message")
+                            // Message Footer (text)
+                            banner.LittleText("Message Footer", modifier = Modifier, button, messages.a1m3)
+                            input.InputFieldLarge(textFooter, { textFooter = it },"Message")
+                        }
+
                         // Save Button
                         button.ButtonGeneric({
-                            userBotVM.updateBot(botEmail, botMJApiKey, botMJSecretKey, botNVApiKey, messageSubject, messageHeader, messageFooter)
-                            button.showToast("Account Saved", context)
+                            userBotVM.updateBotDefaults(
+                                emailSubject,
+                                emailHeader,
+                                emailFooter,
+                                textHeader,
+                                textFooter
+                            )
+                            button.showToast("Information Saved", context)
                         }, "Save")
                     }
                 }

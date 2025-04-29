@@ -20,6 +20,23 @@ interface UserBotDao {
     @Update
     suspend fun updateUserBot(userBot: UserBot)
 
+    @Query("UPDATE user_bot SET email = :email, mjApiKey = :mjApiKey, mjSecretKey = :mjSecretKey, nvApiKey = :nvApiKey WHERE id = 1")
+    suspend fun updateBotInfo(
+        email: String,
+        mjApiKey: String,
+        mjSecretKey: String,
+        nvApiKey: String
+    )
+
+    @Query("UPDATE user_bot SET emailSubject = :emailSubject, emailHeader = :emailHeader, emailFooter = :emailFooter, textHeader = :textHeader, textFooter = :textFooter")
+    suspend fun updateBotDefaults(
+        emailSubject: String,
+        emailHeader: String,
+        emailFooter: String,
+        textHeader: String,
+        textFooter: String
+    )
+
     @Delete
     suspend fun deleteUserBot(userBot: UserBot)
 }

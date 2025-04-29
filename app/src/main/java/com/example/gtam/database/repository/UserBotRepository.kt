@@ -21,6 +21,42 @@ class UserBotRepository(private val userBotDao: UserBotDao) {
         }
     }
 
+    // Update only Api and Email information
+    suspend fun updateBotInfo(
+        email: String,
+        mjApiKey: String,
+        mjSecretKey: String,
+        nvApiKey: String
+    ) {
+        withContext(Dispatchers.IO) {
+            userBotDao.updateBotInfo(
+                email,
+                mjApiKey,
+                mjSecretKey,
+                nvApiKey
+            )
+        }
+    }
+
+    // Update only Default messaging information
+    suspend fun updateBotDefaults(
+        emailSubject: String,
+        emailHeader: String,
+        emailFooter: String,
+        textHeader: String,
+        textFooter: String
+    ) {
+        withContext(Dispatchers.IO) {
+            userBotDao.updateBotDefaults(
+                emailSubject,
+                emailHeader,
+                emailFooter,
+                textHeader,
+                textFooter
+            )
+        }
+    }
+
     // Delete
     suspend fun deleteUserBot(userBot: UserBot) {
         withContext(Dispatchers.IO) {

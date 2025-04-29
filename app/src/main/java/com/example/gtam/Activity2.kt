@@ -43,6 +43,7 @@ class Activity2 : ComponentActivity() {
     private val banner = Banners(Styles())
     private val input = Input(Styles())
     private val button = Buttons(Styles())
+    private val messages = Strings()
     private val dbClients: ClientViewModel by viewModels { ClientFactory(MyApp.clientRepository) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,15 +56,7 @@ class Activity2 : ComponentActivity() {
             var clientAddress by remember { mutableStateOf("") }
             var clientEmail by remember { mutableStateOf("") }
             var clientPhoneNumber by remember { mutableStateOf("") }
-            // Messages
-            val message1 = "This is the client's name for finding it at composition. " +
-                    "The client will not see this name, but a name or address must be provided to list this client."
-            val message2 = "This is the client's address. Should no name be provided the address will be used to find at composition." +
-                    "The client will not see this address, but a name or address must be provided to list this client."
-            val message3 = "This is the client's email. If this field is not blank, the system will send the message by email. " +
-                    "An email or phone number must be provided to list a client."
-            val message4 = "This is the client's phone number. If this field is not blank, the system will send the message by text. " +
-                    "If both email and phone number are provided, email will be prioritized. An email or phone number must be provided to list a client."
+
             // Database
             val clientList by dbClients.allClients.observeAsState(initial = emptyList())
 
@@ -76,19 +69,23 @@ class Activity2 : ComponentActivity() {
                     Column (modifier = Modifier.verticalScroll(rememberScrollState())) {
                         banner.CustomHeader("Manage Clients")
                         // Identity
-                        banner.LittleText("Name", modifier = Modifier, button, message1)
+                        banner.LittleText("Name", modifier = Modifier, button, messages.a2m1)
                         input.InputField(clientName, { clientName = it }, "Client's Name")
-                        banner.LittleText("Address", modifier = Modifier, button, message2)
+                        banner.LittleText("Address", modifier = Modifier, button, messages.a2m2)
                         input.InputField(clientAddress, { clientAddress = it }, "Client's Address")
                         // Email
-                        banner.LittleText("Email", modifier = Modifier, button, message3)
+                        banner.LittleText("Email", modifier = Modifier, button, messages.a2m3)
                         input.InputField(clientEmail,{ clientEmail = it },"Client's Email")
                         // Phone Number
-                        banner.LittleText("Phone", modifier = Modifier, button, message4)
+                        banner.LittleText("Phone", modifier = Modifier, button, messages.a2m4)
                         input.InputField(clientPhoneNumber,{ clientPhoneNumber = it },"Client's Phone (no spaces)", KeyboardType.Number)
                         // Save Button
                         button.ButtonGeneric({
                             saveClient(clientName, clientAddress, clientEmail, clientPhoneNumber, dbClients, context, button)
+                            clientName = ""
+                            clientAddress = ""
+                            clientEmail = ""
+                            clientPhoneNumber = ""
                         }, "Save")
                         // Window for viewing Clients
                         Column(

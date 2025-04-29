@@ -26,7 +26,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,8 +43,7 @@ class Activity3 : ComponentActivity() {
     private val banner = Banners(Styles())
     private val button = Buttons(Styles())
     private val input = Input(Styles())
-    private val message1 = "Write the name of your service to be selected at message composition."
-    private val message2 = "This is the cost of your service, you can also add the same name with a different price."
+    private val messages = Strings()
     private val dbServices: ServiceViewModel by viewModels { ServiceFactory(MyApp.serviceRepository) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,10 +66,10 @@ class Activity3 : ComponentActivity() {
                     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                         banner.CustomHeader("Manage Services")
                         // Service Name
-                        banner.LittleText("Service", modifier = Modifier, button, message1)
+                        banner.LittleText("Service", modifier = Modifier, button, messages.a3m1)
                         input.InputField(service, { service = it }, "Service")
                         // Service Price
-                        banner.LittleText("Price", modifier = Modifier, button, message2)
+                        banner.LittleText("Price", modifier = Modifier, button, messages.a3m2)
                         input.InputField(price, { price = it }, "Price", KeyboardType.Decimal)
                         // Save Button
                         button.ButtonGeneric({

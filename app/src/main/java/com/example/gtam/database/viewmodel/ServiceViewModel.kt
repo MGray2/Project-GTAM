@@ -79,6 +79,10 @@ class ServiceViewModel(private val repository: ServiceRepository) : ViewModel() 
         }
     }
 
+    fun clearServiceSelected() {
+        _selectedServices.postValue(emptyList())
+    }
+
     // Clears _selectedServices and adds Services from memory
     fun getServiceFromMemory(memory: Memory) {
         viewModelScope.launch(Dispatchers.IO) {

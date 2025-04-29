@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gtam.database.entities.UserBot
 import com.example.gtam.database.repository.UserBotRepository
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 @SuppressLint("NullSafeMutableLiveData")
@@ -25,9 +26,11 @@ class BotViewModel(private val repository: UserBotRepository) : ViewModel() {
                         mjApiKey = null,
                         mjSecretKey = null,
                         nvApiKey = null,
-                        messageSubject = "",
-                        messageHeader = "",
-                        messageFooter = ""
+                        emailSubject = "",
+                        emailHeader = "",
+                        emailFooter = "",
+                        textHeader = "",
+                        textFooter = ""
                     )
                     repository.insertUserBot(defaultBot)
                     _userBot.postValue(defaultBot)
@@ -39,28 +42,29 @@ class BotViewModel(private val repository: UserBotRepository) : ViewModel() {
     }
 
 
-    // Update changes to UserBot
-    fun updateBot(
+    fun updateBotInfo(
         email: String,
-        mailjetApiKey: String,
-        mailjetSecretKey: String,
-        numVerifyApiKey: String,
-        messageSubject: String,
-        messageHeader: String,
-        messageFooter: String
+        mjApiKey: String,
+        mjSecretKey: String,
+        nvApiKey: String
     ) {
         viewModelScope.launch {
-            val updatedBot = UserBot(
-                id = 1,
-                email = email,
-                mjApiKey = mailjetApiKey,
-                mjSecretKey = mailjetSecretKey,
-                nvApiKey = numVerifyApiKey,
-                messageSubject = messageSubject,
-                messageHeader = messageHeader,
-                messageFooter = messageFooter
-            )
-            repository.updateUserBot(updatedBot)
+            repository.updateBotInfo(email, mjApiKey, mjSecretKey, nvApiKey)
+            val updatedBot = repository.getUserBot().first()
+            _userBot.postValue(updatedBot)
+        }
+    }
+
+    fun updateBotDefaults(
+        emailSubject: String,
+        emailHeader: String,
+        emailFooter: String,
+        textHeader: String,
+        textFooter: String
+    ) {
+        viewModelScope.launch {
+            repository.updateBotDefaults(emailSubject, emailHeader, emailFooter, textHeader, textFooter)
+            val updatedBot = repository.getUserBot().first()
             _userBot.postValue(updatedBot)
         }
     }
