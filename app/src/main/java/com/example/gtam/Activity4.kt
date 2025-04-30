@@ -43,11 +43,7 @@ import com.example.gtam.database.factory.ServiceFactory
 import com.example.gtam.database.factory.UserBotFactory
 import com.example.gtam.ui.theme.components.*
 import com.example.gtam.ui.theme.GTAMTheme
-import com.example.gtam.database.viewmodel.BotViewModel
-import com.example.gtam.database.viewmodel.ClientViewModel
-import com.example.gtam.database.viewmodel.HistoryViewModel
-import com.example.gtam.database.viewmodel.MemoryViewModel
-import com.example.gtam.database.viewmodel.ServiceViewModel
+import com.example.gtam.database.viewmodel.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -67,6 +63,7 @@ class Activity4 : ComponentActivity() {
     private val serviceVM: ServiceViewModel by viewModels { ServiceFactory(MyApp.serviceRepository) }
     private val memoryVM: MemoryViewModel by viewModels { MemoryFactory(MyApp.memoryRepository) }
     private val historyVM: HistoryViewModel by viewModels { HistoryFactory(MyApp.historyRepository)}
+    private val messageVM: MessageViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -214,7 +211,7 @@ class Activity4 : ComponentActivity() {
                         // Send Message
                         button.ButtonGeneric({
                             // Send email
-                            sendMessage(clientVM, bot, historyVM, clientSelected, serviceList, messageSubject, messageHeader, messageFooter)
+                            messageVM.sendMessage(clientVM, bot, historyVM, clientSelected, serviceList, messageSubject, messageHeader, messageFooter, getTodayFullDate())
                             button.showToast("Sending Message", context)
                             // If rememberThis is true, attempt to save preference
                             if (rememberThis) {
@@ -254,68 +251,6 @@ private fun saveMessage(
     }
 }
 
-private fun sendMessage(
-    database: ClientViewModel,
-    userBot: UserBot,
-    history: HistoryViewModel,
-    clientSelected: MutableState<Long?>,
-    serviceList: List<Service>,
-    subject: String,
-    header: String,
-    footer: String
-) {
-    CoroutineScope(Dispatchers.IO).launch {
-        val clientId = clientSelected.value ?: return@launch
-        val client = database.getClientById(clientId).await()
-        var response = Messenger.MessengerResponse(true, "No errors detected.")
-        var messageType = ""
-        var sub = subject // modifiable subject
-
-        // If Email
-        if (!client?.clientEmail.isNullOrBlank()) {
-            response = Messenger().sendEmail(
-                sender = userBot.email ?: return@launch,
-                username = userBot.mjApiKey ?: return@launch,
-                password = userBot.mjSecretKey ?: return@launch,
-                recipient = client!!.clientEmail!!,
-                subject = subject,
-                header = header,
-                services = serviceList,
-                footer = footer
-            )
-            messageType = "Email"
-        }
-        // If Text
-        if (!client?.clientPhone.isNullOrBlank()) {
-            response = Messenger().sendSmsEmail(
-                sender = userBot.email ?: return@launch,
-                apiKey = userBot.mjApiKey ?: return@launch,
-                apiSecretKey = userBot.mjSecretKey ?: return@launch,
-                recipient = client!!.clientPhone!!,
-                numVerifyKey = userBot.nvApiKey ?: return@launch,
-                header = header,
-                services = serviceList,
-                footer = footer
-            )
-            messageType = "Text"
-            sub = "(subject ignored for text)"
-        }
-        // Create a record of the message
-        history.insertHistory(
-            clientName = client?.clientName,
-            clientAddress = client?.clientAddress,
-            clientEmail = client?.clientEmail,
-            clientPhone = client?.clientPhone,
-            type = messageType,
-            status = response.status,
-            errorMessage = response.message,
-            date = getTodayFullDate(),
-            subject = sub,
-            body = Messenger().formatBody(header, footer, serviceList)
-        )
-    }
-}
-
 private fun saveService(database: ServiceViewModel, serviceSelected: MutableState<Long?>, serviceNameWI: String, servicePriceWI: String) {
     if (serviceSelected.value != null) {
         database.addService(serviceSelected)
@@ -323,12 +258,6 @@ private fun saveService(database: ServiceViewModel, serviceSelected: MutableStat
         val newService = Service(id = -System.currentTimeMillis(), serviceName = serviceNameWI, servicePrice = servicePriceWI.toDouble(), serviceDate = null)
         database.addService(newService)
     }
-}
-
-private fun getTodayDate(): String {
-    val calendar = Calendar.getInstance()
-    val dateFormat = SimpleDateFormat("MM/dd/yy", Locale.getDefault())
-    return dateFormat.format(calendar.time)
 }
 
 private fun getTodayFullDate(): String {

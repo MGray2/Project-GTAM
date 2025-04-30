@@ -8,14 +8,21 @@ class Strings {
 
     // Activity 1 Placeholders
     val a1p1 = "The Green Team of Saltillo"
+
     val a1p2 = "Hello, this is Michael Gray." +
-            "\nI just wanted to follow up with a quick summary of the work completed and provide payment details. " +
-            "Below is a breakdown of the work completed.\n"
+            "\nI just wanted to follow up with a quick summary of the work completed and provide payment details.\n"
+
     val a1p3 = "You can send the payment to:\n141 CR 963, Saltillo MS, 38866" +
             "\n\nIf you have any questions or need anything else, feel free to reach out. Thanks again for your business!" +
             "\nBest regards,\nMichael Gray" +
             "\n\nThis message was sent automatically. If you have any questions, " +
             "just reach out at gray.michael2011@gmail.com — I’ll get back to you soon."
+
+    val a1p4 = "Hello, this is Michael Gray." +
+            "I just wanted to follow up with a quick summary of the work completed and provide payment details.\n"
+
+    val a1p5 = "You can send the payment to: 141 CR 963, Saltillo MS, 38866" +
+    "\nThis message was sent automatically - replies will not be received."
 
     // Activity 2
     val a2m1 = "This is the client's name for finding it at composition. " +

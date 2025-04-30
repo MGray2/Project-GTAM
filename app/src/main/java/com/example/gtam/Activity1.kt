@@ -66,8 +66,8 @@ class Activity1 : ComponentActivity() {
                 emailSubject = bot.emailSubject.ifBlank { messages.a1p1 }
                 emailHeader = bot.emailHeader.ifBlank { messages.a1p2 }
                 emailFooter = bot.emailFooter.ifBlank { messages.a1p3 }
-                textHeader = bot.textHeader.ifBlank { "" }
-                textFooter = bot.textFooter.ifBlank { "" }
+                textHeader = bot.textHeader.ifBlank { messages.a1p4 }
+                textFooter = bot.textFooter.ifBlank { messages.a1p5 }
             }
 
             // UI
