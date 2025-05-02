@@ -2,7 +2,6 @@ package com.example.gtam
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -37,19 +36,14 @@ import androidx.lifecycle.LiveData
 import com.example.gtam.database.entities.Service
 import com.example.gtam.database.entities.UserBot
 import com.example.gtam.database.factory.ClientFactory
-import com.example.gtam.database.factory.HistoryFactory
 import com.example.gtam.database.factory.MemoryFactory
+import com.example.gtam.database.factory.MessageFactory
 import com.example.gtam.database.factory.ServiceFactory
 import com.example.gtam.database.factory.UserBotFactory
 import com.example.gtam.ui.theme.components.*
 import com.example.gtam.ui.theme.GTAMTheme
 import com.example.gtam.database.viewmodel.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.util.Locale
-import java.text.SimpleDateFormat
-import java.util.Calendar
 
 
 // Compose Message
@@ -62,9 +56,7 @@ class Activity4 : ComponentActivity() {
     private val clientVM: ClientViewModel by viewModels { ClientFactory(MyApp.clientRepository) }
     private val serviceVM: ServiceViewModel by viewModels { ServiceFactory(MyApp.serviceRepository) }
     private val memoryVM: MemoryViewModel by viewModels { MemoryFactory(MyApp.memoryRepository) }
-    private val historyVM: HistoryViewModel by viewModels { HistoryFactory(MyApp.historyRepository)}
-    private val messageVM: MessageViewModel by viewModels()
-
+    private val messageVM: MessageViewModel by viewModels { MessageFactory(MyApp.messageRepository) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -210,9 +202,12 @@ class Activity4 : ComponentActivity() {
 
                         // Send Message
                         button.ButtonGeneric({
-                            // Send email
-                            messageVM.sendMessage(clientVM, bot, historyVM, clientSelected, serviceList, messageSubject, messageHeader, messageFooter, getTodayFullDate())
-                            button.showToast("Sending Message", context)
+                            clientSelected.value?.let { clientId ->
+                                messageVM.queueMessage(clientId, messageSubject, messageHeader, messageFooter, serviceList, context) {
+                                    button.showToast("Sending Message", context)
+                                }
+                            }
+
                             // If rememberThis is true, attempt to save preference
                             if (rememberThis) {
                                 saveMessage(clientSelected, memoryVM, messageSubject, messageHeader, messageFooter, serviceList, button, context)
@@ -258,14 +253,6 @@ private fun saveService(database: ServiceViewModel, serviceSelected: MutableStat
         val newService = Service(id = -System.currentTimeMillis(), serviceName = serviceNameWI, servicePrice = servicePriceWI.toDouble(), serviceDate = null)
         database.addService(newService)
     }
-}
-
-private fun getTodayFullDate(): String {
-    val calendar = Calendar.getInstance()
-    val day = SimpleDateFormat("EEEE", Locale.getDefault()).format(calendar.time)
-    val date = SimpleDateFormat("MM/dd/yy", Locale.getDefault()).format(calendar.time)
-    val time = SimpleDateFormat("hh:mm:ss", Locale.getDefault()).format(calendar.time)
-    return "$day, $date $time"
 }
 
 // Window to view the list of Services

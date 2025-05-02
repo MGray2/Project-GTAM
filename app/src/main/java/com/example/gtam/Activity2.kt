@@ -43,7 +43,7 @@ class Activity2 : ComponentActivity() {
     private val banner = Banners(Styles())
     private val input = Input(Styles())
     private val button = Buttons(Styles())
-    private val messages = Strings()
+    private val messages = Strings
     private val dbClients: ClientViewModel by viewModels { ClientFactory(MyApp.clientRepository) }
 
     override fun onCreate(savedInstanceState: Bundle?) {

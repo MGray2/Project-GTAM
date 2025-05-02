@@ -21,4 +21,7 @@ interface ClientDao {
 
     @Query("SELECT * FROM clients WHERE id = :target")
     fun getClientById(target: Long): Flow<Client?>
+
+    @Query("SELECT * FROM clients WHERE id = :target")
+    suspend fun getClientByIdOnce(target: Long): Client?
 }

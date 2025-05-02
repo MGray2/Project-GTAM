@@ -23,4 +23,9 @@ class ClientRepository(private val clientDao: ClientDao) {
     fun getClientById(clientId: Long): Flow<Client?> {
         return clientDao.getClientById(clientId)
     }
+
+    // Get one instance (for coroutine)
+    suspend fun getClientByIdOnce(clientId: Long): Client? {
+        return clientDao.getClientByIdOnce(clientId)
+    }
 }

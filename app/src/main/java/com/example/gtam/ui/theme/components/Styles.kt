@@ -56,7 +56,7 @@ class Styles() {
         return when {
             screenHeight < 600 -> 130.dp
             screenHeight < 840 -> 140.dp
-            else -> 150.dp
+            else -> 170.dp
         }
     }
 
@@ -65,6 +65,14 @@ class Styles() {
             screenHeight < 600 -> 120.dp
             screenHeight < 840 -> 130.dp
             else -> 140.dp
+        }
+    }
+
+    fun adaptiveSmallWidth(screenWidth: Int): Dp {
+        return when {
+            screenWidth < 600 -> 160.dp
+            screenWidth < 840 -> 180.dp
+            else -> 200.dp
         }
     }
 

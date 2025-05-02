@@ -32,7 +32,7 @@ class Activity1 : ComponentActivity() {
     private val banner = Banners(Styles())
     private val input = Input(Styles())
     private val button = Buttons(Styles())
-    private val messages = Strings()
+    private val messages = Strings
     private val userBotVM: BotViewModel by viewModels { UserBotFactory(MyApp.userBotRepository) }
 
 

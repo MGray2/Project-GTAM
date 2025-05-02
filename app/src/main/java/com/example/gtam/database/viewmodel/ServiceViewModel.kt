@@ -12,6 +12,8 @@ import com.example.gtam.database.dao.ServiceDao
 import com.example.gtam.database.entities.Memory
 import com.example.gtam.database.entities.Service
 import com.example.gtam.database.repository.ServiceRepository
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch

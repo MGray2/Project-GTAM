@@ -17,6 +17,9 @@ interface UserBotDao {
     @Query("SELECT * FROM user_bot WHERE id = 1 LIMIT 1")
     fun getUserBot(): Flow<UserBot?>
 
+    @Query("SELECT * FROM user_bot LIMIT 1")
+    suspend fun getUserBotOnce(): UserBot?
+
     @Update
     suspend fun updateUserBot(userBot: UserBot)
 

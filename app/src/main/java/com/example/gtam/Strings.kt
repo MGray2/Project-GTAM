@@ -1,6 +1,6 @@
 package com.example.gtam
 
-class Strings {
+object Strings {
     // Activity 1
     val a1m1 = "Default system text for the subject of the email. The subject will be ignored if the message is a text."
     val a1m2 = "Default system text for the start of the email, before any listed services."

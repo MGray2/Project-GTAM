@@ -132,7 +132,7 @@ class Input(private val styles: Styles) {
             ) },
             textStyle = TextStyle(fontSize = styles.adaptiveSmallFont(config.screenWidthDp)),
             modifier = Modifier
-                .width(140.dp)
+                .width(styles.adaptiveSmallWidth(config.screenWidthDp))
                 .padding(10.dp),
             colors = TextFieldDefaults.colors(
                 focusedTextColor = MaterialTheme.colorScheme.onSurface,
@@ -150,9 +150,10 @@ class Input(private val styles: Styles) {
 
         TextField(
             value = text,
-            onValueChange = { newText -> if (newText.all { it.isDigit() }) {
-                onValueChange(newText)
-            } },
+            onValueChange = { newText ->
+                if (newText.isEmpty() || newText.matches(Regex("^\\d*\\.?\\d*\$"))) {
+                    onValueChange(newText)
+                } },
             placeholder = { Text(placeholder, fontSize = styles.adaptiveMediumFont(config.screenWidthDp)) },
             textStyle = TextStyle(fontSize = styles.adaptiveMediumFont(config.screenWidthDp)),
             modifier = Modifier.padding(9.dp, 0.dp)

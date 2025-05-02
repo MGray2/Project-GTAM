@@ -43,7 +43,7 @@ class Activity3 : ComponentActivity() {
     private val banner = Banners(Styles())
     private val button = Buttons(Styles())
     private val input = Input(Styles())
-    private val messages = Strings()
+    private val messages = Strings
     private val dbServices: ServiceViewModel by viewModels { ServiceFactory(MyApp.serviceRepository) }
 
     override fun onCreate(savedInstanceState: Bundle?) {

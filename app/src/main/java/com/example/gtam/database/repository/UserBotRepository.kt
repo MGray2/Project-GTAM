@@ -70,4 +70,9 @@ class UserBotRepository(private val userBotDao: UserBotDao) {
             userBotDao.getUserBot()
         }
     }
+
+    // Get one instance (for coroutine)
+    suspend fun getUserBotOnce(): UserBot? {
+        return userBotDao.getUserBotOnce()
+    }
 }
