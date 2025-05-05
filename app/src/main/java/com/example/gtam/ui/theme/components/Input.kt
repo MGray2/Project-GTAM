@@ -62,8 +62,7 @@ class Input(private val styles: Styles) {
             placeholder = { Text(placeholder, fontSize = styles.adaptiveMediumFont(config.screenWidthDp)) },
             textStyle = TextStyle(fontSize = styles.adaptiveMediumFont(config.screenWidthDp)),
             modifier = Modifier.padding(9.dp, 0.dp)
-                .fillMaxWidth()
-                .height(styles.adaptiveSmallHeight(config.screenHeightDp)),
+                .fillMaxWidth(),
             colors = TextFieldDefaults.colors(
                 focusedTextColor = MaterialTheme.colorScheme.onSurface,
                 unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
@@ -84,8 +83,7 @@ class Input(private val styles: Styles) {
             placeholder = { Text(placeholder, fontSize = styles.adaptiveMediumFont(config.screenWidthDp)) },
             textStyle = TextStyle(fontSize = styles.adaptiveMediumFont(config.screenWidthDp)),
             modifier = Modifier.padding(9.dp, 0.dp)
-                .fillMaxWidth()
-                .height(styles.adaptiveSmallHeight(config.screenHeightDp)),
+                .fillMaxWidth(),
             visualTransformation = if (isHidden) PasswordVisualTransformation() else VisualTransformation.None,
             colors = TextFieldDefaults.colors(
                 focusedTextColor = MaterialTheme.colorScheme.onSurface,
@@ -107,8 +105,7 @@ class Input(private val styles: Styles) {
             placeholder = { Text(placeholder, fontSize = styles.adaptiveMediumFont(config.screenWidthDp)) },
             textStyle = TextStyle(fontSize = styles.adaptiveMediumFont(config.screenWidthDp)),
             modifier = Modifier.padding(9.dp, 0.dp)
-                .fillMaxWidth()
-                .height(styles.adaptiveLargeHeight(config.screenHeightDp)),
+                .fillMaxWidth(),
             colors = TextFieldDefaults.colors(
                 focusedTextColor = MaterialTheme.colorScheme.onSurface,
                 unfocusedTextColor = MaterialTheme.colorScheme.onSurface,

@@ -1,4 +1,4 @@
-package com.example.gtam
+package com.example.gtam.activities
 
 import android.content.Context
 import android.os.Bundle
@@ -28,11 +28,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.LiveData
+import com.example.gtam.MyApp
 import com.example.gtam.database.entities.Service
 import com.example.gtam.database.entities.UserBot
 import com.example.gtam.database.factory.ClientFactory
@@ -49,9 +50,10 @@ import java.util.Locale
 // Compose Message
 class Activity4 : ComponentActivity() {
     // Global
-    private val banner = Banners(Styles())
-    private val button = Buttons(Styles())
-    private val input = Input(Styles())
+    private val styles = Styles()
+    private val banner = Banners(styles)
+    private val button = Buttons(styles)
+    private val input = Input(styles)
     private val userBotVM: BotViewModel by viewModels { UserBotFactory(MyApp.userBotRepository) }
     private val clientVM: ClientViewModel by viewModels { ClientFactory(MyApp.clientRepository) }
     private val serviceVM: ServiceViewModel by viewModels { ServiceFactory(MyApp.serviceRepository) }
@@ -219,75 +221,80 @@ class Activity4 : ComponentActivity() {
             }
         }
     }
-}
 
-private fun saveMessage(
-    clientSelected: MutableState<Long?>,
-    memoryVM: MemoryViewModel,
-    messageSubject: String,
-    messageHeader: String,
-    messageFooter: String,
-    serviceList: List<Service>,
-    button: Buttons,
-    context: Context
-): Boolean {
-    clientSelected.value?.let { clientId ->
-        memoryVM.saveMemory(
-        clientId,
-        messageSubject,
-        messageHeader,
-        messageFooter,
-        serviceList
+    // Remember this interaction
+    private fun saveMessage(
+        clientSelected: MutableState<Long?>,
+        memoryVM: MemoryViewModel,
+        messageSubject: String,
+        messageHeader: String,
+        messageFooter: String,
+        serviceList: List<Service>,
+        button: Buttons,
+        context: Context
+    ): Boolean {
+        clientSelected.value?.let { clientId ->
+            memoryVM.saveMemory(
+                clientId,
+                messageSubject,
+                messageHeader,
+                messageFooter,
+                serviceList
             )
-        return true
-    } ?: run {
-        button.showToast("Client not selected, could not save preference.", context)
-    return false
+            return true
+        } ?: run {
+            button.showToast("Client not selected, could not save preference.", context)
+            return false
+        }
+    }
+
+    // Helper to store services to memory
+    private fun saveService(database: ServiceViewModel, serviceSelected: MutableState<Long?>, serviceNameWI: String, servicePriceWI: String) {
+        if (serviceSelected.value != null) {
+            database.addService(serviceSelected)
+        } else if (serviceNameWI.isNotBlank() && servicePriceWI.isNotBlank()) {
+            val newService = Service(id = -System.currentTimeMillis(), serviceName = serviceNameWI, servicePrice = servicePriceWI.toDouble(), serviceDate = null)
+            database.addService(newService)
+        }
+    }
+
+    // Window to view the list of Services
+    @Composable
+    private fun ServiceWindow(counter: Int, iterable: Service, database: ServiceViewModel, input: Input, button: Buttons) {
+        val serviceDateState = remember { mutableStateOf(iterable.serviceDate ?: "") }
+        if (counter % 2 != 0) {
+            ServiceRow(modifier = Modifier.background(MaterialTheme.colorScheme.surface), iterable, database, input, button, serviceDateState)
+        } else {
+            ServiceRow(modifier = Modifier, iterable, database, input, button, serviceDateState)
+        }
+    }
+
+    // Additional styling for each Service
+    @Composable
+    private fun ServiceRow(modifier: Modifier, iterable: Service, database: ServiceViewModel, input: Input, button: Buttons, serviceDateState: MutableState<String>) {
+        val config = LocalConfiguration.current
+        val rounded = String.format(Locale.US,"%.2f", iterable.servicePrice)
+        Row(modifier = modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .padding(10.dp),
+            verticalAlignment = Alignment.CenterVertically) {
+            Text(text = iterable.serviceName,
+                modifier = Modifier.weight(1F),
+                fontSize = styles.adaptiveSmallFont(config.screenWidthDp))
+            Text(text = "$${rounded}",
+                modifier = Modifier.weight(1F),
+                fontSize = styles.adaptiveSmallFont(config.screenWidthDp))
+            button.DatePickerButton { iterable.serviceDate = it
+                serviceDateState.value = it }
+            input.InputFieldSmall(
+                serviceDateState.value,
+                { serviceDateState.value = it
+                    iterable.serviceDate = it }, "Date")
+            button.RemoveButton { database.removeService(iterable.id) }
+        }
     }
 }
 
-private fun saveService(database: ServiceViewModel, serviceSelected: MutableState<Long?>, serviceNameWI: String, servicePriceWI: String) {
-    if (serviceSelected.value != null) {
-        database.addService(serviceSelected)
-    } else if (serviceNameWI.isNotBlank() && servicePriceWI.isNotBlank()) {
-        val newService = Service(id = -System.currentTimeMillis(), serviceName = serviceNameWI, servicePrice = servicePriceWI.toDouble(), serviceDate = null)
-        database.addService(newService)
-    }
-}
 
-// Window to view the list of Services
-@Composable
-private fun ServiceWindow(counter: Int, iterable: Service, database: ServiceViewModel, input: Input, button: Buttons) {
-    val serviceDateState = remember { mutableStateOf(iterable.serviceDate ?: "") }
-    if (counter % 2 != 0) {
-        ServiceRow(modifier = Modifier.background(MaterialTheme.colorScheme.surface), iterable, database, input, button, serviceDateState)
-    } else {
-        ServiceRow(modifier = Modifier, iterable, database, input, button, serviceDateState)
-    }
-}
-
-// Additional styling for each Service
-@Composable
-private fun ServiceRow(modifier: Modifier, iterable: Service, database: ServiceViewModel, input: Input, button: Buttons, serviceDateState: MutableState<String>) {
-    val rounded = String.format(Locale.US,"%.2f", iterable.servicePrice)
-    Row(modifier = modifier
-        .fillMaxWidth()
-        .wrapContentHeight()
-        .padding(10.dp),
-        verticalAlignment = Alignment.CenterVertically) {
-        Text(text = iterable.serviceName,
-            modifier = Modifier.weight(1F),
-            fontSize = 20.sp)
-        Text(text = "$${rounded}",
-            modifier = Modifier.weight(1F),
-            fontSize = 20.sp)
-        button.DatePickerButton { iterable.serviceDate = it
-        serviceDateState.value = it }
-        input.InputFieldSmall(
-            serviceDateState.value,
-            { serviceDateState.value = it
-            iterable.serviceDate = it }, "Date")
-        button.RemoveButton { database.removeService(iterable.id) }
-    }
-}
 

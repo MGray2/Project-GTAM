@@ -1,8 +1,6 @@
 package com.example.gtam.ui.theme.components
 
-import android.util.Log
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.TextStyle
+
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp

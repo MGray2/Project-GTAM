@@ -1,4 +1,4 @@
-package com.example.gtam
+package com.example.gtam.activities
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -19,6 +19,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import com.example.gtam.MyApp
+import com.example.gtam.Strings
 import com.example.gtam.database.entities.UserBot
 import com.example.gtam.database.factory.UserBotFactory
 import com.example.gtam.database.viewmodel.BotViewModel
@@ -34,7 +36,6 @@ class Activity7 : ComponentActivity() {
     private val banner = Banners(Styles())
     private val input = Input(Styles())
     private val button = Buttons(Styles())
-    private val messages = Strings
     private val userBotVM: BotViewModel by viewModels { UserBotFactory(MyApp.userBotRepository) }
 
 
@@ -77,10 +78,10 @@ class Activity7 : ComponentActivity() {
                     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                         banner.CustomHeader("Bot Account Setup")
                         // Bot Email
-                        banner.LittleText("Email", modifier = Modifier, button, messages.a7m1)
+                        banner.LittleText("Email", modifier = Modifier, button, Strings.A7M1)
                         input.InputField(botEmail, { botEmail = it },"Email")
                         // API
-                        banner.LittleText("Api Setup", modifier = Modifier, button, messages.a7m2)
+                        banner.LittleText("Api Setup", modifier = Modifier, button, Strings.A7M2)
                         input.InputFieldSecure(botMJApiKey, { botMJApiKey = it}, "Mailjet Api Key", hideInfo)
                         input.InputFieldSecure(botMJSecretKey, { botMJSecretKey = it }, "Mailjet Secret Key", hideInfo)
                         input.InputFieldSecure(botNVApiKey, { botNVApiKey = it },"NumVerify Api Key", hideInfo)

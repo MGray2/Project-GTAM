@@ -1,4 +1,4 @@
-package com.example.gtam
+package com.example.gtam.activities
 
 
 import android.os.Bundle
@@ -22,6 +22,8 @@ import com.example.gtam.ui.theme.components.*
 import com.example.gtam.ui.theme.GTAMTheme
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import com.example.gtam.MyApp
+import com.example.gtam.Strings
 import com.example.gtam.database.entities.UserBot
 import com.example.gtam.database.factory.UserBotFactory
 import com.example.gtam.database.viewmodel.BotViewModel
@@ -32,9 +34,7 @@ class Activity1 : ComponentActivity() {
     private val banner = Banners(Styles())
     private val input = Input(Styles())
     private val button = Buttons(Styles())
-    private val messages = Strings
     private val userBotVM: BotViewModel by viewModels { UserBotFactory(MyApp.userBotRepository) }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,11 +63,11 @@ class Activity1 : ComponentActivity() {
             ))
             LaunchedEffect(bot) {
                 // Populate the fields
-                emailSubject = bot.emailSubject.ifBlank { messages.a1p1 }
-                emailHeader = bot.emailHeader.ifBlank { messages.a1p2 }
-                emailFooter = bot.emailFooter.ifBlank { messages.a1p3 }
-                textHeader = bot.textHeader.ifBlank { messages.a1p4 }
-                textFooter = bot.textFooter.ifBlank { messages.a1p5 }
+                emailSubject = bot.emailSubject.ifBlank { Strings.A1P1 }
+                emailHeader = bot.emailHeader.ifBlank { Strings.A1P2 }
+                emailFooter = bot.emailFooter.ifBlank { Strings.A1P3 }
+                textHeader = bot.textHeader.ifBlank { Strings.A1P4 }
+                textFooter = bot.textFooter.ifBlank { Strings.A1P5 }
             }
 
             // UI
@@ -81,20 +81,30 @@ class Activity1 : ComponentActivity() {
                         input.InputSwitch(textSwitch, {textSwitch = it}, "Text Specific Message")
                         if (!textSwitch) {
                             // Message Subject
-                            banner.LittleText("Message Subject", modifier = Modifier, button, messages.a1m1)
+                            banner.LittleText("Message Subject", modifier = Modifier, button,
+                                Strings.A1M1
+                            )
                             input.InputField(emailSubject, { emailSubject = it }, "Subject")
                             // Message Header
-                            banner.LittleText("Message Header", modifier = Modifier, button, messages.a1m2)
+                            banner.LittleText("Message Header", modifier = Modifier, button,
+                                Strings.A1M2
+                            )
                             input.InputFieldLarge(emailHeader, { emailHeader = it },"Message")
                             // Message Footer
-                            banner.LittleText("Message Footer", modifier = Modifier, button, messages.a1m3)
+                            banner.LittleText("Message Footer", modifier = Modifier, button,
+                                Strings.A1M3
+                            )
                             input.InputFieldLarge(emailFooter, { emailFooter = it },"Message")
                         } else {
                             // Message Header (text)
-                            banner.LittleText("Message Header", modifier = Modifier, button, messages.a1m2)
+                            banner.LittleText("Message Header", modifier = Modifier, button,
+                                Strings.A1M2
+                            )
                             input.InputFieldLarge(textHeader, { textHeader = it },"Message")
                             // Message Footer (text)
-                            banner.LittleText("Message Footer", modifier = Modifier, button, messages.a1m3)
+                            banner.LittleText("Message Footer", modifier = Modifier, button,
+                                Strings.A1M3
+                            )
                             input.InputFieldLarge(textFooter, { textFooter = it },"Message")
                         }
 

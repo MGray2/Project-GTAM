@@ -1,4 +1,4 @@
-package com.example.gtam
+package com.example.gtam.activities
 
 import android.os.Build
 import android.os.Bundle
@@ -55,41 +55,41 @@ class Activity6 : ComponentActivity() {
             }
         }
     }
-}
 
-@Composable
-private fun HistoryFormat(history: History?) {
-    val config = LocalConfiguration.current
-    val body = buildAnnotatedString {
-        history?.let {
-            append("\n")
-            append("Name: ${history.clientName}\n")
-            append("Address: ${history.clientAddress}\n")
-            append("Email: ${history.clientEmail}\n")
-            append("Phone: ${history.clientPhone}\n")
+    @Composable
+    private fun HistoryFormat(history: History?) {
+        val config = LocalConfiguration.current
+        val body = buildAnnotatedString {
+            history?.let {
+                append("\n")
+                append("Name: ${history.clientName}\n")
+                append("Address: ${history.clientAddress}\n")
+                append("Email: ${history.clientEmail}\n")
+                append("Phone: ${history.clientPhone}\n")
 
-            val status = if (history.status) "Success" else "Failure"
-            append("Type: ${history.type}\n")
+                val status = if (history.status) "Success" else "Failure"
+                append("Type: ${history.type}\n")
 
-            append("Status: ")
-            if (status == "Success")
-                withStyle(style = SpanStyle(color = Color.Green)) {
-                    append(status)
-                } else {
-                withStyle(style = SpanStyle(color = Color.Red)) {
-                    append(status)
+                append("Status: ")
+                if (status == "Success")
+                    withStyle(style = SpanStyle(color = Color.Green)) {
+                        append(status)
+                    } else {
+                    withStyle(style = SpanStyle(color = Color.Red)) {
+                        append(status)
+                    }
                 }
+                append("\n")
+                if (!history.status) {
+                    append("Reason: ${history.errorMessage}\n")
+                }
+                append("Subject: ${history.subject}\n")
+                append("Body: ${history.body}\n")
             }
-            append("\n")
-            if (!history.status) {
-                append("Reason: ${history.errorMessage}\n")
-            }
-            append("Subject: ${history.subject}\n")
-            append("Body: ${history.body}\n")
         }
+        Text(body,
+            fontSize = Styles().adaptiveSmallFont(config.screenWidthDp),
+            lineHeight = 1.5.em
+        )
     }
-    Text(body,
-        fontSize = Styles().adaptiveSmallFont(config.screenWidthDp),
-        lineHeight = 1.5.em
-    )
 }

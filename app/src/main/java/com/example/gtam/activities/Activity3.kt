@@ -1,4 +1,4 @@
-package com.example.gtam
+package com.example.gtam.activities
 
 
 import android.os.Bundle
@@ -26,13 +26,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.gtam.database.entities.Service
 import com.example.gtam.ui.theme.components.*
 import com.example.gtam.ui.theme.GTAMTheme
 import androidx.compose.ui.platform.LocalContext
+import com.example.gtam.MyApp
+import com.example.gtam.Strings
 import com.example.gtam.database.factory.ServiceFactory
 import java.util.Locale
 import com.example.gtam.database.viewmodel.ServiceViewModel
@@ -40,10 +42,10 @@ import com.example.gtam.database.viewmodel.ServiceViewModel
 // Manage Services
 class Activity3 : ComponentActivity() {
     // Global
-    private val banner = Banners(Styles())
-    private val button = Buttons(Styles())
-    private val input = Input(Styles())
-    private val messages = Strings
+    private val styles = Styles()
+    private val banner = Banners(styles)
+    private val button = Buttons(styles)
+    private val input = Input(styles)
     private val dbServices: ServiceViewModel by viewModels { ServiceFactory(MyApp.serviceRepository) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,10 +68,10 @@ class Activity3 : ComponentActivity() {
                     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                         banner.CustomHeader("Manage Services")
                         // Service Name
-                        banner.LittleText("Service", modifier = Modifier, button, messages.a3m1)
+                        banner.LittleText("Service", modifier = Modifier, button, Strings.A3M1)
                         input.InputField(service, { service = it }, "Service")
                         // Service Price
-                        banner.LittleText("Price", modifier = Modifier, button, messages.a3m2)
+                        banner.LittleText("Price", modifier = Modifier, button, Strings.A3M2)
                         input.InputField(price, { price = it }, "Price", KeyboardType.Decimal)
                         // Save Button
                         button.ButtonGeneric({
@@ -95,33 +97,34 @@ class Activity3 : ComponentActivity() {
             }
         }
     }
-}
 
-// Window to view the list of Services
-@Composable
-private fun ServiceWindow(counter: Int, iterable: Service, database: ServiceViewModel, button: Buttons) {
-    if (counter % 2 != 0) {
-        ServiceRow(modifier = Modifier.background(MaterialTheme.colorScheme.surface), iterable, database, button)
-    } else {
-        ServiceRow(modifier = Modifier, iterable, database, button)
+    // Window to view the list of Services
+    @Composable
+    private fun ServiceWindow(counter: Int, iterable: Service, database: ServiceViewModel, button: Buttons) {
+        if (counter % 2 != 0) {
+            ServiceRow(modifier = Modifier.background(MaterialTheme.colorScheme.surface), iterable, database, button)
+        } else {
+            ServiceRow(modifier = Modifier, iterable, database, button)
+        }
     }
-}
 
-// Additional styling for each Service
-@Composable
-private fun ServiceRow(modifier: Modifier, iterable: Service, database: ServiceViewModel, button: Buttons) {
-    val rounded = String.format(Locale.US,"%.2f", iterable.servicePrice)
-    Row(modifier = modifier
-        .fillMaxWidth()
-        .wrapContentHeight()
-        .padding(10.dp),
-        verticalAlignment = Alignment.CenterVertically) {
-        Text(text = iterable.serviceName,
-            modifier = Modifier.weight(1F),
-            fontSize = 20.sp)
-        Text(text = "$${rounded}",
-            modifier = Modifier.weight(1F),
-            fontSize = 20.sp)
-        button.DeleteButton { database.deleteService(iterable.id) }
+    // Additional styling for each Service
+    @Composable
+    private fun ServiceRow(modifier: Modifier, iterable: Service, database: ServiceViewModel, button: Buttons) {
+        val config = LocalConfiguration.current
+        val rounded = String.format(Locale.US,"%.2f", iterable.servicePrice)
+        Row(modifier = modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .padding(10.dp),
+            verticalAlignment = Alignment.CenterVertically) {
+            Text(text = iterable.serviceName,
+                modifier = Modifier.weight(1F),
+                fontSize = styles.adaptiveSmallFont(config.screenWidthDp))
+            Text(text = "$${rounded}",
+                modifier = Modifier.weight(1F),
+                fontSize = styles.adaptiveSmallFont(config.screenWidthDp))
+            button.DeleteButton { database.deleteService(iterable.id) }
+        }
     }
 }

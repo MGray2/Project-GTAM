@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
-import com.example.gtam.MessageWorker
+import com.example.gtam.messaging.MessageWorker
 import com.example.gtam.database.entities.Message
 import com.example.gtam.database.entities.Service
 import com.example.gtam.database.repository.MessageRepository

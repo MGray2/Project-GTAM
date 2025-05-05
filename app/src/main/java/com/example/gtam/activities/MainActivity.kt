@@ -1,4 +1,4 @@
-package com.example.gtam
+package com.example.gtam.activities
 
 
 import android.os.Bundle

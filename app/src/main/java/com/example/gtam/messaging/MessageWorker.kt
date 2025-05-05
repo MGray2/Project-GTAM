@@ -1,7 +1,10 @@
-package com.example.gtam
+package com.example.gtam.messaging
 
-import android.content.Context import androidx.work.CoroutineWorker
+import android.content.Context
+import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.example.gtam.Date
+import com.example.gtam.MyApp
 import com.example.gtam.database.entities.History
 import com.example.gtam.database.entities.Service
 import com.google.gson.Gson
@@ -39,7 +42,7 @@ class MessageWorker(
         var subject = message.subject
         val messenger = Messenger()
 
-        // Send Email if applicable
+        // Send Email
         if (!client.clientEmail.isNullOrBlank()) {
             response = messenger.sendEmail(
                 sender = userBot.email ?: return Result.failure(),
@@ -52,10 +55,8 @@ class MessageWorker(
                 footer = message.footer
             )
             messageType = "Email"
-        }
-
-        // Send SMS if applicable
-        if (!client.clientPhone.isNullOrBlank()) {
+            // Send SMS
+        } else if (!client.clientPhone.isNullOrBlank()) {
             response = messenger.sendSmsEmail(
                 sender = userBot.email ?: return Result.failure(),
                 apiKey = userBot.mjApiKey ?: return Result.failure(),
@@ -87,6 +88,10 @@ class MessageWorker(
         // Remove after operation
         MyApp.messageRepository.delete(message)
 
-        return if (response.status) Result.success() else Result.retry()
+        return if (response.status) {
+            Result.success()
+        } else {
+            Result.failure()
+        }
     }
 }

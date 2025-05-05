@@ -1,7 +1,6 @@
 package com.example.gtam
 
 import android.app.Application
-import android.content.Context
 import androidx.room.Room
 import com.example.gtam.database.AppDatabase
 import com.example.gtam.database.repository.ClientRepository

@@ -1,4 +1,4 @@
-package com.example.gtam
+package com.example.gtam.messaging
 import java.util.*
 import com.example.gtam.database.entities.Service
 import okhttp3.OkHttpClient
@@ -10,7 +10,6 @@ import kotlinx.coroutines.withContext
 import java.net.HttpURLConnection
 import java.net.URL
 import android.util.Base64
-import android.util.Log
 import android.util.Patterns
 import androidx.compose.ui.text.buildAnnotatedString
 import kotlinx.coroutines.delay
@@ -18,6 +17,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
 import java.io.OutputStreamWriter
+import java.util.concurrent.TimeUnit
 
 class Messenger {
     // Data class to hold information received from NumVerify
@@ -120,18 +120,32 @@ class Messenger {
     // Uses NumVerify API to find the provider of a phone number
     private suspend fun getProvider(phoneNumber: String, apiKey: String): String? {
         return withContext(Dispatchers.IO) {
-            val client = OkHttpClient()
-            val url = "https://apilayer.net/api/validate?access_key=$apiKey&number=$phoneNumber"
+            try {
+                val client = OkHttpClient.Builder()
+                    .callTimeout(10, TimeUnit.SECONDS) // Timeout to prevent freezing
+                    .build()
 
-            val request = Request.Builder().url(url).build()
-            client.newCall(request).execute().use { response ->
-                if (!response.isSuccessful) return@withContext null
-                val body = response.body?.string() ?: return@withContext null
+                val url = "https://apilayer.net/api/validate?access_key=$apiKey&number=$phoneNumber"
+                val request = Request.Builder().url(url).build()
 
-                val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
-                val jsonAdapter = moshi.adapter(CarrierInfo::class.java)
-                val carrierInfo = jsonAdapter.fromJson(body)
-                return@withContext carrierInfo?.carrier
+                client.newCall(request).execute().use { response ->
+                    if (!response.isSuccessful) {
+                        return@withContext null
+                    }
+
+                    val body = response.body?.string()
+                    if (body.isNullOrBlank()) {
+                        return@withContext null
+                    }
+
+                    val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+                    val jsonAdapter = moshi.adapter(CarrierInfo::class.java)
+                    val carrierInfo = jsonAdapter.fromJson(body)
+
+                    return@withContext carrierInfo?.carrier
+                }
+            } catch (e: Exception) {
+                return@withContext null
             }
         }
     }
@@ -235,16 +249,16 @@ class Messenger {
     //  Mailjet apiKey, Mailjet SecretKey, sender is an email, recipient is a phone number. returns messenger response
     suspend fun sendSmsEmail(apiKey: String, apiSecretKey: String, sender: String, recipient: String, numVerifyKey: String, header: String, services: List<Service>, footer: String): MessengerResponse {
         var phoneNumber = recipient
+        if (phoneNumber.length < 10) return MessengerResponse(false, "Invalid phone number.")
         if (phoneNumber.length == 10) phoneNumber = "1$phoneNumber" // Add country number
 
         val body = formatBody(header, footer, services)
         var provider = getProvider(phoneNumber, numVerifyKey)
+
         if (provider == null) provider = getProvider(recipient, numVerifyKey) // try original number
         if (phoneNumber.length == 11) phoneNumber = phoneNumber.substring(1) // Remove country number
-
         val smsGateway = getSmsGateway(phoneNumber, provider)
             ?: return MessengerResponse(false, "Failed to create SMS gateway.") // does not need country number
-
         val parts = prepareSmsMessages(body)
 
         parts.forEach { part ->

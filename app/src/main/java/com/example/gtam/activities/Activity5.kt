@@ -1,4 +1,4 @@
-package com.example.gtam
+package com.example.gtam.activities
 
 import android.content.Context
 import android.content.Intent
@@ -21,11 +21,11 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.example.gtam.MyApp
 import com.example.gtam.database.entities.History
 import com.example.gtam.database.factory.HistoryFactory
 import com.example.gtam.database.viewmodel.HistoryViewModel
@@ -80,38 +80,38 @@ class Activity5 : ComponentActivity() {
             }
         }
     }
-}
 
-// Go to activity 6
-private fun historyButton(context: Context, history: History) {
-    val intent = Intent(context, Activity6::class.java).apply {
-        putExtra("historyInstance", history)
+    // Go to activity 6
+    private fun historyButton(context: Context, history: History) {
+        val intent = Intent(context, Activity6::class.java).apply {
+            putExtra("historyInstance", history)
+        }
+        context.startActivity(intent)
     }
-    context.startActivity(intent)
-}
 
-@Composable
-private fun HistoryWindow(counter: Int, iterable: History, button: Buttons, context: Context) {
-    if (counter % 2 != 0) {
-        HistoryRow(modifier = Modifier, iterable, button, context)
-    } else {
-        HistoryRow(modifier = Modifier, iterable, button, context)
+    @Composable
+    private fun HistoryWindow(counter: Int, iterable: History, button: Buttons, context: Context) {
+        if (counter % 2 != 0) {
+            HistoryRow(modifier = Modifier, iterable, button, context)
+        } else {
+            HistoryRow(modifier = Modifier, iterable, button, context)
+        }
     }
-}
 
-@Composable
-private fun HistoryRow(modifier: Modifier, iterable: History, button: Buttons, context: Context) {
-    var name = ""
-    if (!iterable.clientName.isNullOrBlank()) {
-        name = iterable.clientName
-    } else if (!iterable.clientAddress.isNullOrBlank()) {
-        name = iterable.clientAddress
-    }
-    Row(modifier = modifier
-        .fillMaxWidth()
-        .wrapContentHeight()
-        .padding(10.dp),
-        verticalAlignment = Alignment.CenterVertically) {
-        button.HistoryButton({ historyButton(context, iterable) }, "$name\n${iterable.date}", iterable.status)
+    @Composable
+    private fun HistoryRow(modifier: Modifier, iterable: History, button: Buttons, context: Context) {
+        var name = ""
+        if (!iterable.clientName.isNullOrBlank()) {
+            name = iterable.clientName
+        } else if (!iterable.clientAddress.isNullOrBlank()) {
+            name = iterable.clientAddress
+        }
+        Row(modifier = modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .padding(10.dp),
+            verticalAlignment = Alignment.CenterVertically) {
+            button.HistoryButton({ historyButton(context, iterable) }, "$name\n${iterable.date}", iterable.status)
+        }
     }
 }
