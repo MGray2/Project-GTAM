@@ -10,7 +10,10 @@ The Green Team Auto Manager (GTAM) is my software solution for my dad's business
 
 ## Installation
 
-- to be posted.
+Currently, the app is in closed testing on google play. This means that not just anyone could follow the link and see the app listed in the store. If you are interested in downloading the GTAM app from google play, you will need to provide me an email to add to the testers list. Once your email is added to the list, make sure to use that email when you use the link to google play.
+
+Message me at micahg355be@gmail.com if you want me to add your email to the testing list.
+[Play Store Link](https://play.google.com/store/apps/details?id=com.ms.gtam)
 
 ## Setup
 
